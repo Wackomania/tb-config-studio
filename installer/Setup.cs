@@ -31,6 +31,7 @@ static class Setup
     const string KeyBase = "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\TBConfigStudio";
     static bool dry, silent, noDesktop, noStart, noLaunch, uninstall, removeData;
     static string dir, testId = "", logFile;
+    static int parentPid = 0;
     static StringBuilder log = new StringBuilder();
 
     static void Say(string s)
@@ -69,6 +70,7 @@ static class Setup
             else if (u.StartsWith("/DIR=")) dir = a.Substring(5).Trim('"');
             else if (u.StartsWith("/TESTID=")) testId = Regex.Replace(a.Substring(8), "[^A-Za-z0-9_-]", "");
             else if (u.StartsWith("/LOG=")) logFile = a.Substring(5).Trim('"');
+            else if (u.StartsWith("/PARENT=")) int.TryParse(a.Substring(8), out parentPid);
         }
 #if UNINSTALL_ONLY
         uninstall = true;
@@ -259,12 +261,12 @@ static class Setup
         {
             string tmp = Path.Combine(Path.GetTempPath(), "tbs-uninstall-" + Guid.NewGuid().ToString("N").Substring(0, 8) + ".exe");
             File.Copy(me, tmp, true);
-            StringBuilder a = new StringBuilder("/UNINSTALL /FROMTEMP /DIR=\"" + target + "\"");
+            StringBuilder a = new StringBuilder("/UNINSTALL /FROMTEMP /PARENT=" + Process.GetCurrentProcess().Id + " /DIR=\"" + target + "\"");
             if (silent) a.Append(" /S"); if (removeData) a.Append(" /REMOVEDATA"); if (testId.Length > 0) a.Append(" /TESTID=" + testId); if (logFile != null) a.Append(" /LOG=\"" + logFile + "\"");
             Process p = Process.Start(new ProcessStartInfo(tmp, a.ToString()) { UseShellExecute = false });
-            if (silent) p.WaitForExit(120000);
-            return silent ? p.ExitCode : 0;
+            return 0;                               // the copy finishes the work after this program has exited (it waits for us)
         }
+        if (fromTemp && parentPid > 0) { try { Process.GetProcessById(parentPid).WaitForExit(30000); } catch (Exception) { } }
         StopRunningHost(target);
         if (!File.Exists(Path.Combine(target, "manifest.json")) && Directory.Exists(target) && Directory.GetFileSystemEntries(target).Length > 0)
             throw new Exception("That folder does not look like an installation of this app. Nothing was removed.");

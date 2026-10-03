@@ -58,7 +58,7 @@ function create({ dataDir, port = 0, onQuit = () => {}, noWindow = false } = {})
     const s = readSettings();
     const alive = (s.recent || []).filter((p) => { try { return fs.statSync(p).isDirectory(); } catch (e) { return false; } });
     return {
-      app: { name: 'TB Config Studio', version: pkg.version }, recent: s.recent || [], recentAlive: alive, firstRunDone: !!s.firstRunDone,
+      app: { name: 'TB Config Studio', version: pkg.version, pingAgeMs: pinged ? Date.now() - lastPing : null }, recent: s.recent || [], recentAlive: alive, firstRunDone: !!s.firstRunDone,
       overview: ws ? ws.overview() : null,
       schemaMods: schemas.mods.map((m) => ({ id: m.mod.id, folder: m.mod.folder, name: m.mod.name, coverage: m.mod.coverage, origin: m._origin, files: m.files.length, fields: m.files.reduce((a, f) => a + f._fields.length, 0), described: m.files.reduce((a, f) => a + f._fields.filter((x) => x.label && x.help).length, 0), docs: m.mod.docs || '', summary: m.mod.summary, notes: m.mod.notes || '' })),
       schemaErrors: schemas.errors, presetTypes: presetLib.TYPES, presetErrors: presets.errors,
