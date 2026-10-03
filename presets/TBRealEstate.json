@@ -1,0 +1,63 @@
+{
+  "mod": "TBRealEstate",
+  "presets": {
+    "pve": {
+      "changes": [
+        {
+          "file": "house.json",
+          "path": "housesCanOnlyBeRaidWhenOwnerIsOnline",
+          "value": 1,
+          "why": "Offline owners cannot be raided"
+        },
+        {
+          "file": "house.json",
+          "path": "notSoldHousesAreLocked",
+          "value": 1,
+          "why": "Keep unowned houses closed"
+        }
+      ]
+    },
+    "pvp": {
+      "changes": [
+        {
+          "file": "house.json",
+          "path": "housesCanOnlyBeRaidWhenOwnerIsOnline",
+          "value": 1,
+          "why": "Avoids offline raiding frustration while keeping raids"
+        }
+      ]
+    },
+    "hardcore": {
+      "changes": [
+        {
+          "file": "house.json",
+          "path": "housesCanOnlyBeRaidWhenOwnerIsOnline",
+          "value": 0,
+          "why": "Houses can be raided at any time"
+        },
+        {
+          "file": "house.json",
+          "path": "howManyHousesCanPlayerBuy",
+          "value": 1,
+          "why": "One house per player"
+        }
+      ]
+    },
+    "casual": {
+      "changes": [
+        {
+          "file": "house.json",
+          "path": "howManyHousesCanPlayerBuy",
+          "value": 2,
+          "why": "Allow a second house"
+        },
+        {
+          "file": "GlobalRaidConfig.json",
+          "path": "isEnabled",
+          "value": 1,
+          "why": "Raids only inside the time windows (edit the times too)"
+        }
+      ]
+    }
+  }
+}

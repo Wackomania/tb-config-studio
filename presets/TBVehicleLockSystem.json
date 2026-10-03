@@ -1,0 +1,65 @@
+{
+  "mod": "TBVehicleLockSystem",
+  "presets": {
+    "pve": {
+      "changes": [
+        {
+          "file": "RaidVehicleConfig.json",
+          "path": "vehiclesCanBeRaided",
+          "value": 0,
+          "why": "No vehicle theft on a PvE server"
+        },
+        {
+          "file": "ShortCircuitVehicleConfig.json",
+          "path": "vehiclesCanBeShortCircuited",
+          "value": 0,
+          "why": "No sabotage of other players vehicles on PvE"
+        }
+      ]
+    },
+    "hardcore": {
+      "changes": [
+        {
+          "file": "ShortCircuitVehicleConfig.json",
+          "path": "needToolForShortCircuit",
+          "value": 1,
+          "why": "Sabotage needs a tool"
+        },
+        {
+          "file": "PackVehicleConfig.json",
+          "path": "packTimeInSeconds",
+          "value": 120,
+          "why": "Longer exposed time while packing"
+        },
+        {
+          "file": "PackVehicleConfig.json",
+          "path": "unpackTimeInSeconds",
+          "value": 120,
+          "why": "Longer exposed time while unpacking"
+        }
+      ]
+    },
+    "casual": {
+      "changes": [
+        {
+          "file": "PackVehicleConfig.json",
+          "path": "packTimeInSeconds",
+          "value": 30,
+          "why": "Quick packing"
+        },
+        {
+          "file": "PackVehicleConfig.json",
+          "path": "unpackTimeInSeconds",
+          "value": 30,
+          "why": "Quick unpacking"
+        },
+        {
+          "file": "ShortCircuitVehicleConfig.json",
+          "path": "repairShortCircuitTimeInSeconds",
+          "value": 15,
+          "why": "Faster repair of a short circuit"
+        }
+      ]
+    }
+  }
+}

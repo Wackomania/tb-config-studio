@@ -1,0 +1,732 @@
+{
+  "schemaVersion": 1,
+  "mod": {
+    "id": "Global",
+    "folder": "Global",
+    "name": "TB Library (global configs)",
+    "summary": "TBLib holds the settings shared by all TB mods: who is an admin, which money is used, premium status, key binds, vehicle sizes, logging and NPC outfits. Change them once here and every TB mod follows.",
+    "coverage": "in-depth",
+    "docs": "https://doc.themodbase.com/GlobalConfigs/Readme.html",
+    "sources": [
+      "GlobalConfigs/Readme",
+      "GlobalConfigs/AdminConfig",
+      "GlobalConfigs/CurrencyConfig",
+      "GlobalConfigs/Logger",
+      "GlobalConfigs/NPCGearConfig",
+      "GlobalConfigs/Premium",
+      "GlobalConfigs/PremiumConfig",
+      "GlobalConfigs/Tip4ServApiConfig",
+      "GlobalConfigs/TBKeyBindsConfig",
+      "GlobalConfigs/VehicleSpawnConfig",
+      "GlobalConfigs/ReputationSystem/Index"
+    ],
+    "notes": "The Premium page describes the AddPremium folder (files named SteamID_Days_ModName.premium, 1-999 days) and premium coins; those are not JSON configs. ReputationSystem is a scripting API, not a config. Tip4ServApiConfig and TBKeyCodeMatch have no version fields."
+  },
+  "files": [
+    {
+      "id": "adminconfig",
+      "match": "AdminConfig.json",
+      "title": "Admin rights (all TB mods)",
+      "summary": "Lists which players are admins in which TB mods. One entry per player id; the entry named \"Add here Steam Or DayZ ID\" is a template you can copy.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "label": "Config version",
+          "help": "Internal version number of this file format. The mod manages it; do not edit.",
+          "type": "string",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented",
+          "default": "16"
+        },
+        "isInitialized": {
+          "label": "Initialised marker",
+          "help": "Internal marker the mod sets after it has created the file. Do not change it.",
+          "type": "flag",
+          "internal": true,
+          "level": "danger",
+          "confidence": "observed",
+          "default": 1
+        },
+        "admins": {
+          "label": "Admins",
+          "help": "One entry per admin. The key is the player's Steam 64 id or DayZ id; the entry lists in which mods that person is an admin.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "admins.*": {
+          "label": "Admin entry",
+          "help": "Rights of one admin. The key is the Steam 64 id or DayZ id of that player. The entry named \"Add here Steam Or DayZ ID\" is only a template.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "admins.*.dailyRewardAdmin": {
+          "label": "Daily Reward admin",
+          "help": "1 gives this player admin rights inside Daily Reward (admin menu and admin actions); 0 keeps normal player rights. Only grant it to people you trust.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "Admin rights let the person change or give out things in that mod."
+        },
+        "admins.*.realEstateAdmin": {
+          "label": "Real Estate admin",
+          "help": "1 gives this player admin rights inside Real Estate (admin menu and admin actions); 0 keeps normal player rights. Only grant it to people you trust.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "Admin rights let the person change or give out things in that mod."
+        },
+        "admins.*.carDealerAdmin": {
+          "label": "Car Dealer admin",
+          "help": "1 gives this player admin rights inside Car Dealer (admin menu and admin actions); 0 keeps normal player rights. Only grant it to people you trust.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "Admin rights let the person change or give out things in that mod."
+        },
+        "admins.*.basicNeedsAdmin": {
+          "label": "Basic Needs admin",
+          "help": "1 gives this player admin rights inside Basic Needs (admin menu and admin actions); 0 keeps normal player rights. Only grant it to people you trust.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "Admin rights let the person change or give out things in that mod."
+        },
+        "admins.*.deathInsurance": {
+          "label": "Death Insurance admin",
+          "help": "1 gives this player admin rights inside Death Insurance (admin menu and admin actions); 0 keeps normal player rights. Only grant it to people you trust.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "Admin rights let the person change or give out things in that mod."
+        },
+        "admins.*.secondHandMarket": {
+          "label": "Second Hand Market admin",
+          "help": "1 gives this player admin rights inside Second Hand Market (admin menu and admin actions); 0 keeps normal player rights. Only grant it to people you trust.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "Admin rights let the person change or give out things in that mod."
+        },
+        "admins.*.revivePlayer": {
+          "label": "Revive Player admin",
+          "help": "1 gives this player admin rights inside Revive Player (admin menu and admin actions); 0 keeps normal player rights. Only grant it to people you trust.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "Admin rights let the person change or give out things in that mod."
+        },
+        "admins.*.jewelsOfSurvival": {
+          "label": "Jewels of Survival admin",
+          "help": "1 gives this player admin rights inside Jewels of Survival (admin menu and admin actions); 0 keeps normal player rights. Only grant it to people you trust.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "Admin rights let the person change or give out things in that mod."
+        },
+        "admins.*.warParty": {
+          "label": "War Party admin",
+          "help": "1 gives this player admin rights inside War Party (admin menu and admin actions); 0 keeps normal player rights. Only grant it to people you trust.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "Admin rights let the person change or give out things in that mod."
+        },
+        "admins.*.carry": {
+          "label": "Carry admin",
+          "help": "1 gives this player admin rights inside Carry (admin menu and admin actions); 0 keeps normal player rights. Only grant it to people you trust.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "Admin rights let the person change or give out things in that mod."
+        },
+        "admins.*.dynamicDealer": {
+          "label": "Dynamic Trader admin",
+          "help": "1 gives this player admin rights inside Dynamic Trader (admin menu and admin actions); 0 keeps normal player rights. Only grant it to people you trust.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "Admin rights let the person change or give out things in that mod."
+        },
+        "admins.*.survivorLuck": {
+          "label": "Survivor Luck admin",
+          "help": "1 gives this player admin rights inside Survivor Luck (admin menu and admin actions); 0 keeps normal player rights. Only grant it to people you trust.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "Admin rights let the person change or give out things in that mod."
+        },
+        "admins.*.staticLightsAdmin": {
+          "label": "Static Lights admin",
+          "help": "1 gives this player admin rights inside Static Lights (placing and editing the permanent lights) (admin menu and admin actions); 0 keeps normal player rights. Only grant it to people you trust.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "Admin rights let the person change or give out things in that mod."
+        },
+        "admins.*.vehicleLockSystem": {
+          "label": "Vehicle Lock System admin",
+          "help": "1 gives this player admin rights inside Vehicle Lock System (admin menu and admin actions); 0 keeps normal player rights. Only grant it to people you trust.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "Admin rights let the person change or give out things in that mod."
+        },
+        "admins.*.notes": {
+          "label": "Notes",
+          "help": "Free text so you remember who this id belongs to. It has no effect in game.",
+          "type": "text",
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "currencyconfig",
+      "match": "CurrencyConfig.json",
+      "title": "Currencies",
+      "summary": "Defines the money the TB mods use: which items count as money and what they are worth, and whether a bank mod is used.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "label": "Config version",
+          "help": "Internal version number of this file format. The mod manages it; do not edit.",
+          "type": "string",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented",
+          "default": "2"
+        },
+        "isInitialized": {
+          "label": "Initialised marker",
+          "help": "Internal marker the mod sets after it has created the file. Do not change it.",
+          "type": "flag",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented",
+          "default": 1
+        },
+        "currencyValues": {
+          "label": "Old currency values (deprecated)",
+          "help": "Old top-level money table kept for compatibility. The docs mark it as deprecated and going away; use the values inside \"currencies\" instead.",
+          "type": "object",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "useMoneyFromLBMasterATM": {
+          "label": "Use LBMaster ATM (deprecated)",
+          "help": "Old top-level switch for the LBMaster ATM bank link, deprecated in favour of the per-currency setting. Leave at 0.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "default": 0
+        },
+        "currencies": {
+          "label": "Currencies",
+          "help": "The list of currencies the TB mods can use for prices. One entry must have the unique name \"default\".",
+          "type": "list",
+          "confidence": "documented"
+        },
+        "currencies[]": {
+          "label": "Currency",
+          "help": "One currency definition.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "currencies[].uniqueName": {
+          "label": "Unique name",
+          "help": "Internal name other TB configs use to refer to this currency. Must be unique, and one currency has to be called \"default\" or things break.",
+          "type": "string",
+          "level": "advanced",
+          "risk": "Renaming or removing \"default\" can break prices in the other TB mods.",
+          "confidence": "documented",
+          "default": "default"
+        },
+        "currencies[].displayName": {
+          "label": "Display name",
+          "help": "Name players see in game for this currency (for example Ruble).",
+          "type": "string",
+          "confidence": "documented",
+          "default": "default"
+        },
+        "currencies[].currencyValues": {
+          "label": "Money items",
+          "help": "Table of money item class names and what each is worth in this currency.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "currencies[].currencyValues.*": {
+          "label": "Item value",
+          "help": "Worth of one money item (the key is its class name, case-sensitive), for example 50 for a 50 banknote. Expansion banknote types are supported too.",
+          "type": "number",
+          "min": 0,
+          "unit": "coins",
+          "confidence": "documented"
+        },
+        "currencies[].useLBMasterATM": {
+          "label": "Use LBMaster ATM",
+          "help": "1 pays and charges through the LBMaster ATM bank balance instead of money items; 0 uses items only. Needs the LBMaster ATM mod loaded.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "default": 0
+        },
+        "currencies[].useDCBanking": {
+          "label": "Use DC Banking",
+          "help": "1 pays and charges through the DC Banking system instead of money items; 0 uses items only. Needs that banking mod loaded.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "default": 0
+        }
+      }
+    },
+    {
+      "id": "logger",
+      "match": "Logger.json",
+      "title": "Global logging",
+      "summary": "Controls CSV and Discord logging of premium coin use and premium file grants, and daily log rotation for all TB mods.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "label": "Config version",
+          "help": "Internal version number of this file format. The mod manages it; do not edit.",
+          "type": "string",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented",
+          "default": "3"
+        },
+        "logUsePremiumCoinCSV": {
+          "label": "Log premium coin use to CSV",
+          "help": "1 writes a CSV line whenever a player activates a premium coin; files go under the TBMods Logs/Global folder, one place per player.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "default": 0
+        },
+        "logUsePremiumCoinDiscord": {
+          "label": "Log premium coin use to Discord",
+          "help": "1 posts premium coin activations to Discord. Needs the webhook below.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "default": 1
+        },
+        "discordUsePremiumCoinWebhookURL": {
+          "label": "Premium coin webhook",
+          "help": "Address of the Discord webhook that receives premium coin activations. Leave empty to send nothing. Treat it like a password: anyone who has it can post to your channel.",
+          "type": "url",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "logUsePremiumAPICSV": {
+          "label": "Log premium API grants to CSV",
+          "help": "1 writes a CSV line when a premium file from the AddPremium folder is processed.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "default": 0
+        },
+        "logPremiumAPIDiscord": {
+          "label": "Log premium API grants to Discord",
+          "help": "1 posts processed premium grants to Discord. Needs the webhook below.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "default": 1
+        },
+        "discordLogPremiumAPIWebhookURL": {
+          "label": "Premium API webhook",
+          "help": "Address of the Discord webhook that receives premium grants from the AddPremium folder. Leave empty to send nothing. Treat it like a password: anyone who has it can post to your channel.",
+          "type": "url",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "enableGlobalLogFileRotation": {
+          "label": "Rotate log files by date",
+          "help": "1 starts a new CSV log file per day for all TB mods; 0 keeps appending to one file, which can grow large.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "premiumconfig",
+      "match": "PremiumConfig.json",
+      "title": "Premium file API",
+      "summary": "Switch and timing for handing out premium status through files in the AddPremium folder.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "label": "Config version",
+          "help": "Internal version number of this file format. The mod manages it; do not edit.",
+          "type": "string",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented",
+          "default": "1"
+        },
+        "isInitialized": {
+          "label": "Initialised marker",
+          "help": "Internal marker the mod sets after it has created the file. Do not change it.",
+          "type": "flag",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented",
+          "default": 1
+        },
+        "enableAPI": {
+          "label": "Enable premium file API",
+          "help": "1 lets you hand out premium status by dropping files named SteamID_Days_ModName.premium into the AddPremium folder; the mod checks the folder regularly. 0 disables it.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "default": 1
+        },
+        "checkAPITimeInMinutes": {
+          "label": "Check interval",
+          "help": "How often (in minutes) the AddPremium folder is checked. The lowest allowed value is 1.",
+          "type": "int",
+          "unit": "minutes",
+          "min": 1,
+          "typical": "1-5",
+          "confidence": "documented",
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "tbkeybindsconfig",
+      "match": "TBKeyBindsConfig.json",
+      "title": "Key binds",
+      "summary": "Default keys for the TB mod menus and whether the server forces them on players.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "label": "Config version",
+          "help": "Internal version number of this file format. The mod manages it; do not edit.",
+          "type": "string",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented",
+          "default": "1"
+        },
+        "isInitialized": {
+          "label": "Initialised marker",
+          "help": "Internal marker the mod sets after it has created the file. Do not change it.",
+          "type": "flag",
+          "internal": true,
+          "level": "danger",
+          "confidence": "observed",
+          "default": 1
+        },
+        "keyBinds": {
+          "label": "Key binds",
+          "help": "List of key bindings the TB mods offer to players (open daily reward, open war party, and so on).",
+          "type": "list",
+          "confidence": "documented"
+        },
+        "keyBinds[]": {
+          "label": "Key bind",
+          "help": "One key binding.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "keyBinds[].name": {
+          "label": "Action name",
+          "help": "Name of the input action (for example UAInputOpenTBDailyReward). Defined by the mods; do not rename.",
+          "type": "string",
+          "level": "advanced",
+          "confidence": "documented",
+          "default": "UAInputOpenTBDailyReward"
+        },
+        "keyBinds[].defaultKey": {
+          "label": "Default key code",
+          "help": "Number of the key used for this action. Look the number up in TBKeyCodeMatch.json (for example 25 is P).",
+          "type": "int",
+          "min": 0,
+          "confidence": "documented",
+          "default": 25
+        },
+        "keyBinds[].useServerKeyBind": {
+          "label": "Force server key",
+          "help": "1 makes every player use the key above even if they chose their own. 0 lets saved player choices stay; players keep their own saved key until you set 1 or they reset it.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "default": 0
+        }
+      }
+    },
+    {
+      "id": "tbkeycodematch",
+      "match": "TBKeyCodeMatch.json",
+      "title": "Key code lookup table",
+      "summary": "Reference table that maps key code numbers to key names. Use it to find the number for TBKeyBindsConfig. It is meant to be read, not edited.",
+      "restart": true,
+      "fields": {
+        "keyCodes": {
+          "label": "Key codes",
+          "help": "Lookup table from key code number to key name.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "keyCodes.*": {
+          "label": "Key name",
+          "help": "Name of the key whose code is this entry's key. Reference data; do not change.",
+          "type": "string",
+          "level": "danger",
+          "risk": "Editing this table does not change keys in game and may confuse other configs.",
+          "confidence": "observed"
+        }
+      }
+    },
+    {
+      "id": "tip4servapiconfig",
+      "match": "Tip4ServApiConfig.json",
+      "title": "Tip4Serv integration",
+      "summary": "Connects the server to Tip4Serv so purchases can grant premium. Contains a secret token.",
+      "restart": true,
+      "fields": {
+        "enableAPI": {
+          "label": "Enable Tip4Serv",
+          "help": "1 makes the server ask Tip4Serv now and then whether players bought something, so the purchase can grant premium in the TB mods. 0 disables it. Needs TBLib 5.32.0 or newer.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "default": 0
+        },
+        "apiToken": {
+          "label": "Tip4Serv token",
+          "help": "Bearer token from your Tip4Serv account, used to authenticate the server. Keep it private.",
+          "type": "secret",
+          "level": "danger",
+          "risk": "Anyone with this token can act as your Tip4Serv server account. Never share the file.",
+          "confidence": "documented",
+          "default": "AddYourBearerTokenHere"
+        },
+        "checkAPITimeInMinutes": {
+          "label": "Check interval",
+          "help": "How often (in minutes) the server asks Tip4Serv for new purchases.",
+          "type": "int",
+          "unit": "minutes",
+          "min": 1,
+          "typical": "1-5",
+          "confidence": "documented",
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "vehiclespawnconfig",
+      "match": "VehicleSpawnConfig.json",
+      "title": "Vehicle spawn sizes",
+      "summary": "Space needed per vehicle type, used by Car Dealer, Second Hand Market and Daily Reward when placing a vehicle.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "label": "Config version",
+          "help": "Internal version number of this file format. The mod manages it; do not edit.",
+          "type": "string",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented",
+          "default": "1"
+        },
+        "isInitialized": {
+          "label": "Initialised marker",
+          "help": "Internal marker the mod sets after it has created the file. Do not change it.",
+          "type": "flag",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented",
+          "default": 1
+        },
+        "vehicleSizes": {
+          "label": "Vehicle sizes",
+          "help": "Space each vehicle needs when spawned by Car Dealer, Second Hand Market and Daily Reward, so the spawn spot is checked for room. One entry per vehicle class plus \"default\".",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "vehicleSizes.*": {
+          "label": "Size (3 numbers)",
+          "help": "Three numbers: width, height and length of the space the vehicle needs. The key is the vehicle class name, or \"default\" for vehicles not listed.",
+          "type": "list",
+          "confidence": "documented"
+        },
+        "vehicleSizes.*[]": {
+          "label": "Dimension",
+          "help": "One of the three dimensions. Order is width, height, length.",
+          "type": "number",
+          "unit": "metres",
+          "min": 0,
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "gearsets",
+      "match": "GearSets/*.json",
+      "title": "NPC gear sets",
+      "summary": "One file per NPC outfit, used by mods that spawn trader NPCs (for example Death Insurance). The mod creates a missing file when a config names a new set.",
+      "restart": true,
+      "fields": {
+        "name": {
+          "label": "Gear set name",
+          "help": "Name of this NPC outfit. It must match the file name without .json; other configs refer to it by this name.",
+          "type": "string",
+          "confidence": "documented"
+        },
+        "version": {
+          "label": "Config version",
+          "help": "Internal version number of this file format. The mod manages it; do not edit.",
+          "type": "string",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "items": {
+          "label": "Items",
+          "help": "Everything the NPC wears or carries.",
+          "type": "list",
+          "confidence": "documented"
+        },
+        "items[]": {
+          "label": "Item",
+          "help": "One item on the NPC.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "items[].type": {
+          "label": "Item class",
+          "help": "Class name of the item (case-sensitive).",
+          "type": "classname",
+          "confidence": "documented"
+        },
+        "items[].quantityInPercent": {
+          "label": "Condition / fill",
+          "help": "How full or healthy the item is, 100 meaning perfect or full.",
+          "type": "number",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "items[].slot": {
+          "label": "Slot",
+          "help": "Body slot of the item.",
+          "type": "enum",
+          "enum": [
+            {
+              "value": "Headgear",
+              "label": "Headgear"
+            },
+            {
+              "value": "Mask",
+              "label": "Mask"
+            },
+            {
+              "value": "Body",
+              "label": "Body"
+            },
+            {
+              "value": "Vest",
+              "label": "Vest"
+            },
+            {
+              "value": "Gloves",
+              "label": "Gloves"
+            },
+            {
+              "value": "Legs",
+              "label": "Legs"
+            },
+            {
+              "value": "Feet",
+              "label": "Feet"
+            },
+            {
+              "value": "Back",
+              "label": "Back"
+            },
+            {
+              "value": "Eyewear",
+              "label": "Eyewear"
+            },
+            {
+              "value": "Armband",
+              "label": "Armband"
+            },
+            {
+              "value": "Hips",
+              "label": "Hips"
+            },
+            {
+              "value": "Melee",
+              "label": "Melee"
+            },
+            {
+              "value": "Shoulder",
+              "label": "Shoulder"
+            }
+          ],
+          "confidence": "documented"
+        },
+        "items[].attachments": {
+          "label": "Attachments",
+          "help": "Items attached to or inside this item. Same structure as an item; empty list if none.",
+          "type": "list",
+          "confidence": "documented"
+        },
+        "items[].attachments[]": {
+          "label": "Attachment",
+          "help": "One attached item.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "items[].attachments[].type": {
+          "label": "Attachment class",
+          "help": "Class name of the attached item.",
+          "type": "classname",
+          "confidence": "documented"
+        },
+        "items[].attachments[].quantityInPercent": {
+          "label": "Attachment condition",
+          "help": "Condition or fill level of the attached item.",
+          "type": "number",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "items[].attachments[].slot": {
+          "label": "Attachment slot",
+          "help": "Attachments use an empty text here instead of a body slot name.",
+          "type": "string",
+          "confidence": "documented"
+        }
+      }
+    }
+  ]
+}

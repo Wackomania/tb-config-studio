@@ -1,0 +1,470 @@
+{
+  "schemaVersion": 1,
+  "mod": {
+    "id": "TBDailyReward",
+    "folder": "TBDailyReward",
+    "name": "TB Daily Reward",
+    "summary": "Players earn rewards by meeting conditions such as online time, kills or distance. Conditions are grouped in levels, each level has one or more rewards, and premium players can have their own levels and rewards. Rewards are built from item files that you define once and reuse.",
+    "coverage": "partial",
+    "docs": "https://doc.themodbase.com/DailyReward/Readme.html",
+    "sources": [
+      "DailyReward/Readme.html",
+      "DailyReward/FAQ.html",
+      "DailyReward/Configs/General.html",
+      "DailyReward/Configs/RewardLevels.html",
+      "DailyReward/Configs/Logger.html",
+      "DailyReward/Configs/Example_Item_1.html",
+      "DailyReward/Configs/Example_Level_Condition_1.html",
+      "DailyReward/Configs/Level_1_Example_Reward_1.html"
+    ],
+    "notes": "Names in RewardLevels.json must match file names (without .json) in LevelConditions and RewardLevels, case sensitive. The sample has about 1400 item files in Items; they all share one shape. Player data lives in TBMods/Data/TBDailyReward."
+  },
+  "files": [
+    {
+      "id": "general",
+      "match": "General.json",
+      "title": "General",
+      "summary": "Kill counting rules and how many backups of player data are kept.",
+      "restart": true,
+      "fields": {
+        "lAqARElqTugNRMlFWzouWiA": {
+          "type": "string",
+          "default": "3",
+          "label": "Config version (obfuscated key)",
+          "help": "This oddly named entry is the config version stored under a scrambled name (the docs list it as version 3). Leave it exactly as it is.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "observed"
+        },
+        "subtractNPCKillsFromPlayerKills": {
+          "type": "flag",
+          "default": 1,
+          "label": "Subtract NPC kills",
+          "help": "Takes kills of NPCs (from NPC mods) off the player kill count so they do not count towards conditions.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "maxBackupsPerPlayer": {
+          "type": "int",
+          "default": 960,
+          "label": "Backups per player",
+          "help": "How many player data backups are kept. One backup is made per 3 online minutes, so 960 is about 48 hours of play. -1 turns backups off.",
+          "special": {
+            "-1": "off"
+          },
+          "min": -1,
+          "typical": "480-960",
+          "confidence": "documented"
+        },
+        "doNotCountKillsWhenPlayerIsInSameGroupFromLBMasterGroup": {
+          "type": "flag",
+          "default": 1,
+          "label": "Ignore teammate kills",
+          "help": "Kills of players in the same LBmaster Advanced Groups group do not count.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "items-files",
+      "match": "Items/*.json",
+      "title": "Item definition (one file per item)",
+      "summary": "A reward item: class name, condition, quantity and attachments. The file name equals the unique name. Rewards refer to items by that name.",
+      "restart": true,
+      "fields": {
+        "uniqueName": {
+          "type": "string",
+          "label": "Unique name",
+          "help": "Name of this item definition. Must be identical to the file name without .json, case sensitive.",
+          "confidence": "documented",
+          "level": "danger",
+          "risk": "If it differs from the file name the item is not found."
+        },
+        "health": {
+          "type": "number",
+          "label": "Health",
+          "help": "Condition of the item in percent. 100 is pristine.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "type": {
+          "type": "classname",
+          "label": "Class name",
+          "help": "Item class name as used in types.xml.",
+          "confidence": "documented"
+        },
+        "quantity": {
+          "type": "number",
+          "label": "Quantity",
+          "help": "Amount or fill level, as a fraction. 1.0 is full, 0.5 is half. For stackable items the meaning follows the item.",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "attachmentUniqueNames": {
+          "type": "list",
+          "label": "Attachments",
+          "help": "Unique names of other item files that are attached to this item (scopes, magazines and so on).",
+          "confidence": "documented"
+        },
+        "isCar": {
+          "type": "flag",
+          "label": "Is a vehicle",
+          "help": "1 if the item is a vehicle, 0 for normal items.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "attachmentUniqueNames[]": {
+          "type": "string",
+          "label": "Attachment",
+          "help": "Unique name of another item file in the Items folder.",
+          "confidence": "documented"
+        }
+      },
+      "instances": 1402,
+      "role": "records"
+    },
+    {
+      "id": "levelconditions-files",
+      "match": "LevelConditions/*.json",
+      "title": "Level condition (one file per level)",
+      "summary": "What a player has to achieve to unlock a reward level. Use -1 to switch a requirement off.",
+      "restart": true,
+      "fields": {
+        "uniqueName": {
+          "type": "string",
+          "label": "Unique name",
+          "help": "Name of this condition, equal to the file name without .json.",
+          "confidence": "documented",
+          "level": "danger"
+        },
+        "level": {
+          "type": "int",
+          "label": "Level number",
+          "help": "Reward tier this condition belongs to; used to order the levels.",
+          "min": 1,
+          "confidence": "documented"
+        },
+        "onlineTimeRequiredInMinutes": {
+          "type": "int",
+          "label": "Online time needed",
+          "help": "Minutes the player must have played. -1 turns this requirement off.",
+          "unit": "minutes",
+          "special": {
+            "-1": "off"
+          },
+          "min": -1,
+          "confidence": "documented"
+        },
+        "playerKillsRequiredCount": {
+          "type": "int",
+          "label": "Player kills needed",
+          "help": "Kills of other players (not counting headshots). -1 turns it off.",
+          "special": {
+            "-1": "off"
+          },
+          "min": -1,
+          "confidence": "documented"
+        },
+        "headshotKillsRequiredCount": {
+          "type": "int",
+          "label": "Headshot kills needed",
+          "help": "Headshot kills of players. -1 turns it off.",
+          "special": {
+            "-1": "off"
+          },
+          "min": -1,
+          "confidence": "documented"
+        },
+        "distanceTravelledRequiredInMeters": {
+          "type": "int",
+          "label": "Distance needed",
+          "help": "Distance the player must have travelled. -1 turns it off.",
+          "unit": "metres",
+          "special": {
+            "-1": "off"
+          },
+          "min": -1,
+          "confidence": "documented"
+        },
+        "canReTakenAfterPeriodOfDaysRealTime": {
+          "type": "int",
+          "label": "Repeat after days",
+          "help": "Real-time days before the reward can be taken again. -1 turns repeating off. The shipped files use 0 for no wait.",
+          "unit": "days",
+          "special": {
+            "-1": "off"
+          },
+          "min": -1,
+          "confidence": "documented"
+        },
+        "canTakenOnlyOnce": {
+          "type": "flag",
+          "label": "Only once",
+          "help": "1 means the reward can be taken one time per player ever. The check uses the unique name, so renaming the condition lets players take it again.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "animalsKillsRequiredCount": {
+          "type": "int",
+          "label": "Animal kills needed",
+          "help": "Total animal kills. -1 turns it off. When used, the per-species list below is ignored.",
+          "special": {
+            "-1": "off"
+          },
+          "min": -1,
+          "confidence": "documented"
+        },
+        "infectedKillsRequiredCount": {
+          "type": "int",
+          "label": "Infected kills needed",
+          "help": "Total zombie kills. -1 turns it off. When used, the per-type list below is ignored.",
+          "special": {
+            "-1": "off"
+          },
+          "min": -1,
+          "confidence": "documented"
+        },
+        "aiKillsRequiredCount": {
+          "type": "int",
+          "label": "AI kills needed",
+          "help": "Kills of AI players. -1 turns it off.",
+          "special": {
+            "-1": "off"
+          },
+          "min": -1,
+          "confidence": "documented"
+        },
+        "aiHeadShotKillsRequiredCount": {
+          "type": "int",
+          "label": "AI headshot kills needed",
+          "help": "Headshot kills of AI players. -1 turns it off.",
+          "special": {
+            "-1": "off"
+          },
+          "min": -1,
+          "confidence": "documented"
+        },
+        "version": {
+          "type": "string",
+          "label": "Config version",
+          "help": "Managed by the mod itself. Leave it as it is.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "displayName": {
+          "type": "string",
+          "label": "Display name",
+          "help": "Text on the level button in the menu. Translation keys like #TBDR_Level 1 are used by default.",
+          "confidence": "documented"
+        },
+        "animalKills": {
+          "label": "Animal kills per species",
+          "help": "Kills needed per animal class, as class name and count. Leave empty to turn off.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "animalKills.*": {
+          "label": "Count",
+          "help": "Number of kills needed for this animal class.",
+          "type": "int",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "zombieKills": {
+          "label": "Infected kills per type",
+          "help": "Kills needed per zombie class, as class name and count. Leave empty to turn off.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "zombieKills.*": {
+          "label": "Count",
+          "help": "Number of kills needed for this zombie class.",
+          "type": "int",
+          "min": 0,
+          "confidence": "documented"
+        }
+      },
+      "instances": 8,
+      "role": "records"
+    },
+    {
+      "id": "logger",
+      "match": "Logger.json",
+      "title": "Logging",
+      "summary": "Logging of taken rewards to file and Discord.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Config version",
+          "help": "Managed by the mod itself. Leave it as it is.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised flag",
+          "help": "Set by the mod once the file was created. Leave it as it is.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "logReward": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log rewards",
+          "help": "Write each reward claim to the log file.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logRewardDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord: rewards",
+          "help": "Also post claims to Discord.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordRewardWebhookURL": {
+          "type": "url",
+          "label": "Discord address: rewards",
+          "help": "Webhook address for reward messages. Needed when Discord logging is on.",
+          "level": "advanced",
+          "confidence": "documented",
+          "risk": "The address works like a password for the channel: anyone who has it can post there. Do not share it."
+        }
+      }
+    },
+    {
+      "id": "rewardlevels",
+      "match": "RewardLevels.json",
+      "title": "Reward levels index",
+      "summary": "Lists which level condition files and reward files are used, for normal and premium players.",
+      "restart": true,
+      "fields": {
+        "defaultLevelConditionUniqueNames[]": {
+          "type": "string",
+          "default": "Default_Level_Condition_1",
+          "label": "Condition name",
+          "help": "File name in LevelConditions without .json, case sensitive.",
+          "confidence": "documented"
+        },
+        "defaultLevelConditionUniqueNames": {
+          "type": "list",
+          "label": "Conditions (normal)",
+          "help": "Names of the level condition files for normal players.",
+          "confidence": "documented"
+        },
+        "premiumLevelConditionUniqueNames[]": {
+          "type": "string",
+          "default": "Premium_Level_Condition_1",
+          "label": "Condition name",
+          "help": "File name in LevelConditions without .json, case sensitive.",
+          "confidence": "documented"
+        },
+        "premiumLevelConditionUniqueNames": {
+          "type": "list",
+          "label": "Conditions (premium)",
+          "help": "Names of the level condition files for premium players.",
+          "confidence": "documented"
+        },
+        "uniqueNameRewardLevels[]": {
+          "type": "string",
+          "default": "Level_1_Reward_1",
+          "label": "Reward name",
+          "help": "File name in RewardLevels without .json, case sensitive.",
+          "confidence": "documented"
+        },
+        "uniqueNameRewardLevels": {
+          "type": "list",
+          "label": "Rewards (normal)",
+          "help": "Names of the reward files for normal players. A level can have several rewards.",
+          "confidence": "documented"
+        },
+        "uniqueNamePremiumRewardLevels[]": {
+          "type": "string",
+          "default": "Level_1_Premium_Reward_1",
+          "label": "Reward name",
+          "help": "File name in RewardLevels without .json, case sensitive.",
+          "confidence": "documented"
+        },
+        "uniqueNamePremiumRewardLevels": {
+          "type": "list",
+          "label": "Rewards (premium)",
+          "help": "Names of the reward files for premium players.",
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "rewardlevels-files",
+      "match": "RewardLevels/*.json",
+      "title": "Reward (one file per reward)",
+      "summary": "One reward of a level: which item definitions the player receives and how often it can be taken in total.",
+      "restart": true,
+      "fields": {
+        "uniqueName": {
+          "type": "string",
+          "label": "Unique name",
+          "help": "Name of this reward, equal to the file name without .json.",
+          "confidence": "documented",
+          "level": "danger"
+        },
+        "version": {
+          "type": "string",
+          "label": "Config version",
+          "help": "Managed by the mod itself. Leave it as it is.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "level": {
+          "type": "int",
+          "label": "Level",
+          "help": "Level this reward belongs to.",
+          "min": 1,
+          "confidence": "documented"
+        },
+        "canTakenTimes": {
+          "type": "int",
+          "label": "Total claims allowed",
+          "help": "How many times this reward can be taken by all players together. -1 means unlimited. To reset the counter, delete its data file and reload configs.",
+          "special": {
+            "-1": "unlimited"
+          },
+          "min": -1,
+          "confidence": "documented"
+        },
+        "items": {
+          "type": "list",
+          "label": "Items (internal)",
+          "help": "Filled by the mod. Leave empty and use the item names list instead.",
+          "internal": true,
+          "confidence": "documented"
+        },
+        "uniqueItemNames[]": {
+          "type": "string",
+          "label": "Item name",
+          "help": "File name in Items without .json, case sensitive.",
+          "confidence": "documented"
+        },
+        "uniqueItemNames": {
+          "type": "list",
+          "label": "Items given",
+          "help": "Unique names of item files (from the Items folder) the player gets.",
+          "confidence": "documented"
+        }
+      },
+      "instances": 40,
+      "role": "records"
+    }
+  ]
+}

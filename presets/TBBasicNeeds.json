@@ -1,0 +1,111 @@
+{
+  "mod": "TBBasicNeeds",
+  "presets": {
+    "pve": {
+      "changes": [
+        {
+          "file": "Config.json",
+          "path": "toiletDisableDamage",
+          "value": 1,
+          "why": "Players cannot be hurt while using a toilet."
+        },
+        {
+          "file": "DiseaseConfig.json",
+          "path": "chanceToGetCholera",
+          "value": 0.005,
+          "why": "Gentler illness chance."
+        }
+      ]
+    },
+    "pvp": {
+      "changes": [
+        {
+          "file": "Config.json",
+          "path": "toiletDisableDamage",
+          "value": 0,
+          "why": "Using a toilet is not a safe spot in PvP."
+        },
+        {
+          "file": "Config.json",
+          "path": "toiletMakeInvisible",
+          "value": 0,
+          "why": "Players stay visible on the toilet."
+        }
+      ]
+    },
+    "hardcore": {
+      "changes": [
+        {
+          "file": "Config.json",
+          "path": "toiletDisableDamage",
+          "value": 0,
+          "why": "No protection while on the toilet."
+        },
+        {
+          "file": "Config.json",
+          "path": "toiletMakeInvisible",
+          "value": 0,
+          "why": "Players stay visible on the toilet."
+        },
+        {
+          "file": "DiseaseConfig.json",
+          "path": "chanceToGetSalmonella",
+          "value": 0.03,
+          "why": "Illness is more likely."
+        },
+        {
+          "file": "DiseaseConfig.json",
+          "path": "chanceToGetCholera",
+          "value": 0.03,
+          "why": "Illness is more likely."
+        },
+        {
+          "file": "DiseaseConfig.json",
+          "path": "chanceToGetInfluenza",
+          "value": 0.03,
+          "why": "Illness is more likely."
+        }
+      ]
+    },
+    "casual": {
+      "changes": [
+        {
+          "file": "Config.json",
+          "path": "toiletDisableDamage",
+          "value": 1,
+          "why": "Safe while on the toilet."
+        },
+        {
+          "file": "Config.json",
+          "path": "pooIncreaseFactorPerTick",
+          "value": 0.5,
+          "why": "Needs grow more slowly."
+        },
+        {
+          "file": "Config.json",
+          "path": "peeIncreaseFactorPerTick",
+          "value": 0.5,
+          "why": "Needs grow more slowly."
+        },
+        {
+          "file": "DiseaseConfig.json",
+          "path": "chanceToGetSalmonella",
+          "value": 0.002,
+          "why": "Illness is rare."
+        },
+        {
+          "file": "DiseaseConfig.json",
+          "path": "chanceToGetCholera",
+          "value": 0.002,
+          "why": "Illness is rare."
+        },
+        {
+          "file": "DiseaseConfig.json",
+          "path": "chanceToGetInfluenza",
+          "value": 0.002,
+          "why": "Illness is rare."
+        }
+      ]
+    }
+  }
+}

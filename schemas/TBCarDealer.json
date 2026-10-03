@@ -1,0 +1,736 @@
+{
+  "schemaVersion": 1,
+  "mod": {
+    "id": "TBCarDealer",
+    "folder": "TBCarDealer",
+    "name": "TB Car Dealer",
+    "summary": "A vehicle dealership. Players browse a showroom, buy vehicles, sell their own and can test drive models. Prices and variants come from car and price item files.",
+    "coverage": "in-depth",
+    "docs": "https://doc.themodbase.com/TBCarDealer/Readme.html",
+    "sources": [
+      "TBCarDealer/Readme",
+      "TBCarDealer/Configs/CarConfigs",
+      "TBCarDealer/Configs/DealerPointConfig",
+      "TBCarDealer/Configs/DealerPointsConfig",
+      "TBCarDealer/Configs/CarCategorieOrder",
+      "TBCarDealer/Configs/Logger",
+      "TBCarDealer/Configs/PriceItems",
+      "TBCarDealer/ConfigEditor/Readme"
+    ]
+  },
+  "files": [
+    {
+      "id": "carcategorieorder",
+      "match": "CarCategorieOrder.json",
+      "title": "Category order",
+      "summary": "Order of vehicle categories at each dealer.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Format version",
+          "help": "Version number of this file format. The mod uses it to upgrade old files. Never change it.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "categorieOrder.*": {
+          "label": "Category order of this dealer",
+          "help": "Order in which vehicle categories appear at the dealer. The key is the dealer name. New categories are added automatically at reload and restart.",
+          "type": "list",
+          "confidence": "documented"
+        },
+        "categorieOrder.*[]": {
+          "label": "Category name",
+          "help": "One category name as used in car configs.",
+          "type": "string",
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "carconfigs-files",
+      "match": "CarConfigs/*.json",
+      "title": "Car (one file per car)",
+      "summary": "A car with its variants, category, test drive and reputation rules.",
+      "restart": true,
+      "fields": {
+        "uniqueName": {
+          "type": "string",
+          "default": "Hatchback",
+          "label": "Car id",
+          "help": "Name of this car entry. Must match the file name. Dealers refer to it by this name.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "items": {
+          "type": "list",
+          "default": [],
+          "label": "Items (internal)",
+          "help": "Reserved by the mod. Do not change.",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "uniqueCarNames": {
+          "type": "list",
+          "label": "Car variants",
+          "help": "Names of price item files (PriceItems folder) that make up this car and its colour or equipment variants.",
+          "confidence": "documented"
+        },
+        "uniqueCarNames[]": {
+          "type": "string",
+          "default": "Hatchback_02_Black_Complete",
+          "label": "Variant file name",
+          "help": "Name of one price item file in PriceItems.",
+          "confidence": "documented"
+        },
+        "category": {
+          "type": "string",
+          "default": "Cars",
+          "label": "Category",
+          "help": "Group this car is shown under at the dealer.",
+          "confidence": "documented"
+        },
+        "canUsedForTestDrive": {
+          "type": "flag",
+          "default": 0,
+          "label": "Allow test drive",
+          "help": "Lets players test the car. Needs a test drive start position on the dealer point.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "maxDistanceToTestDriveSpawnPosition": {
+          "type": "int",
+          "default": 100,
+          "label": "Test drive range",
+          "help": "How far from the start spot the player may drive before the test ends.",
+          "confidence": "documented",
+          "unit": "metres",
+          "min": 0
+        },
+        "maxTimeInSecondsForTestDrive": {
+          "type": "int",
+          "default": 300,
+          "label": "Test drive time",
+          "help": "How long a test drive lasts. It also ends when the player leaves the car or the range.",
+          "confidence": "documented",
+          "unit": "seconds",
+          "min": 0,
+          "typical": "120-600"
+        },
+        "enablePoints": {
+          "type": "flag",
+          "default": 0,
+          "label": "Use reputation",
+          "help": "Switches reputation rules for this car on. When off, the limits below are ignored.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "minPointsNeededForBuy": {
+          "type": "int",
+          "default": -2147483648,
+          "label": "Minimum reputation to buy",
+          "help": "Lowest reputation a player may have and still buy. The default (about minus 2.1 billion) means no lower limit.",
+          "confidence": "documented",
+          "unit": "points",
+          "level": "advanced"
+        },
+        "maxPointsNeededForBuy": {
+          "type": "int",
+          "default": 2147483647,
+          "label": "Maximum reputation to buy",
+          "help": "Highest reputation a player may have and still buy. The default (about 2.1 billion) means no upper limit.",
+          "confidence": "documented",
+          "unit": "points",
+          "level": "advanced"
+        },
+        "minPointsNeededForSell": {
+          "type": "int",
+          "default": -2147483648,
+          "label": "Minimum reputation to sell",
+          "help": "Lowest reputation a player may have and still sell. The default means no lower limit.",
+          "confidence": "documented",
+          "unit": "points",
+          "level": "advanced"
+        },
+        "maxPointsNeededForSell": {
+          "type": "int",
+          "default": 2147483647,
+          "label": "Maximum reputation to sell",
+          "help": "Highest reputation a player may have and still sell. The default means no upper limit.",
+          "confidence": "documented",
+          "unit": "points",
+          "level": "advanced"
+        },
+        "givePlayerPointsForBuy": {
+          "type": "int",
+          "default": 0,
+          "label": "Points for buying",
+          "help": "Reputation points gained per purchase. Only used when reputation is enabled.",
+          "confidence": "documented",
+          "unit": "points",
+          "level": "advanced"
+        },
+        "givePlayerPointsForSell": {
+          "type": "int",
+          "default": 0,
+          "label": "Points for selling",
+          "help": "Reputation points gained per sale. Only used when reputation is enabled.",
+          "confidence": "documented",
+          "unit": "points",
+          "level": "advanced"
+        },
+        "version": {
+          "type": "string",
+          "default": "3",
+          "label": "Format version",
+          "help": "Version number of this file format. The mod uses it to upgrade old files. Never change it.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        }
+      },
+      "instances": 1
+    },
+    {
+      "id": "dealerpoints",
+      "match": "DealerPoints.json",
+      "title": "Dealer list",
+      "summary": "Dealers that exist and where the first showroom is built.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "2",
+          "label": "Format version",
+          "help": "Version number of this file format. The mod uses it to upgrade old files. Never change it.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Never change it; resetting it can make the mod regenerate defaults.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "firstPositionOfShowroom": {
+          "type": "list",
+          "label": "First showroom position",
+          "help": "Where the first indoor showroom is built, normally a spot outside the playable map. Each further showroom is placed 50 metres higher.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "firstPositionOfShowroom[]": {
+          "type": "number",
+          "default": 1000,
+          "label": "Coordinate value",
+          "help": "One number of an [X, Y, Z] triple: X is east-west, Y is height, Z is north-south on the map.",
+          "unit": "metres",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "dealerPointsNames": {
+          "type": "list",
+          "label": "Dealer names",
+          "help": "Dealers that exist. Each name must match a file in the DealerPoints folder.",
+          "confidence": "documented"
+        },
+        "dealerPointsNames[]": {
+          "type": "string",
+          "default": "Chernogorsk",
+          "label": "Dealer name",
+          "help": "Name of one dealer; must match a file in DealerPoints.",
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "dealerpoints-files",
+      "match": "DealerPoints/*.json",
+      "title": "Dealer (one file per dealer)",
+      "summary": "Location, permissions, spawn spots and cars of one dealer.",
+      "restart": true,
+      "fields": {
+        "uniqueName": {
+          "type": "string",
+          "default": "Chernogorsk",
+          "label": "Dealer id",
+          "help": "Name of this dealer; must match the file name and the entry in DealerPoints.json.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "version": {
+          "type": "string",
+          "default": "7",
+          "label": "Format version",
+          "help": "Version number of this file format. The mod uses it to upgrade old files. Never change it.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "displayName": {
+          "type": "string",
+          "default": "Chernogorsk",
+          "label": "Display name",
+          "help": "Name players see for this dealer.",
+          "confidence": "documented"
+        },
+        "playerCanSellCars": {
+          "type": "flag",
+          "default": 1,
+          "label": "Players can sell cars",
+          "help": "Lets players sell their own vehicles here.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "playerCanEnterShowRoom": {
+          "type": "flag",
+          "default": 1,
+          "label": "Players can enter showroom",
+          "help": "Lets players walk into the showroom to look at cars.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "playerCanBuyCars": {
+          "type": "flag",
+          "default": 1,
+          "label": "Players can buy cars",
+          "help": "Lets players buy vehicles here. Turn off for a look-only dealer.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "acceptOnlyCash": {
+          "type": "flag",
+          "default": 0,
+          "label": "Cash only",
+          "help": "1 means only cash carried by the player counts; money in a bank or ATM is ignored.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "position": {
+          "type": "list",
+          "label": "Dealer position",
+          "help": "World position [X, Y, Z] of the dealer machine.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "position[]": {
+          "type": "number",
+          "default": 6542.52978515625,
+          "label": "Coordinate value",
+          "help": "One number of an [X, Y, Z] triple: X is east-west, Y is height, Z is north-south on the map.",
+          "unit": "metres",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "orientation": {
+          "type": "list",
+          "label": "Dealer orientation",
+          "help": "Facing of the dealer in degrees (three angles).",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "orientation[]": {
+          "type": "number",
+          "default": 314,
+          "label": "Angle value",
+          "help": "One angle of a three-value orientation, in degrees.",
+          "unit": "degrees",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "useExactPosition": {
+          "type": "flag",
+          "default": 0,
+          "label": "Use exact position",
+          "help": "0 places the dealer on the ground, 1 uses the coordinates as given.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "spawnPosition": {
+          "type": "list",
+          "label": "Vehicle spawn position",
+          "help": "Where a bought car appears [X, Y, Z]. Keep the spot free of buildings.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "spawnPosition[]": {
+          "type": "number",
+          "default": 6537.02978515625,
+          "label": "Coordinate value",
+          "help": "One number of an [X, Y, Z] triple: X is east-west, Y is height, Z is north-south on the map.",
+          "unit": "metres",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "spawnOrientation": {
+          "type": "list",
+          "label": "Vehicle spawn orientation",
+          "help": "Direction a bought car faces when it appears.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "spawnOrientation[]": {
+          "type": "number",
+          "default": 220,
+          "label": "Angle value",
+          "help": "One angle of a three-value orientation, in degrees.",
+          "unit": "degrees",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "useExactSpawnPosition": {
+          "type": "flag",
+          "default": 0,
+          "label": "Use exact spawn position",
+          "help": "1 spawns the car exactly at the spawn position; 0 searches for a nearby free space.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "sellPosition": {
+          "type": "list",
+          "label": "Inspection position",
+          "help": "Where the dealer inspects a car a player wants to sell.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "sellPosition[]": {
+          "type": "number",
+          "default": 6537.02978515625,
+          "label": "Coordinate value",
+          "help": "One number of an [X, Y, Z] triple: X is east-west, Y is height, Z is north-south on the map.",
+          "unit": "metres",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "sellOrientation": {
+          "type": "list",
+          "label": "Inspection orientation",
+          "help": "Direction of the inspection spot.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "sellOrientation[]": {
+          "type": "number",
+          "default": 220,
+          "label": "Angle value",
+          "help": "One angle of a three-value orientation, in degrees.",
+          "unit": "degrees",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "scanBoxToFindCarsForSell": {
+          "type": "list",
+          "label": "Sell scan box size",
+          "help": "Size [X, Y, Z] of the box searched for the player car when selling.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "scanBoxToFindCarsForSell[]": {
+          "type": "number",
+          "default": 30,
+          "label": "Coordinate value",
+          "help": "One number of an [X, Y, Z] triple: X is east-west, Y is height, Z is north-south on the map.",
+          "unit": "metres",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "testDriveReturnHeightOffset": {
+          "type": "number",
+          "default": 0,
+          "label": "Test drive return height offset",
+          "help": "Height adjustment added to the spot where the player returns after a test drive.",
+          "confidence": "documented",
+          "unit": "metres",
+          "level": "advanced"
+        },
+        "parkingSignType": {
+          "type": "classname",
+          "default": "TBCDSignParking",
+          "label": "Parking sign class",
+          "help": "Class name of the sign object placed at the sell spot.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "spawnParkingSign": {
+          "type": "flag",
+          "default": 1,
+          "label": "Spawn parking sign",
+          "help": "Places a parking sign at the sell inspection spot.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "parkingSignHeightOffset": {
+          "type": "number",
+          "default": 1,
+          "label": "Parking sign height offset",
+          "help": "Height adjustment for the sign. Normally 1.",
+          "confidence": "documented",
+          "unit": "metres",
+          "level": "advanced"
+        },
+        "type": {
+          "type": "classname",
+          "default": "TBCDMachine",
+          "label": "Dealer object",
+          "help": "Class name of the dealer machine object.",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "An unknown class means no dealer appears."
+        },
+        "testDriveStartPosition": {
+          "type": "list",
+          "label": "Test drive start spots",
+          "help": "Spots where a test drive car appears; each has a position and an orientation.",
+          "confidence": "documented"
+        },
+        "testDriveStartPosition[].position": {
+          "type": "list",
+          "label": "Test drive position",
+          "help": "World position [X, Y, Z] of a test drive start spot.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "testDriveStartPosition[].position[]": {
+          "type": "number",
+          "default": 13932.580078125,
+          "label": "Coordinate value",
+          "help": "One number of an [X, Y, Z] triple: X is east-west, Y is height, Z is north-south on the map.",
+          "unit": "metres",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "testDriveStartPosition[].orientation": {
+          "type": "list",
+          "label": "Test drive orientation",
+          "help": "Facing of the test drive car at this spot.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "testDriveStartPosition[].orientation[]": {
+          "type": "number",
+          "default": -102.81544494628906,
+          "label": "Angle value",
+          "help": "One angle of a three-value orientation, in degrees.",
+          "unit": "degrees",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "uniqueFileNames": {
+          "type": "list",
+          "label": "Cars for sale",
+          "help": "Names of car config files (CarConfigs folder) offered at this dealer.",
+          "confidence": "documented"
+        },
+        "uniqueFileNames[]": {
+          "type": "string",
+          "default": "Hatchback",
+          "label": "Car file name",
+          "help": "Name of one car config file.",
+          "confidence": "documented"
+        },
+        "enableNpcTrader": {
+          "type": "flag",
+          "default": 0,
+          "label": "Show NPC dealer",
+          "help": "Places a character next to the machine.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "npcType": {
+          "type": "classname",
+          "default": "SurvivorM_Mirek",
+          "label": "NPC class",
+          "help": "Class name of the character model for the NPC dealer.",
+          "confidence": "documented"
+        },
+        "npcGearSetName": {
+          "type": "string",
+          "default": "",
+          "label": "NPC gear set",
+          "help": "Name of the outfit for the NPC. Created if it does not exist. Empty uses default clothes.",
+          "confidence": "documented",
+          "level": "advanced"
+        }
+      },
+      "instances": 1
+    },
+    {
+      "id": "logger",
+      "match": "Logger.json",
+      "title": "Transaction logging",
+      "summary": "Where car purchases and sales are logged.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Format version",
+          "help": "Version number of this file format. The mod uses it to upgrade old files. Never change it.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "logBuyCSV": {
+          "type": "flag",
+          "default": 0,
+          "label": "Log buys to CSV",
+          "help": "Writes every car purchase to a CSV file on the server.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logBuyDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log buys to Discord",
+          "help": "Posts every car purchase to the buy webhook address.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordBuyWebhookURL": {
+          "type": "url",
+          "label": "Discord webhook address",
+          "help": "Web address that car purchases are posted to when the matching Discord switch is on. Treat it like a password: anyone holding it can post to that channel. Leave empty if you do not use it.",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "A wrong or revoked address silently loses the messages."
+        },
+        "logSellCSV": {
+          "type": "flag",
+          "default": 0,
+          "label": "Log sells to CSV",
+          "help": "Writes every car sale to a CSV file.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logSellDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log sells to Discord",
+          "help": "Posts every car sale to the sell webhook address.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordSellWebhookURL": {
+          "type": "url",
+          "label": "Discord webhook address",
+          "help": "Web address that car sales are posted to when the matching Discord switch is on. Treat it like a password: anyone holding it can post to that channel. Leave empty if you do not use it.",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "A wrong or revoked address silently loses the messages."
+        }
+      }
+    },
+    {
+      "id": "priceitems-files",
+      "match": "PriceItems/*.json",
+      "title": "Price item (one file per item)",
+      "summary": "Price and attachments of one car or part.",
+      "restart": true,
+      "fields": {
+        "uniqueName": {
+          "type": "string",
+          "label": "Item id",
+          "help": "Name of this price entry; must match the file name. Car configs refer to it.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "type": {
+          "type": "classname",
+          "label": "Item class",
+          "help": "Class name of the vehicle or part, as in types.xml.",
+          "confidence": "documented"
+        },
+        "quantity": {
+          "type": "number",
+          "label": "Quantity",
+          "help": "Amount of the item in percent (fill level). 100 is full.",
+          "confidence": "documented",
+          "unit": "percent",
+          "min": 0,
+          "typical": "100"
+        },
+        "sellPrice": {
+          "type": "int",
+          "label": "Sell price",
+          "help": "What a player would get for selling it. The documentation says this is not implemented yet.",
+          "confidence": "documented",
+          "unit": "coins",
+          "min": 0
+        },
+        "givePlayerPointsForBuy": {
+          "type": "int",
+          "label": "Points for buying",
+          "help": "Reputation points gained on purchase.",
+          "confidence": "documented",
+          "unit": "points",
+          "level": "advanced"
+        },
+        "currencyType": {
+          "type": "string",
+          "label": "Currency",
+          "help": "Currency used. \"default\" uses the main currency from the shared currency config.",
+          "confidence": "documented",
+          "typical": "default"
+        },
+        "buyPrice": {
+          "type": "int",
+          "label": "Buy price",
+          "help": "Price a player pays for this item.",
+          "confidence": "documented",
+          "unit": "coins",
+          "min": 0
+        },
+        "isPremium": {
+          "type": "bool",
+          "label": "Premium only",
+          "help": "Only premium players can buy this item.",
+          "confidence": "documented"
+        },
+        "amountItem": {
+          "type": "int",
+          "label": "Amount per purchase",
+          "help": "How many of this item are given per purchase; used mainly for optional attachments.",
+          "confidence": "documented",
+          "min": 1,
+          "typical": "1"
+        },
+        "attachmentUniqueNames": {
+          "type": "list",
+          "label": "Included attachments",
+          "help": "Price item names that come with the item at no extra cost.",
+          "confidence": "documented"
+        },
+        "attachmentUniqueNames[]": {
+          "type": "string",
+          "label": "Attachment name",
+          "help": "Name of one included price item.",
+          "confidence": "documented"
+        },
+        "optionalAttachmentUniqueNames": {
+          "type": "list",
+          "label": "Optional attachments",
+          "help": "Price item names offered for extra money and not shown in the showroom.",
+          "confidence": "documented"
+        },
+        "version": {
+          "type": "string",
+          "label": "Format version",
+          "help": "Version number of this file format. The mod uses it to upgrade old files. Never change it.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        }
+      },
+      "instances": 12
+    }
+  ]
+}

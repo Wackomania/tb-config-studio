@@ -1,0 +1,1111 @@
+{
+  "schemaVersion": 1,
+  "mod": {
+    "id": "TBBasicNeeds",
+    "folder": "TBBasicNeeds",
+    "name": "TB Basic Needs",
+    "summary": "A hygiene and bodily needs survival layer. Players have to go to the toilet, get dirty, and wash themselves and their clothes at wells, sinks, washing machines and static washing places; staying dirty can make them ill. A HUD shows the needs. Dryers and washing machines use energy, water and detergent.",
+    "coverage": "in-depth",
+    "docs": "https://doc.themodbase.com/BasicNeeds/Readme.html",
+    "sources": [
+      "/BasicNeeds/Readme.html",
+      "/BasicNeeds/FAQ.html",
+      "/BasicNeeds/Configs/Config.html",
+      "/BasicNeeds/Configs/BodyZoneConfigs.html",
+      "/BasicNeeds/Configs/BodyZones.html",
+      "/BasicNeeds/Configs/DiseaseConfig.html",
+      "/BasicNeeds/Configs/DryerConfig.html",
+      "/BasicNeeds/Configs/HudColorConfig.html",
+      "/BasicNeeds/Configs/StaticDryerConfig.html",
+      "/BasicNeeds/Configs/StaticWashingPlaces.html",
+      "/BasicNeeds/Configs/WashingMachineConfig.html"
+    ],
+    "notes": "Several sample defaults differ from the doc defaults (for example tickLengthInMinutes and dirtIncrementRegular), because the sample is a test server file; the schema keeps the sample values as defaults. The mod misspells \"PerMinuted\" in some field names; the spelling must stay exactly as written. The docs mention admins can reload the static washing places config without a restart, other changes are safest with a restart."
+  },
+  "files": [
+    {
+      "id": "bodyzoneconfigs-files",
+      "match": "BodyZoneConfigs/*.json",
+      "title": "Body zone dirt rates",
+      "summary": "One file per body or clothing zone (Base is the body itself). Sets how much dirt that zone collects from each need.",
+      "restart": true,
+      "fields": {
+        "name": {
+          "type": "string",
+          "label": "Zone name",
+          "help": "Name of the zone. It must match an entry in BodyZones.json zoneNames.",
+          "confidence": "documented"
+        },
+        "dirtIncrementWhenPoo": {
+          "type": "number",
+          "label": "Dirt when pooing",
+          "help": "Dirt this zone gains when the player relieves themselves outside a toilet (poo).",
+          "unit": "dirt points",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "dirtIncrementWhenPee": {
+          "type": "number",
+          "label": "Dirt when peeing",
+          "help": "Dirt this zone gains when the player pees outside a toilet.",
+          "unit": "dirt points",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "dirtIncrementRegular": {
+          "type": "number",
+          "label": "Regular dirt gain",
+          "help": "Dirt this zone gains over time while the player is already dirty. The doc default is much higher than the value in the sample file, so compare before changing.",
+          "unit": "dirt points",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "dirtIncrementWhenPooToilet": {
+          "type": "number",
+          "label": "Dirt when pooing in a toilet",
+          "help": "Dirt gained when a toilet is used for poo. Much lower than outside, which rewards using toilets.",
+          "unit": "dirt points",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "dirtIncrementWhenPeeToilet": {
+          "type": "number",
+          "label": "Dirt when peeing in a toilet",
+          "help": "Dirt gained when a toilet is used for pee.",
+          "unit": "dirt points",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "version": {
+          "type": "string",
+          "label": "Config version",
+          "help": "Version number the mod writes into this file so it can upgrade older files. Leave it exactly as it is.",
+          "internal": true,
+          "level": "danger",
+          "risk": "Changing it can make the mod reset or reject the file.",
+          "confidence": "documented"
+        }
+      },
+      "instances": 12,
+      "role": "settings"
+    },
+    {
+      "id": "bodyzones",
+      "match": "BodyZones.json",
+      "title": "Body zones",
+      "summary": "The list of body and clothing zones that can get dirty. Each name needs a matching file in BodyZoneConfigs.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Config version",
+          "help": "Version number the mod writes into this file so it can upgrade older files. Leave it exactly as it is.",
+          "internal": true,
+          "level": "danger",
+          "risk": "Changing it can make the mod reset or reject the file.",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Leave it alone.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "zoneConfigs": {
+          "type": "list",
+          "default": [],
+          "label": "Zone configs (internal)",
+          "help": "Filled in by the mod. Do not edit.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "zoneNames[]": {
+          "type": "string",
+          "default": "Base",
+          "label": "Zone name",
+          "help": "Name of one zone, for example Base, Body, Head, Gloves, Feet.",
+          "confidence": "documented"
+        },
+        "zoneNames": {
+          "type": "list",
+          "label": "Zone names",
+          "help": "The zones that can get dirty. Base is the player body; the others are clothing layers. You can add or remove zones; each one gets its own file in BodyZoneConfigs.",
+          "level": "advanced",
+          "confidence": "documented"
+        }
+      },
+      "role": "settings"
+    },
+    {
+      "id": "config",
+      "match": "Config.json",
+      "title": "Main needs settings",
+      "summary": "Core rules: how fast the toilet and dirt needs grow, their health and blood penalties, toilets and sinks, and which items clean the body and clothes.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "5",
+          "label": "Config version",
+          "help": "Version number the mod writes into this file so it can upgrade older files. Leave it exactly as it is.",
+          "internal": true,
+          "level": "danger",
+          "risk": "Changing it can make the mod reset or reject the file.",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Leave it alone.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "animationCommandUID": {
+          "type": "int",
+          "default": 1056,
+          "label": "Animation id",
+          "help": "Id of the animation played for bodily functions. Expert setting; a wrong id breaks the animation.",
+          "level": "danger",
+          "risk": "A wrong value can break the animation or produce errors.",
+          "confidence": "documented"
+        },
+        "stanceMask": {
+          "type": "int",
+          "default": 2,
+          "label": "Stance mask",
+          "help": "Which stances the bodily-function animation allows. Expert setting.",
+          "level": "danger",
+          "risk": "A wrong value can break the animation.",
+          "confidence": "documented"
+        },
+        "cleanItemsWhenPoo[].type": {
+          "type": "classname",
+          "default": "Paper",
+          "label": "Item",
+          "help": "Class name of the item. Paper is the default.",
+          "confidence": "documented"
+        },
+        "cleanItemsWhenPoo[].dirtFactorForBodyInPercent": {
+          "type": "number",
+          "default": 5,
+          "label": "Dirt left on body",
+          "help": "Share of the dirt that stays on the body when this item is used.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "observed"
+        },
+        "cleanItemsWhenPoo": {
+          "type": "list",
+          "label": "Items for cleaning after poo",
+          "help": "Items that can be used to clean up after pooing, such as paper, and how much dirt they leave.",
+          "confidence": "documented"
+        },
+        "cleanItemsForBodyWash[].type": {
+          "type": "classname",
+          "default": "NoItemInHands",
+          "label": "Cleaning item",
+          "help": "Class name of the item, or a special name for washing without an item.",
+          "confidence": "documented"
+        },
+        "cleanItemsForBodyWash[].dirtDecreaseFactorForBodyInPercentForWell": {
+          "type": "number",
+          "default": 50,
+          "label": "Dirt removed with well water",
+          "help": "How much dirt is removed when washing with well water. Higher is better.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "cleanItemsForBodyWash[].dirtDecreaseFactorForBodyInPercentForFreshWater": {
+          "type": "number",
+          "default": 25,
+          "label": "Dirt removed with fresh water",
+          "help": "How much dirt is removed when washing with fresh water. Higher is better.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "cleanItemsForBodyWash[].dirtDecreaseFactorForBodyInPercentForSeeWater": {
+          "type": "number",
+          "default": 12.5,
+          "label": "Dirt removed with sea water",
+          "help": "How much dirt is removed when washing with sea water. Higher is better.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "cleanItemsForBodyWash[].dirtDecreaseFactorForBodyInPercentForDirtWater": {
+          "type": "number",
+          "default": 6,
+          "label": "Dirt removed with dirty water",
+          "help": "How much dirt is removed when washing with dirty water. Higher is better.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "cleanItemsForBodyWash": {
+          "type": "list",
+          "label": "Items that clean the body",
+          "help": "Items that can be used to wash the body, and how well each works with each kind of water. The special names NoItemInHands / NoCleanItemInClothing mean washing without any item.",
+          "confidence": "documented"
+        },
+        "cleanItemsForClothingWash[].type": {
+          "type": "classname",
+          "default": "NoCleanItemInClothing",
+          "label": "Cleaning item",
+          "help": "Class name of the item, or a special name for washing without an item.",
+          "confidence": "documented"
+        },
+        "cleanItemsForClothingWash[].dirtDecreaseFactorForBodyInPercentForWell": {
+          "type": "number",
+          "default": 50,
+          "label": "Dirt removed with well water",
+          "help": "How much dirt is removed when washing with well water. Higher is better.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "cleanItemsForClothingWash[].dirtDecreaseFactorForBodyInPercentForFreshWater": {
+          "type": "number",
+          "default": 25,
+          "label": "Dirt removed with fresh water",
+          "help": "How much dirt is removed when washing with fresh water. Higher is better.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "cleanItemsForClothingWash[].dirtDecreaseFactorForBodyInPercentForSeeWater": {
+          "type": "number",
+          "default": 12.5,
+          "label": "Dirt removed with sea water",
+          "help": "How much dirt is removed when washing with sea water. Higher is better.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "cleanItemsForClothingWash[].dirtDecreaseFactorForBodyInPercentForDirtWater": {
+          "type": "number",
+          "default": 6,
+          "label": "Dirt removed with dirty water",
+          "help": "How much dirt is removed when washing with dirty water. Higher is better.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "cleanItemsForClothingWash": {
+          "type": "list",
+          "label": "Items that clean the clothing",
+          "help": "Items that can be used to wash the clothing, and how well each works with each kind of water. The special names NoItemInHands / NoCleanItemInClothing mean washing without any item.",
+          "confidence": "documented"
+        },
+        "pooIncreaseFactorPerTick": {
+          "type": "number",
+          "default": 1,
+          "label": "poo need growth per tick",
+          "help": "How much the poo need grows each tick, in percent. 1 means about 100 ticks to a full need.",
+          "unit": "percent per tick",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "pooHealthReduceStatePerTickInPercent": {
+          "type": "number",
+          "default": 0.10000000149011612,
+          "label": "Health loss when poo need is full",
+          "help": "Health penalty applied each tick while the need is ignored.",
+          "unit": "percent per tick",
+          "min": 0,
+          "max": 1,
+          "confidence": "documented"
+        },
+        "pooBloodReduceStatePerTickInPercent": {
+          "type": "number",
+          "default": 0.10000000149011612,
+          "label": "Blood loss when poo need is full",
+          "help": "Blood penalty applied each tick while the need is ignored.",
+          "unit": "percent per tick",
+          "min": 0,
+          "max": 1,
+          "confidence": "documented"
+        },
+        "peeIncreaseFactorPerTick": {
+          "type": "number",
+          "default": 1,
+          "label": "pee need growth per tick",
+          "help": "How much the pee need grows each tick, in percent. 1 means about 100 ticks to a full need.",
+          "unit": "percent per tick",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "peeHealthReduceStatePerTickInPercent": {
+          "type": "number",
+          "default": 0.10000000149011612,
+          "label": "Health loss when pee need is full",
+          "help": "Health penalty applied each tick while the need is ignored.",
+          "unit": "percent per tick",
+          "min": 0,
+          "max": 1,
+          "confidence": "documented"
+        },
+        "peeBloodReduceStatePerTickInPercent": {
+          "type": "number",
+          "default": 0.10000000149011612,
+          "label": "Blood loss when pee need is full",
+          "help": "Blood penalty applied each tick while the need is ignored.",
+          "unit": "percent per tick",
+          "min": 0,
+          "max": 1,
+          "confidence": "documented"
+        },
+        "regularHealthReduceStatePerTickInPercent": {
+          "type": "number",
+          "default": 0.10000000149011612,
+          "label": "Health loss when dirty",
+          "help": "Health penalty per tick while the player is dirty. Not in the doc table; inferred from its neighbours.",
+          "unit": "percent per tick",
+          "min": 0,
+          "confidence": "inferred"
+        },
+        "regularBloodReduceStatePerTickInPercent": {
+          "type": "number",
+          "default": 0.10000000149011612,
+          "label": "Blood loss when dirty",
+          "help": "Blood penalty per tick while the player is dirty. Not in the doc table; inferred from its neighbours.",
+          "unit": "percent per tick",
+          "min": 0,
+          "confidence": "inferred"
+        },
+        "tickLengthInMinutes": {
+          "type": "int",
+          "default": 1,
+          "label": "Tick length",
+          "help": "Real minutes between needs updates. Every per-tick value in this file is applied once per tick, so a shorter tick makes all needs run faster.",
+          "unit": "minutes",
+          "min": 1,
+          "typical": "1 to 5",
+          "confidence": "documented"
+        },
+        "enableToilets": {
+          "type": "flag",
+          "default": 1,
+          "label": "Toilets enabled",
+          "help": "1 lets players use toilet objects, 0 switches the toilet function off.",
+          "confidence": "documented"
+        },
+        "toiletDuration": {
+          "type": "int",
+          "default": 15,
+          "label": "Toilet use time",
+          "help": "How long using the toilet takes.",
+          "unit": "seconds",
+          "min": 1,
+          "confidence": "documented"
+        },
+        "toiletMakeInvisible": {
+          "type": "flag",
+          "default": 1,
+          "label": "Hide player on toilet",
+          "help": "1 hides the player while they use the toilet.",
+          "confidence": "documented"
+        },
+        "toiletDisableDamage": {
+          "type": "flag",
+          "default": 1,
+          "label": "No damage on toilet",
+          "help": "1 protects the player from damage while on the toilet. Turn it off for a harsher server.",
+          "confidence": "documented"
+        },
+        "toiletSmallMenuOnLeft": {
+          "type": "flag",
+          "default": 0,
+          "label": "Compact toilet menu on left",
+          "help": "1 shows the small toilet menu on the left of the screen. Display only.",
+          "confidence": "documented"
+        },
+        "toiletObjectNames[]": {
+          "type": "string",
+          "default": "Toilet",
+          "label": "Toilet object name",
+          "help": "Part of an object name or class name that marks a toilet.",
+          "confidence": "documented"
+        },
+        "toiletObjectNames": {
+          "type": "list",
+          "label": "Toilet objects",
+          "help": "Names or keywords of map objects that count as toilets.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "enableWashClothingSink": {
+          "type": "flag",
+          "default": 1,
+          "label": "Clothes washing at sinks",
+          "help": "1 lets players clean clothing at sinks.",
+          "confidence": "documented"
+        },
+        "sinkMinDirtLevelToWash": {
+          "type": "int",
+          "default": 25,
+          "label": "Minimum dirt to wash",
+          "help": "Clothing must be at least this dirty before it can be washed at a sink.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "sinkObjectNames[]": {
+          "type": "string",
+          "default": "bath.p3d",
+          "label": "Sink object name",
+          "help": "Part of an object name (for example a model file) that marks a sink.",
+          "confidence": "documented"
+        },
+        "sinkObjectNames": {
+          "type": "list",
+          "label": "Sink objects",
+          "help": "Names or keywords of map objects that count as sinks.",
+          "level": "advanced",
+          "confidence": "documented"
+        }
+      },
+      "role": "settings"
+    },
+    {
+      "id": "diseaseconfig",
+      "match": "DiseaseConfig.json",
+      "title": "Diseases",
+      "summary": "Chances of catching an illness while dirty.",
+      "restart": true,
+      "fields": {
+        "chanceToGetSalmonella": {
+          "type": "number",
+          "default": 0.009999999776482582,
+          "label": "Chance of salmonella",
+          "help": "Chance of catching salmonella when the dirty status triggers an illness roll. Written as a fraction: 0.01 is 1 percent, 1 is certain.",
+          "min": 0,
+          "max": 1,
+          "typical": "0.01",
+          "confidence": "documented"
+        },
+        "chanceToGetCholera": {
+          "type": "number",
+          "default": 0.009999999776482582,
+          "label": "Chance of cholera",
+          "help": "Chance of catching cholera when the dirty status triggers an illness roll. Written as a fraction: 0.01 is 1 percent, 1 is certain.",
+          "min": 0,
+          "max": 1,
+          "typical": "0.01",
+          "confidence": "documented"
+        },
+        "chanceToGetInfluenza": {
+          "type": "number",
+          "default": 0.009999999776482582,
+          "label": "Chance of influenza",
+          "help": "Chance of catching influenza when the dirty status triggers an illness roll. Written as a fraction: 0.01 is 1 percent, 1 is certain.",
+          "min": 0,
+          "max": 1,
+          "typical": "0.01",
+          "confidence": "documented"
+        }
+      },
+      "role": "settings"
+    },
+    {
+      "id": "dryerconfig",
+      "match": "DryerConfig.json",
+      "title": "Dryer (item)",
+      "summary": "Energy use and drying speed of the dryer for wet clothing, and which items inside the clothing get damaged.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Config version",
+          "help": "Version number the mod writes into this file so it can upgrade older files. Leave it exactly as it is.",
+          "internal": true,
+          "level": "danger",
+          "risk": "Changing it can make the mod reset or reject the file.",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Leave it alone.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "energyQuantityConsumptionPerMinuted": {
+          "type": "int",
+          "default": 10,
+          "label": "Energy per minute",
+          "help": "Energy the dryer uses each minute. The doubled word \"Minuted\" in the name is correct; do not fix it.",
+          "unit": "energy per minute",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "dryingEffectivenessPerMinuted": {
+          "type": "int",
+          "default": 10,
+          "label": "Drying per minute",
+          "help": "How much wetness is removed each minute, from 0 to 100.",
+          "unit": "percent per minute",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "itemsThatGetDamageWhenInWashedClothing[].type": {
+          "type": "string",
+          "default": "IsElectricAppliance",
+          "label": "Item kind",
+          "help": "Item class name or a category such as IsElectricAppliance or Paper.",
+          "confidence": "documented"
+        },
+        "itemsThatGetDamageWhenInWashedClothing[].damagePerMinute": {
+          "type": "int",
+          "default": 10,
+          "label": "Damage per minute",
+          "help": "Damage the item takes every minute it stays in the load.",
+          "unit": "damage per minute",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "itemsThatGetDamageWhenInWashedClothing": {
+          "type": "list",
+          "label": "Items damaged in the load",
+          "help": "Kinds of items left in the clothing that get damaged during the cycle, for example electronics or paper.",
+          "confidence": "documented"
+        }
+      },
+      "role": "settings"
+    },
+    {
+      "id": "hudcolorconfig",
+      "match": "HudColorConfig.json",
+      "title": "HUD colours",
+      "summary": "Colours used by the needs HUD icons for pee, poo, clothing dirt and body putridness at each level.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Config version",
+          "help": "Version number the mod writes into this file so it can upgrade older files. Leave it exactly as it is.",
+          "internal": true,
+          "level": "danger",
+          "risk": "Changing it can make the mod reset or reject the file.",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Leave it alone.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "peeColors[].name": {
+          "type": "string",
+          "default": "pee1",
+          "label": "Pee level name",
+          "help": "Name of the level this colour belongs to. Do not rename; the mod looks colours up by name.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "peeColors[].a": {
+          "type": "int",
+          "default": 255,
+          "label": "Pee: alpha (opacity)",
+          "help": "Alpha (opacity) value of the colour, 0 to 255.",
+          "min": 0,
+          "max": 255,
+          "confidence": "documented"
+        },
+        "peeColors[].r": {
+          "type": "int",
+          "default": 255,
+          "label": "Pee: red",
+          "help": "Red value of the colour, 0 to 255.",
+          "min": 0,
+          "max": 255,
+          "confidence": "documented"
+        },
+        "peeColors[].g": {
+          "type": "int",
+          "default": 255,
+          "label": "Pee: green",
+          "help": "Green value of the colour, 0 to 255.",
+          "min": 0,
+          "max": 255,
+          "confidence": "documented"
+        },
+        "peeColors[].b": {
+          "type": "int",
+          "default": 255,
+          "label": "Pee: blue",
+          "help": "Blue value of the colour, 0 to 255.",
+          "min": 0,
+          "max": 255,
+          "confidence": "documented"
+        },
+        "peeColors": {
+          "type": "list",
+          "label": "Pee colours",
+          "help": "Four colour steps (pee1 to pee4) from mild to severe. Display only.",
+          "confidence": "documented"
+        },
+        "pooColors[].name": {
+          "type": "string",
+          "default": "poo1",
+          "label": "Poo level name",
+          "help": "Name of the level this colour belongs to. Do not rename; the mod looks colours up by name.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "pooColors[].a": {
+          "type": "int",
+          "default": 255,
+          "label": "Poo: alpha (opacity)",
+          "help": "Alpha (opacity) value of the colour, 0 to 255.",
+          "min": 0,
+          "max": 255,
+          "confidence": "documented"
+        },
+        "pooColors[].r": {
+          "type": "int",
+          "default": 255,
+          "label": "Poo: red",
+          "help": "Red value of the colour, 0 to 255.",
+          "min": 0,
+          "max": 255,
+          "confidence": "documented"
+        },
+        "pooColors[].g": {
+          "type": "int",
+          "default": 255,
+          "label": "Poo: green",
+          "help": "Green value of the colour, 0 to 255.",
+          "min": 0,
+          "max": 255,
+          "confidence": "documented"
+        },
+        "pooColors[].b": {
+          "type": "int",
+          "default": 255,
+          "label": "Poo: blue",
+          "help": "Blue value of the colour, 0 to 255.",
+          "min": 0,
+          "max": 255,
+          "confidence": "documented"
+        },
+        "pooColors": {
+          "type": "list",
+          "label": "Poo colours",
+          "help": "Four colour steps (poo1 to poo4) from mild to severe. Display only.",
+          "confidence": "documented"
+        },
+        "dirtColors[].name": {
+          "type": "string",
+          "default": "dirtClothing0",
+          "label": "Clothing dirt level name",
+          "help": "Name of the level this colour belongs to. Do not rename; the mod looks colours up by name.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "dirtColors[].a": {
+          "type": "int",
+          "default": 255,
+          "label": "Clothing dirt: alpha (opacity)",
+          "help": "Alpha (opacity) value of the colour, 0 to 255.",
+          "min": 0,
+          "max": 255,
+          "confidence": "documented"
+        },
+        "dirtColors[].r": {
+          "type": "int",
+          "default": 255,
+          "label": "Clothing dirt: red",
+          "help": "Red value of the colour, 0 to 255.",
+          "min": 0,
+          "max": 255,
+          "confidence": "documented"
+        },
+        "dirtColors[].g": {
+          "type": "int",
+          "default": 255,
+          "label": "Clothing dirt: green",
+          "help": "Green value of the colour, 0 to 255.",
+          "min": 0,
+          "max": 255,
+          "confidence": "documented"
+        },
+        "dirtColors[].b": {
+          "type": "int",
+          "default": 255,
+          "label": "Clothing dirt: blue",
+          "help": "Blue value of the colour, 0 to 255.",
+          "min": 0,
+          "max": 255,
+          "confidence": "documented"
+        },
+        "dirtColors": {
+          "type": "list",
+          "label": "Clothing dirt colours",
+          "help": "Four colour steps (dirtClothing0 to dirtClothing3) from mild to severe. Display only.",
+          "confidence": "documented"
+        },
+        "putridColors[].name": {
+          "type": "string",
+          "default": "putridPlayer0",
+          "label": "Body putridness level name",
+          "help": "Name of the level this colour belongs to. Do not rename; the mod looks colours up by name.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "putridColors[].a": {
+          "type": "int",
+          "default": 255,
+          "label": "Body putridness: alpha (opacity)",
+          "help": "Alpha (opacity) value of the colour, 0 to 255.",
+          "min": 0,
+          "max": 255,
+          "confidence": "documented"
+        },
+        "putridColors[].r": {
+          "type": "int",
+          "default": 255,
+          "label": "Body putridness: red",
+          "help": "Red value of the colour, 0 to 255.",
+          "min": 0,
+          "max": 255,
+          "confidence": "documented"
+        },
+        "putridColors[].g": {
+          "type": "int",
+          "default": 255,
+          "label": "Body putridness: green",
+          "help": "Green value of the colour, 0 to 255.",
+          "min": 0,
+          "max": 255,
+          "confidence": "documented"
+        },
+        "putridColors[].b": {
+          "type": "int",
+          "default": 255,
+          "label": "Body putridness: blue",
+          "help": "Blue value of the colour, 0 to 255.",
+          "min": 0,
+          "max": 255,
+          "confidence": "documented"
+        },
+        "putridColors": {
+          "type": "list",
+          "label": "Body putridness colours",
+          "help": "Four colour steps (putridPlayer0 to putridPlayer3) from mild to severe. Display only.",
+          "confidence": "documented"
+        }
+      },
+      "role": "settings"
+    },
+    {
+      "id": "staticdryerplaces",
+      "match": "StaticDryerPlaces.json",
+      "title": "Static dryer places",
+      "summary": "Fixed dryer locations on the map that players can use, optionally for a fee.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "2",
+          "label": "Config version",
+          "help": "Version number the mod writes into this file so it can upgrade older files. Leave it exactly as it is.",
+          "internal": true,
+          "level": "danger",
+          "risk": "Changing it can make the mod reset or reject the file.",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Leave it alone.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "dryerPlaces[].position[]": {
+          "type": "number",
+          "default": 5710.72265625,
+          "label": "Position coordinate",
+          "help": "One coordinate (X, Y, Z).",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "dryerPlaces[].position": {
+          "type": "list",
+          "label": "Position",
+          "help": "World position X, Y, Z.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "dryerPlaces[].orientation[]": {
+          "type": "number",
+          "default": -91.50969696044922,
+          "label": "Orientation angle",
+          "help": "One rotation angle in degrees.",
+          "unit": "degrees",
+          "confidence": "documented"
+        },
+        "dryerPlaces[].orientation": {
+          "type": "list",
+          "label": "Orientation",
+          "help": "Rotation of the machine as three angles.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "dryerPlaces[].needsEnergy": {
+          "type": "flag",
+          "default": 1,
+          "label": "Needs energy",
+          "help": "1 means this place needs a power source to work.",
+          "confidence": "documented"
+        },
+        "dryerPlaces[].useExactPosition": {
+          "type": "flag",
+          "default": 1,
+          "label": "Exact position",
+          "help": "1 uses the exact position and height given, 0 allows tolerance.",
+          "confidence": "documented"
+        },
+        "dryerPlaces[].moneyPerMinuted": {
+          "type": "int",
+          "default": -1,
+          "label": "Price per minute",
+          "help": "Currency charged per minute of use. -1 appears in the sample and most likely means free. Interpretation is not stated in the docs.",
+          "unit": "coins per minute",
+          "special": {
+            "-1": "free (assumed)"
+          },
+          "confidence": "inferred"
+        },
+        "dryerPlaces": {
+          "type": "list",
+          "label": "Dryer places",
+          "help": "List of fixed dryer locations.",
+          "confidence": "documented"
+        }
+      },
+      "role": "list"
+    },
+    {
+      "id": "staticwashingplaces",
+      "match": "StaticWashingPlaces.json",
+      "title": "Static washing places",
+      "summary": "Fixed washing machine locations on the map, with what each needs to run (water, detergent, power) and an optional price. Admins can reload this file without a full restart according to the docs.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "2",
+          "label": "Config version",
+          "help": "Version number the mod writes into this file so it can upgrade older files. Leave it exactly as it is.",
+          "internal": true,
+          "level": "danger",
+          "risk": "Changing it can make the mod reset or reject the file.",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Leave it alone.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "washingPlaces[].position[]": {
+          "type": "number",
+          "default": 5710.37109375,
+          "label": "Position coordinate",
+          "help": "One coordinate (X, Y, Z).",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "washingPlaces[].position": {
+          "type": "list",
+          "label": "Position",
+          "help": "World position X, Y, Z.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "washingPlaces[].orientation[]": {
+          "type": "number",
+          "default": -178.8500213623047,
+          "label": "Orientation angle",
+          "help": "One rotation angle in degrees.",
+          "unit": "degrees",
+          "confidence": "documented"
+        },
+        "washingPlaces[].orientation": {
+          "type": "list",
+          "label": "Orientation",
+          "help": "Rotation of the machine as three angles.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "washingPlaces[].needsDetergent": {
+          "type": "flag",
+          "default": 1,
+          "label": "Needs detergent",
+          "help": "1 means players must supply detergent to use it.",
+          "confidence": "documented"
+        },
+        "washingPlaces[].needsWater": {
+          "type": "flag",
+          "default": 1,
+          "label": "Needs water",
+          "help": "1 means players must supply water to use it.",
+          "confidence": "documented"
+        },
+        "washingPlaces[].needsEnergy": {
+          "type": "flag",
+          "default": 1,
+          "label": "Needs energy",
+          "help": "1 means this place needs a power source to work.",
+          "confidence": "documented"
+        },
+        "washingPlaces[].useExactPosition": {
+          "type": "flag",
+          "default": 1,
+          "label": "Exact position",
+          "help": "1 uses the exact position and height given, 0 allows tolerance.",
+          "confidence": "documented"
+        },
+        "washingPlaces[].moneyPerMinuted": {
+          "type": "int",
+          "default": -1,
+          "label": "Price per minute",
+          "help": "Currency charged per minute of use. -1 appears in the sample and most likely means free. Interpretation is not stated in the docs.",
+          "unit": "coins per minute",
+          "special": {
+            "-1": "free (assumed)"
+          },
+          "confidence": "inferred"
+        },
+        "washingPlaces": {
+          "type": "list",
+          "label": "Washing places",
+          "help": "List of fixed washing locations.",
+          "confidence": "documented"
+        }
+      },
+      "role": "list"
+    },
+    {
+      "id": "washingmachineconfig",
+      "match": "WashingMachineConfig.json",
+      "title": "Washing machine (item)",
+      "summary": "Resource use and cleaning speed of the washing machine, and which items in the load get damaged.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Config version",
+          "help": "Version number the mod writes into this file so it can upgrade older files. Leave it exactly as it is.",
+          "internal": true,
+          "level": "danger",
+          "risk": "Changing it can make the mod reset or reject the file.",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Leave it alone.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "energyQuantityConsumptionPerMinuted": {
+          "type": "int",
+          "default": 10,
+          "label": "Energy per minute",
+          "help": "Energy used each minute of a cycle. \"Minuted\" in the name is correct.",
+          "unit": "energy per minute",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "waterQuantityConsumptionPerMinuted": {
+          "type": "int",
+          "default": 100,
+          "label": "Water per minute",
+          "help": "Water used each minute of a cycle.",
+          "unit": "water per minute",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "detergentQuantityConsumptionPerMinuted": {
+          "type": "int",
+          "default": 1,
+          "label": "Detergent per minute",
+          "help": "Detergent used each minute of a cycle.",
+          "unit": "detergent per minute",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "cleanEffectivenessPerMinuted": {
+          "type": "int",
+          "default": 34,
+          "label": "Cleaning per minute",
+          "help": "How much dirt is removed each minute of a cycle.",
+          "unit": "dirt per minute",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "itemsThatGetDamageWhenInWashedClothing[].type": {
+          "type": "string",
+          "default": "IsElectricAppliance",
+          "label": "Item kind",
+          "help": "Item class name or a category such as IsElectricAppliance or Paper.",
+          "confidence": "documented"
+        },
+        "itemsThatGetDamageWhenInWashedClothing[].damagePerMinute": {
+          "type": "int",
+          "default": 10,
+          "label": "Damage per minute",
+          "help": "Damage the item takes every minute it stays in the load.",
+          "unit": "damage per minute",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "itemsThatGetDamageWhenInWashedClothing": {
+          "type": "list",
+          "label": "Items damaged in the load",
+          "help": "Kinds of items left in the clothing that get damaged during the cycle, for example electronics or paper.",
+          "confidence": "documented"
+        }
+      },
+      "role": "settings"
+    }
+  ]
+}

@@ -1,0 +1,1147 @@
+{
+  "schemaVersion": 1,
+  "mod": {
+    "id": "TBWarParty",
+    "folder": "TBWarParty",
+    "name": "TB War Party",
+    "summary": "A PvP arena system. Players use a lobby machine to create and join arena matches (teams, rounds, entry fee, gear sets), fight inside a built arena, and winners are paid out from the pot. Owners define arenas, gear sets, lobby entry points and the match options players can pick from.",
+    "coverage": "in-depth",
+    "docs": "https://doc.themodbase.com/TBWarParty/Readme.html",
+    "sources": [
+      "/TBWarParty/Readme.html",
+      "/TBWarParty/Configs/MainConfig.html",
+      "/TBWarParty/Configs/ArenaMatchConfigs.html",
+      "/TBWarParty/Configs/ArenaBuildingConfig.html",
+      "/TBWarParty/Configs/GearSets.html",
+      "/TBWarParty/Configs/LobbyEnterPoints.html",
+      "/TBWarParty/Configs/Logger.html"
+    ],
+    "notes": "Files are generated on the first server start. Edit them with the server stopped. The doc pages show slightly different file versions than the sample (for example the sample MainConfig is version 5); a few values differ from the doc defaults because the sample is a test server."
+  },
+  "files": [
+    {
+      "id": "arenabuildingconfigs-files",
+      "match": "ArenaBuildingConfigs/*.json",
+      "title": "Arena building (objects)",
+      "summary": "Lists every object (walls, buildings) that is placed to build one arena. Normally produced by a converter from a DayZ Editor design rather than typed by hand.",
+      "restart": true,
+      "fields": {
+        "name": {
+          "type": "string",
+          "default": "Coliseumfinish",
+          "label": "Arena name",
+          "help": "A descriptive name for the arena. It is only a label and does not change how the arena works; the file name is what other files refer to.",
+          "confidence": "documented"
+        },
+        "m_SceneObjects[].param1": {
+          "type": "classname",
+          "default": "Land_Prison_Wall_Large",
+          "label": "Object class name",
+          "help": "Class name of the object to place, for example a prison wall.",
+          "confidence": "documented"
+        },
+        "m_SceneObjects[].param2[]": {
+          "type": "number",
+          "default": 3824.4296875,
+          "label": "Position coordinate",
+          "help": "One coordinate of the object position (order X, Y, Z).",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "m_SceneObjects[].param2": {
+          "type": "list",
+          "label": "Object position",
+          "help": "World position of the object as three numbers X, Y, Z.",
+          "confidence": "documented"
+        },
+        "m_SceneObjects[].param3[]": {
+          "type": "number",
+          "default": 68.07669067382812,
+          "label": "Rotation angle",
+          "help": "One rotation angle of the object (order X, Y, Z), in degrees.",
+          "unit": "degrees",
+          "confidence": "documented"
+        },
+        "m_SceneObjects[].param3": {
+          "type": "list",
+          "label": "Object rotation",
+          "help": "Rotation of the object as three angles.",
+          "confidence": "documented"
+        },
+        "m_SceneObjects": {
+          "type": "list",
+          "label": "Arena objects",
+          "help": "All the objects that make up the arena. Each entry has a class name, a position and a rotation. Hand-editing is error prone; prefer the converter tools.",
+          "level": "advanced",
+          "confidence": "documented"
+        }
+      },
+      "instances": 1,
+      "role": "records"
+    },
+    {
+      "id": "arenamatchconfigs-files",
+      "match": "ArenaMatchConfigs/*.json",
+      "title": "Arena match rules",
+      "summary": "One file per arena. Sets the options players can choose when creating a match (players, rounds, fees, penalties), the fixed match rules, countdowns and where each team spawns.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "2",
+          "label": "Config version",
+          "help": "Version number the mod writes into this file so it can upgrade older files. Leave it exactly as it is.",
+          "internal": true,
+          "level": "danger",
+          "risk": "Changing it can make the mod reset or reject the file.",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Leave it alone.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "arenaObjectsConfigFile": {
+          "type": "string",
+          "default": "Colosseum",
+          "label": "Arena layout file",
+          "help": "Name of the arena building file (in ArenaBuildingConfigs) to load for this arena. Leave empty if the arena needs no extra objects.",
+          "confidence": "documented"
+        },
+        "playersCount[]": {
+          "type": "int",
+          "default": 1,
+          "label": "Players per match (value)",
+          "help": "One choice offered to the match creator. Minimum and maximum number of players per match (the doc shows a pair such as 10 and 15).",
+          "unit": "players",
+          "min": 1,
+          "confidence": "documented"
+        },
+        "playersCount": {
+          "type": "list",
+          "label": "Players per match",
+          "help": "Minimum and maximum number of players per match (the doc shows a pair such as 10 and 15).",
+          "confidence": "documented"
+        },
+        "roundsCount[]": {
+          "type": "int",
+          "default": 1,
+          "label": "Rounds per match (value)",
+          "help": "One choice offered to the match creator. Minimum and maximum number of rounds the creator can pick.",
+          "unit": "rounds",
+          "min": 1,
+          "confidence": "documented"
+        },
+        "roundsCount": {
+          "type": "list",
+          "label": "Rounds per match",
+          "help": "Minimum and maximum number of rounds the creator can pick.",
+          "confidence": "documented"
+        },
+        "deathPenaltyTimeInSeconds[]": {
+          "type": "int",
+          "default": 0,
+          "label": "Death penalty options (value)",
+          "help": "One choice offered to the match creator. Waiting times before a killed player comes back that the creator can choose from.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "deathPenaltyTimeInSeconds": {
+          "type": "list",
+          "label": "Death penalty options",
+          "help": "Waiting times before a killed player comes back that the creator can choose from.",
+          "confidence": "documented"
+        },
+        "maxTimePerRoundInMinutes[]": {
+          "type": "int",
+          "default": 5,
+          "label": "Round length options (value)",
+          "help": "One choice offered to the match creator. Maximum round durations the creator can choose from.",
+          "unit": "minutes",
+          "min": 1,
+          "confidence": "documented"
+        },
+        "maxTimePerRoundInMinutes": {
+          "type": "list",
+          "label": "Round length options",
+          "help": "Maximum round durations the creator can choose from.",
+          "confidence": "documented"
+        },
+        "maxKillsPerRound[]": {
+          "type": "int",
+          "default": 1,
+          "label": "Kills-to-win options (value)",
+          "help": "One choice offered to the match creator. Kill counts that end a round, offered to the creator.",
+          "unit": "kills",
+          "min": 1,
+          "confidence": "documented"
+        },
+        "maxKillsPerRound": {
+          "type": "list",
+          "label": "Kills-to-win options",
+          "help": "Kill counts that end a round, offered to the creator.",
+          "confidence": "documented"
+        },
+        "startingFee[]": {
+          "type": "int",
+          "default": 1000,
+          "label": "Entry fee options (value)",
+          "help": "One choice offered to the match creator. Entry fees (in the server currency) the creator can choose from. The fees form the pot that is paid out to the winners.",
+          "unit": "coins",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "startingFee": {
+          "type": "list",
+          "label": "Entry fee options",
+          "help": "Entry fees (in the server currency) the creator can choose from. The fees form the pot that is paid out to the winners.",
+          "confidence": "documented"
+        },
+        "teamWinRatio[].place": {
+          "type": "int",
+          "default": 1,
+          "label": "Place",
+          "help": "Finishing place this payout applies to (1 = winner).",
+          "min": 1,
+          "confidence": "documented"
+        },
+        "teamWinRatio[].ratio": {
+          "type": "number",
+          "default": 0.5,
+          "label": "Share of the pot",
+          "help": "Fraction of the pot paid to this place. 0.5 means half.",
+          "min": 0,
+          "max": 1,
+          "unit": "fraction of pot",
+          "typical": "0.5 for 1st, 0.3 for 2nd",
+          "confidence": "documented"
+        },
+        "teamWinRatio": {
+          "type": "list",
+          "label": "Payout by place",
+          "help": "How the pot is split between places. Each entry gives a place and the share of the pot (0 to 1) paid to that team or player.",
+          "risk": "Shares that add up to more than 1 would pay out more than was collected.",
+          "confidence": "documented"
+        },
+        "enableChangeSides": {
+          "type": "flag",
+          "default": 1,
+          "label": "Allow switching sides",
+          "help": "Reserved option for swapping team sides between rounds. The docs describe it as a future feature, so it may have no effect yet.",
+          "confidence": "documented"
+        },
+        "enableOneLifeMode": {
+          "type": "flag",
+          "default": 1,
+          "label": "Offer one-life mode",
+          "help": "Lets the match creator choose a mode where a killed player is out for the rest of the round.",
+          "confidence": "documented"
+        },
+        "enableShowTeamMarker": {
+          "type": "flag",
+          "default": 1,
+          "label": "Offer team markers",
+          "help": "Lets the creator choose to show teammates with markers.",
+          "confidence": "documented"
+        },
+        "enableFriendlyFire": {
+          "type": "flag",
+          "default": 1,
+          "label": "Offer friendly fire",
+          "help": "Lets the creator choose whether teammates can damage each other.",
+          "confidence": "documented"
+        },
+        "enableStaminaMode": {
+          "type": "flag",
+          "default": 1,
+          "label": "Offer stamina option",
+          "help": "Lets the creator choose whether stamina drains during the match.",
+          "confidence": "documented"
+        },
+        "enableShowSpectatorMode": {
+          "type": "flag",
+          "default": 1,
+          "label": "Allow spectators",
+          "help": "Lets people join a match as spectators.",
+          "confidence": "documented"
+        },
+        "gearSetNames[]": {
+          "type": "string",
+          "default": "Cop",
+          "label": "Gear set name",
+          "help": "Name of a gear set file in GearSets, without .json.",
+          "confidence": "documented"
+        },
+        "gearSetNames": {
+          "type": "list",
+          "label": "Gear sets offered",
+          "help": "Names of the gear sets players can choose, each matching a file in the GearSets folder (without .json). A name with no file will not work.",
+          "confidence": "documented"
+        },
+        "gearSets": {
+          "type": "list",
+          "default": [],
+          "label": "Gear sets (internal)",
+          "help": "Filled in by the mod while it runs. Do not edit.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "externalPlayersCanEnterArena": {
+          "type": "flag",
+          "default": 0,
+          "label": "Outside players may enter",
+          "help": "Reserved option, described in the docs as a future feature. Keep it at its default.",
+          "confidence": "documented"
+        },
+        "adminCanEnterArena": {
+          "type": "flag",
+          "default": 1,
+          "label": "Admins may enter arena",
+          "help": "Reserved option for admins entering the arena, described in the docs as a future feature.",
+          "confidence": "documented"
+        },
+        "enableMultipleGearSets": {
+          "type": "flag",
+          "default": 1,
+          "label": "Allow several gear sets",
+          "help": "Lets the match creator pick more than one gear set for a match.",
+          "confidence": "documented"
+        },
+        "showArenaBoarderPoints": {
+          "type": "flag",
+          "default": 1,
+          "label": "Show arena border points",
+          "help": "Reserved option to show the arena border points. Described in the docs as a future feature.",
+          "confidence": "documented"
+        },
+        "teamSpawnZones.1[].position[]": {
+          "type": "number",
+          "default": 3980.15625,
+          "label": "Position coordinate",
+          "help": "One coordinate of the spawn position (X, Y, Z).",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "teamSpawnZones.1[].position": {
+          "type": "list",
+          "label": "Team 1 spawn position",
+          "help": "World position X, Y, Z of the spawn zone. Must be inside the arena.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "teamSpawnZones.1[].orientation[]": {
+          "type": "number",
+          "default": -131.2412109375,
+          "label": "Orientation angle",
+          "help": "One angle of the spawn orientation, in degrees.",
+          "unit": "degrees",
+          "confidence": "documented"
+        },
+        "teamSpawnZones.1[].orientation": {
+          "type": "list",
+          "label": "Team 1 spawn facing",
+          "help": "Direction players face when they spawn, as three angles.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "teamSpawnZones.1[].radius": {
+          "type": "int",
+          "default": 10,
+          "label": "Team 1 spawn radius",
+          "help": "Players are scattered inside this distance around the spawn position.",
+          "unit": "metres",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "teamSpawnZones.1": {
+          "type": "list",
+          "label": "Team 1 spawn zones",
+          "help": "Where players of team 1 appear in the arena. Each entry has a position, an orientation and a radius.",
+          "confidence": "documented"
+        },
+        "teamSpawnZones.2[].position[]": {
+          "type": "number",
+          "default": 3874.965087890625,
+          "label": "Position coordinate",
+          "help": "One coordinate of the spawn position (X, Y, Z).",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "teamSpawnZones.2[].position": {
+          "type": "list",
+          "label": "Team 2 spawn position",
+          "help": "World position X, Y, Z of the spawn zone. Must be inside the arena.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "teamSpawnZones.2[].orientation[]": {
+          "type": "number",
+          "default": 68.81841278076172,
+          "label": "Orientation angle",
+          "help": "One angle of the spawn orientation, in degrees.",
+          "unit": "degrees",
+          "confidence": "documented"
+        },
+        "teamSpawnZones.2[].orientation": {
+          "type": "list",
+          "label": "Team 2 spawn facing",
+          "help": "Direction players face when they spawn, as three angles.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "teamSpawnZones.2[].radius": {
+          "type": "int",
+          "default": 10,
+          "label": "Team 2 spawn radius",
+          "help": "Players are scattered inside this distance around the spawn position.",
+          "unit": "metres",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "teamSpawnZones.2": {
+          "type": "list",
+          "label": "Team 2 spawn zones",
+          "help": "Where players of team 2 appear in the arena. Each entry has a position, an orientation and a radius.",
+          "confidence": "documented"
+        },
+        "teamsCount": {
+          "type": "list",
+          "default": [],
+          "label": "Teams count (internal)",
+          "help": "Filled in by the mod while it runs. Do not edit.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "playerHealth": {
+          "type": "int",
+          "default": 100,
+          "label": "Player health",
+          "help": "Health points a player has in the arena.",
+          "unit": "HP",
+          "min": 1,
+          "confidence": "documented"
+        },
+        "playerShield": {
+          "type": "int",
+          "default": 100,
+          "label": "Player shield",
+          "help": "Size of the shield that regenerates automatically on top of health.",
+          "unit": "shield points",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "startCountdown": {
+          "type": "int",
+          "default": 60,
+          "label": "Start countdown",
+          "help": "Wait before a match starts. The docs give a minimum of 6 seconds.",
+          "unit": "seconds",
+          "min": 6,
+          "confidence": "documented"
+        },
+        "startNextRoundCountdown": {
+          "type": "int",
+          "default": 10,
+          "label": "Next round countdown",
+          "help": "Wait between rounds. The docs give a minimum of 6 seconds.",
+          "unit": "seconds",
+          "min": 6,
+          "confidence": "documented"
+        },
+        "endMatchCountdown": {
+          "type": "int",
+          "default": 20,
+          "label": "End of match countdown",
+          "help": "Wait at the end of a match before players are sent back. The docs give a minimum of 6 seconds.",
+          "unit": "seconds",
+          "min": 6,
+          "confidence": "documented"
+        }
+      },
+      "instances": 1,
+      "role": "settings"
+    },
+    {
+      "id": "gearsets-files",
+      "match": "GearSets/*.json",
+      "title": "Gear set",
+      "summary": "One file per gear set. Lists the items, clothing and weapons (with attachments) every player receives for a match when the set is chosen.",
+      "restart": true,
+      "fields": {
+        "name": {
+          "type": "string",
+          "label": "Gear set name",
+          "help": "Name shown to players in game. The file name is what ArenaMatchConfigs refers to.",
+          "confidence": "documented"
+        },
+        "items[].type": {
+          "type": "classname",
+          "label": "Item class name",
+          "help": "Class name of the item or attachment.",
+          "confidence": "documented"
+        },
+        "items[].quantityInPercent": {
+          "type": "int",
+          "label": "Quantity",
+          "help": "How full or how much of the item is spawned, from 0 to 100 percent (for example how full a magazine is).",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "items[].attachments": {
+          "type": "list",
+          "label": "Attachments",
+          "help": "Items attached to this one (optics, magazines, suppressors). Same structure as an item.",
+          "confidence": "documented"
+        },
+        "items[].quickBarEntityShortcut": {
+          "type": "int",
+          "label": "Quick bar slot",
+          "help": "Quick bar slot for the item. -1 means no quick bar shortcut.",
+          "special": {
+            "-1": "no shortcut"
+          },
+          "confidence": "documented"
+        },
+        "items[].isInHand": {
+          "type": "flag",
+          "label": "Held in hand",
+          "help": "1 puts the item in the player hands at start. Only works for top level items.",
+          "confidence": "documented"
+        },
+        "items[].attachments[].type": {
+          "type": "classname",
+          "label": "Item class name",
+          "help": "Class name of the item or attachment.",
+          "confidence": "documented"
+        },
+        "items[].attachments[].quantityInPercent": {
+          "type": "int",
+          "label": "Quantity",
+          "help": "How full or how much of the item is spawned, from 0 to 100 percent (for example how full a magazine is).",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "items[].attachments[].attachments": {
+          "type": "list",
+          "label": "Nested attachments",
+          "help": "Attachments of an attachment. Same structure as an item.",
+          "confidence": "documented"
+        },
+        "items[].attachments[].quickBarEntityShortcut": {
+          "type": "int",
+          "label": "Quick bar slot",
+          "help": "Quick bar slot for the item. -1 means no quick bar shortcut.",
+          "special": {
+            "-1": "no shortcut"
+          },
+          "confidence": "documented"
+        },
+        "items[].attachments[].isInHand": {
+          "type": "flag",
+          "label": "Held in hand",
+          "help": "Ignored on attachments; only top level items can be held in hand.",
+          "confidence": "documented"
+        },
+        "items": {
+          "type": "list",
+          "label": "Items",
+          "help": "Everything given to the player with this gear set.",
+          "confidence": "documented"
+        },
+        "version": {
+          "type": "string",
+          "label": "Config version",
+          "help": "Version number the mod writes into this file so it can upgrade older files. Leave it exactly as it is.",
+          "internal": true,
+          "level": "danger",
+          "risk": "Changing it can make the mod reset or reject the file.",
+          "confidence": "documented"
+        }
+      },
+      "instances": 13,
+      "role": "records"
+    },
+    {
+      "id": "lobbyenterpoints-files",
+      "match": "LobbyEnterPoints/*.json",
+      "title": "Lobby entry point",
+      "summary": "One file per place on the map where players find a lobby machine to open the arena menu, optionally with an NPC.",
+      "restart": true,
+      "fields": {
+        "uniqueName": {
+          "type": "string",
+          "default": "Chernogorsk",
+          "label": "Entry point name",
+          "help": "Unique name of the entry point. MainConfig lists entry points by file name.",
+          "confidence": "documented"
+        },
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Config version",
+          "help": "Version number the mod writes into this file so it can upgrade older files. Leave it exactly as it is.",
+          "internal": true,
+          "level": "danger",
+          "risk": "Changing it can make the mod reset or reject the file.",
+          "confidence": "documented"
+        },
+        "coordinate.position[]": {
+          "type": "number",
+          "default": 6534.5,
+          "label": "Position coordinate",
+          "help": "One coordinate of the position (X, Y, Z).",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "coordinate.position": {
+          "type": "list",
+          "label": "Position",
+          "help": "World position X, Y, Z of the machine.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "coordinate.orientation[]": {
+          "type": "number",
+          "default": -48.9991340637207,
+          "label": "Orientation angle",
+          "help": "One rotation angle in degrees.",
+          "unit": "degrees",
+          "confidence": "documented"
+        },
+        "coordinate.orientation": {
+          "type": "list",
+          "label": "Orientation",
+          "help": "Rotation of the machine as three angles.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "type": {
+          "type": "enum",
+          "default": "TBWPMachine",
+          "label": "Entry point type",
+          "help": "Kind of entry point. TBWPMachine is currently the only one.",
+          "enum": [
+            {
+              "value": "TBWPMachine",
+              "label": "Lobby machine"
+            }
+          ],
+          "confidence": "documented"
+        },
+        "useExactPosition": {
+          "type": "flag",
+          "default": 0,
+          "label": "Use exact position",
+          "help": "0 drops the machine to the ground automatically. 1 uses the height you give.",
+          "confidence": "documented"
+        },
+        "enableNpcTrader": {
+          "type": "flag",
+          "default": 0,
+          "label": "Spawn an NPC",
+          "help": "1 spawns an NPC next to the machine. The two NPC fields below only apply then.",
+          "confidence": "documented"
+        },
+        "npcType": {
+          "type": "classname",
+          "default": "",
+          "label": "NPC model",
+          "help": "Class name of the NPC character model.",
+          "confidence": "documented"
+        },
+        "npcGearSetName": {
+          "type": "string",
+          "default": "",
+          "label": "NPC gear set",
+          "help": "Name of a gear set file (GearSets folder) the NPC wears.",
+          "confidence": "documented"
+        }
+      },
+      "instances": 1,
+      "role": "records"
+    },
+    {
+      "id": "logger",
+      "match": "logger.json",
+      "title": "Discord match log",
+      "summary": "Sends the kill feed and match created, started and finished messages to Discord and holds the texts used in them.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "3",
+          "label": "Config version",
+          "help": "Version number the mod writes into this file so it can upgrade older files. Leave it exactly as it is.",
+          "internal": true,
+          "level": "danger",
+          "risk": "Changing it can make the mod reset or reject the file.",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Leave it alone.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "logKillFeedToDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Post kill feed to Discord",
+          "help": "1 sends this kind of message to its Discord webhook, 0 turns it off.",
+          "confidence": "documented"
+        },
+        "discordKillFeedWebhookURL": {
+          "type": "url",
+          "label": "Kill feed webhook",
+          "help": "Discord webhook address that receives the \"kill feed\" messages. Treat it like a password: anyone who has it can post to your channel. Leave it empty or switch the matching option off to stop these messages.",
+          "level": "advanced",
+          "risk": "A leaked webhook lets others post in your Discord channel.",
+          "confidence": "documented"
+        },
+        "discordKillFeedHeader": {
+          "type": "string",
+          "default": "Kill Feed",
+          "label": "Kill Feed Header text",
+          "help": "Text used in the Discord message. %1 is replaced by the arena, team or player name where the default shows it. Purely cosmetic.",
+          "confidence": "documented"
+        },
+        "discordKillerTitle": {
+          "type": "string",
+          "default": "Killer",
+          "label": "Killer Title text",
+          "help": "Text used in the Discord message. %1 is replaced by the arena, team or player name where the default shows it. Purely cosmetic.",
+          "confidence": "documented"
+        },
+        "discordVictimTitle": {
+          "type": "string",
+          "default": "Victim",
+          "label": "Victim Title text",
+          "help": "Text used in the Discord message. %1 is replaced by the arena, team or player name where the default shows it. Purely cosmetic.",
+          "confidence": "documented"
+        },
+        "discordWeaponTitle": {
+          "type": "string",
+          "default": "Weapon",
+          "label": "Weapon Title text",
+          "help": "Text used in the Discord message. %1 is replaced by the arena, team or player name where the default shows it. Purely cosmetic.",
+          "confidence": "documented"
+        },
+        "postMatchCreatedInDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Post created to Discord",
+          "help": "1 sends this kind of message to its Discord webhook, 0 turns it off.",
+          "confidence": "documented"
+        },
+        "discordMatchCreatedWebhookURL": {
+          "type": "url",
+          "label": "Match created webhook",
+          "help": "Discord webhook address that receives the \"match created\" messages. Treat it like a password: anyone who has it can post to your channel. Leave it empty or switch the matching option off to stop these messages.",
+          "level": "advanced",
+          "risk": "A leaked webhook lets others post in your Discord channel.",
+          "confidence": "documented"
+        },
+        "discordMatchCreatedHeader": {
+          "type": "string",
+          "default": "Match created in Arena %1",
+          "label": "Match Created Header text",
+          "help": "Text used in the Discord message. %1 is replaced by the arena, team or player name where the default shows it. Purely cosmetic.",
+          "confidence": "documented"
+        },
+        "postMatchStartInDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Post start to Discord",
+          "help": "1 sends this kind of message to its Discord webhook, 0 turns it off.",
+          "confidence": "documented"
+        },
+        "discordMatchStartWebhookURL": {
+          "type": "url",
+          "label": "Match start webhook",
+          "help": "Discord webhook address that receives the \"match start\" messages. Treat it like a password: anyone who has it can post to your channel. Leave it empty or switch the matching option off to stop these messages.",
+          "level": "advanced",
+          "risk": "A leaked webhook lets others post in your Discord channel.",
+          "confidence": "documented"
+        },
+        "discordMatchStartHeader": {
+          "type": "string",
+          "default": "Match started in Arena %1",
+          "label": "Match Start Header text",
+          "help": "Text used in the Discord message. %1 is replaced by the arena, team or player name where the default shows it. Purely cosmetic.",
+          "confidence": "documented"
+        },
+        "postMatchWinInDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Post win to Discord",
+          "help": "1 sends this kind of message to its Discord webhook, 0 turns it off.",
+          "confidence": "documented"
+        },
+        "discordMatchWinWebhookURL": {
+          "type": "url",
+          "label": "Match win webhook",
+          "help": "Discord webhook address that receives the \"match win\" messages. Treat it like a password: anyone who has it can post to your channel. Leave it empty or switch the matching option off to stop these messages.",
+          "level": "advanced",
+          "risk": "A leaked webhook lets others post in your Discord channel.",
+          "confidence": "documented"
+        },
+        "discordMatchWinHeader": {
+          "type": "string",
+          "default": "Match ended in Arena %1",
+          "label": "Match Win Header text",
+          "help": "Text used in the Discord message. %1 is replaced by the arena, team or player name where the default shows it. Purely cosmetic.",
+          "confidence": "documented"
+        },
+        "discordMatchTitleTeamWinAgainstAll": {
+          "type": "string",
+          "default": "Team: %1 won against all",
+          "label": "Match Title Team Win Against All text",
+          "help": "Text used in the Discord message. %1 is replaced by the arena, team or player name where the default shows it. Purely cosmetic.",
+          "confidence": "documented"
+        },
+        "discordMatchBodyTeamFirstLine": {
+          "type": "string",
+          "default": "| Place | Team | Points | Kills | Deaths |",
+          "label": "Match Body Team First Line text",
+          "help": "Text used in the Discord message. %1 is replaced by the arena, team or player name where the default shows it. Purely cosmetic.",
+          "confidence": "documented"
+        },
+        "discordMatchTitlePlayerWinAgainstAll": {
+          "type": "string",
+          "default": "Player: %1 won against all",
+          "label": "Match Title Player Win Against All text",
+          "help": "Text used in the Discord message. %1 is replaced by the arena, team or player name where the default shows it. Purely cosmetic.",
+          "confidence": "documented"
+        },
+        "discordMatchBodyPlayerFirstLine": {
+          "type": "string",
+          "default": "| Place | Player name | Points | Kills | Deaths |",
+          "label": "Match Body Player First Line text",
+          "help": "Text used in the Discord message. %1 is replaced by the arena, team or player name where the default shows it. Purely cosmetic.",
+          "confidence": "documented"
+        },
+        "logTeamsCount": {
+          "type": "string",
+          "default": "Teams Count",
+          "label": "Teams Count label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logPlayersPerTeam": {
+          "type": "string",
+          "default": "Players Per Team",
+          "label": "Players Per Team label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logRoundsCount": {
+          "type": "string",
+          "default": "Rounds Count",
+          "label": "Rounds Count label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logDeathPenaltyTime": {
+          "type": "string",
+          "default": "Death Penalty Time",
+          "label": "Death Penalty Time label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logMaxTimePerRound": {
+          "type": "string",
+          "default": "Max Time Per Round",
+          "label": "Max Time Per Round label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logMaxKillsPerRound": {
+          "type": "string",
+          "default": "Max Kills Per Round",
+          "label": "Max Kills Per Round label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logEnableChangeSides": {
+          "type": "string",
+          "default": "Enable Change Sides",
+          "label": "Enable Change Sides label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logEnableOneLifeMode": {
+          "type": "string",
+          "default": "Enable One Life Mode",
+          "label": "Enable One Life Mode label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logEnableShowTeamMarker": {
+          "type": "string",
+          "default": "Enable Show Team Marker",
+          "label": "Enable Show Team Marker label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logEnableStamina": {
+          "type": "string",
+          "default": "Enable Stamina",
+          "label": "Enable Stamina label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logEnableMultipleGearSets": {
+          "type": "string",
+          "default": "Enable Multiple Gear Sets",
+          "label": "Enable Multiple Gear Sets label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logEnableSpectatorMode": {
+          "type": "string",
+          "default": "Enable Spectator Mode",
+          "label": "Enable Spectator Mode label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logEnableRandomTeamSelect": {
+          "type": "string",
+          "default": "Enable Random Team Select",
+          "label": "Enable Random Team Select label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logStartingFee": {
+          "type": "string",
+          "default": "Starting Fee",
+          "label": "Starting Fee label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logIsPermanent": {
+          "type": "string",
+          "default": "Is Permanent",
+          "label": "Is Permanent label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logTeamWinRatio": {
+          "type": "string",
+          "default": "Team Win Ratio",
+          "label": "Team Win Ratio label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logEnableFriendlyFire": {
+          "type": "string",
+          "default": "Enable Friendly Fire",
+          "label": "Enable Friendly Fire label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logForceFirstPerson": {
+          "type": "string",
+          "default": "Force First Person",
+          "label": "Force First Person label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logLootWillDeletedWhenPlayerDie": {
+          "type": "string",
+          "default": "Loot Will Deleted When Player Die",
+          "label": "Loot Will Deleted When Player Die label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logDisableSpectatorIfMatchIsStarted": {
+          "type": "string",
+          "default": "Disable Spectator If Match Is Started",
+          "label": "Disable Spectator If Match Is Started label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logDisableJoinIfMatchIsStarted": {
+          "type": "string",
+          "default": "Disable Join If Match Is Started",
+          "label": "Disable Join If Match Is Started label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logWinCondition": {
+          "type": "string",
+          "default": "Win Condition",
+          "label": "Win Condition label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logWinByKills": {
+          "type": "string",
+          "default": "Win by Kills",
+          "label": "Win By Kills label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logWinByPoints": {
+          "type": "string",
+          "default": "Win by Points",
+          "label": "Win By Points label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logPlace": {
+          "type": "string",
+          "default": "Place",
+          "label": "Place label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        },
+        "logRatio": {
+          "type": "string",
+          "default": "Ratio",
+          "label": "Ratio label",
+          "help": "Wording used for this item in the match summary shown to players and in Discord. Purely cosmetic and can be translated.",
+          "confidence": "documented"
+        }
+      },
+      "role": "settings"
+    },
+    {
+      "id": "mainconfig",
+      "match": "MainConfig.json",
+      "title": "Main settings",
+      "summary": "Turns the arena system on or off, lists the active arenas and lobby entry points, and sets lobby behaviour.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "5",
+          "label": "Config version",
+          "help": "Version number the mod writes into this file so it can upgrade older files. Leave it exactly as it is.",
+          "internal": true,
+          "level": "danger",
+          "risk": "Changing it can make the mod reset or reject the file.",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Leave it alone.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "isActive": {
+          "type": "flag",
+          "default": 1,
+          "label": "Arenas active",
+          "help": "1 lets players create arena matches, 0 switches creation off. Admins can also toggle it from the admin menu.",
+          "confidence": "documented"
+        },
+        "playerSpawnInMainLobby": {
+          "type": "flag",
+          "default": 0,
+          "label": "New players spawn in main lobby",
+          "help": "1 sends new players to the main lobby instead of the map. Players cannot leave the lobby except to enter a match. Needs a server restart.",
+          "level": "advanced",
+          "risk": "Players are held in the lobby until they join a match.",
+          "confidence": "documented"
+        },
+        "arenaFileNames[]": {
+          "type": "string",
+          "default": "Colosseum",
+          "label": "Arena name",
+          "help": "File name (without .json) of an arena.",
+          "confidence": "documented"
+        },
+        "arenaFileNames": {
+          "type": "list",
+          "label": "Active arenas",
+          "help": "Names of the arenas in use, each matching a file name in the arena match folder. Needs a restart.",
+          "confidence": "documented"
+        },
+        "lobbyEnterPointsNames[]": {
+          "type": "string",
+          "default": "Chernogorsk",
+          "label": "Entry point name",
+          "help": "File name (without .json) of a lobby entry point.",
+          "confidence": "documented"
+        },
+        "lobbyEnterPointsNames": {
+          "type": "list",
+          "label": "Active lobby entry points",
+          "help": "Names of the lobby entry points in use, each matching a file in LobbyEnterPoints.",
+          "confidence": "documented"
+        },
+        "arenas": {
+          "type": "list",
+          "default": [],
+          "label": "Arenas (internal)",
+          "help": "Used internally by the mod. Do not edit.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "mainLobbyPosition[]": {
+          "type": "number",
+          "default": 0,
+          "label": "Position coordinate",
+          "help": "One coordinate of the main lobby position (X, Y, Z).",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "mainLobbyPosition": {
+          "type": "list",
+          "label": "Main lobby position",
+          "help": "World position X, Y, Z of the main lobby where players are placed when it is used.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "playerCanOpenArenaMenuFromEverywhere": {
+          "type": "flag",
+          "default": 0,
+          "label": "Arena menu from anywhere",
+          "help": "1 lets players open the arena menu anywhere, 0 only at a lobby entry point.",
+          "confidence": "documented"
+        },
+        "permanentLobbies": {
+          "type": "list",
+          "default": [],
+          "label": "Permanent lobbies",
+          "help": "Names of lobbies that always exist, each matching a file in a PermanentLobbies folder. Needs a restart.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "enableHitAnimation": {
+          "type": "flag",
+          "default": 1,
+          "label": "Hit animation",
+          "help": "Shows a hit animation when a player takes damage in the arena.",
+          "confidence": "documented"
+        },
+        "disableNpcSpawnInLobbyBuilding": {
+          "type": "flag",
+          "default": 0,
+          "label": "No NPCs in lobby building",
+          "help": "1 stops NPCs spawning inside the lobby building.",
+          "confidence": "documented"
+        }
+      },
+      "role": "settings"
+    }
+  ]
+}

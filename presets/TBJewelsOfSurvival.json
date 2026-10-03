@@ -1,0 +1,101 @@
+{
+  "mod": "TBJewelsOfSurvival",
+  "presets": {
+    "pve": {
+      "changes": [
+        {
+          "file": "MineConfig.json",
+          "path": "mineTimeCopperInSeconds",
+          "value": 20,
+          "why": "Shorter mining for a relaxed progression."
+        },
+        {
+          "file": "MineConfig.json",
+          "path": "mineTimeIronInSeconds",
+          "value": 25,
+          "why": "Shorter mining for a relaxed progression."
+        }
+      ]
+    },
+    "casual": {
+      "changes": [
+        {
+          "file": "OreChanceConfig.json",
+          "path": "chanceToGetCopperOreWhenMined",
+          "value": 95,
+          "why": "Fewer empty mining attempts."
+        },
+        {
+          "file": "OreChanceConfig.json",
+          "path": "chanceToGetIronOreWhenMined",
+          "value": 85,
+          "why": "Fewer empty mining attempts."
+        },
+        {
+          "file": "OreChanceConfig.json",
+          "path": "chanceToGetSilverOreWhenMined",
+          "value": 70,
+          "why": "Fewer empty mining attempts."
+        },
+        {
+          "file": "SmelterConfig.json",
+          "path": "staticSmelterNeedsGas",
+          "value": 0,
+          "why": "No gas hunting for the fixed smelter."
+        },
+        {
+          "file": "GrinderConfig.json",
+          "path": "staticGrinderNeedsBattery",
+          "value": 0,
+          "why": "No battery needed for the fixed grinder."
+        }
+      ]
+    },
+    "hardcore": {
+      "changes": [
+        {
+          "file": "OreChanceConfig.json",
+          "path": "chanceToGetCopperOreWhenMined",
+          "value": 70,
+          "why": "Mining fails more often."
+        },
+        {
+          "file": "OreChanceConfig.json",
+          "path": "chanceToGetIronOreWhenMined",
+          "value": 55,
+          "why": "Mining fails more often."
+        },
+        {
+          "file": "OreChanceConfig.json",
+          "path": "chanceToGetSilverOreWhenMined",
+          "value": 40,
+          "why": "Mining fails more often."
+        },
+        {
+          "file": "OreChanceConfig.json",
+          "path": "chanceToGetGoldOreWhenMined",
+          "value": 35,
+          "why": "Mining fails more often."
+        },
+        {
+          "file": "OreChanceConfig.json",
+          "path": "chanceToGetGreenDiamondOreWhenMined",
+          "value": 15,
+          "why": "Gems become rarer."
+        },
+        {
+          "file": "OreChanceConfig.json",
+          "path": "chanceToGetBlueDiamondOreWhenMined",
+          "value": 8,
+          "why": "Gems become rarer."
+        },
+        {
+          "file": "OreChanceConfig.json",
+          "path": "chanceToGetRedDiamondOreWhenMined",
+          "value": 5,
+          "why": "Top gems become rare."
+        }
+      ]
+    }
+  }
+}

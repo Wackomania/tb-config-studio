@@ -1,0 +1,13 @@
+{
+  "mod": "TBCarDealer",
+  "presets": {
+    "pvp": { "changes": [
+      { "file": "Logger.json", "path": "logBuyCSV", "value": 1, "why": "Keep a local record of vehicle purchases" },
+      { "file": "Logger.json", "path": "logSellCSV", "value": 1, "why": "Keep a local record of vehicle sales" }
+    ] },
+    "hardcore": { "changes": [
+      { "file": "Logger.json", "path": "logBuyCSV", "value": 1, "why": "Keep a local record of vehicle purchases" },
+      { "file": "Logger.json", "path": "logSellCSV", "value": 1, "why": "Keep a local record of vehicle sales" }
+    ] }
+  }
+}

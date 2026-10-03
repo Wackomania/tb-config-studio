@@ -1,0 +1,23 @@
+{
+  "mod": "TBSecondHandMarket",
+  "presets": {
+    "pve": { "changes": [
+      { "file": "StallConfigs.json", "path": "maxMarketStallPerUser", "value": 3, "why": "Relaxed servers can let players run more stalls" },
+      { "file": "GlobalStallConfig.json", "path": "freeSlotsForPlayer", "value": 100, "why": "More free slots for a relaxed economy" }
+    ] },
+    "casual": { "changes": [
+      { "file": "StallConfigs.json", "path": "maxMarketStallPerUser", "value": 3, "why": "Let casual players keep more stalls" },
+      { "file": "GlobalStallConfig.json", "path": "freeSlotsForPlayer", "value": 100, "why": "More free slots, less friction" },
+      { "file": "BulletinBoard.json", "path": "priceForPublishOnBulletinBoard", "value": -1, "why": "Free posting on the board" }
+    ] },
+    "pvp": { "changes": [
+      { "file": "StallConfigs.json", "path": "maxMarketStallPerUser", "value": 2, "why": "Limit stalls that can become raid targets" }
+    ] },
+    "hardcore": { "changes": [
+      { "file": "StallConfigs.json", "path": "maxMarketStallPerUser", "value": 1, "why": "Scarce stalls fit a hard economy" },
+      { "file": "GlobalStallConfig.json", "path": "sellTaxInPercentageOffer", "value": 10, "why": "A tax removes coins from the economy" },
+      { "file": "GlobalStallConfig.json", "path": "sellTaxInPercentageOrder", "value": 10, "why": "A tax removes coins from the economy" },
+      { "file": "GlobalStallConfig.json", "path": "freeSlotsForPlayer", "value": 20, "why": "Fewer free slots" }
+    ] }
+  }
+}

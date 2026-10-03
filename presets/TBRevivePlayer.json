@@ -1,0 +1,71 @@
+{
+  "mod": "TBRevivePlayer",
+  "presets": {
+    "pve": {
+      "changes": [
+        {
+          "file": "HospitalReviveConfig.json",
+          "path": "minTimeBefore",
+          "value": 60,
+          "why": "Short wait before hospital revive"
+        },
+        {
+          "file": "HospitalReviveConfig.json",
+          "path": "damageConfig.health",
+          "value": 1,
+          "why": "Full health after revive"
+        }
+      ]
+    },
+    "hardcore": {
+      "changes": [
+        {
+          "file": "HospitalReviveConfig.json",
+          "path": "minTimeBefore",
+          "value": 300,
+          "why": "Long wait before hospital revive"
+        },
+        {
+          "file": "HospitalReviveConfig.json",
+          "path": "damageConfig.health",
+          "value": 0.3,
+          "why": "Weak after revive"
+        },
+        {
+          "file": "HospitalReviveConfig.json",
+          "path": "damageConfig.blood",
+          "value": 0.3,
+          "why": "Low blood after revive"
+        },
+        {
+          "file": "GeneralConfig.json",
+          "path": "defibrillatorHealthLoss",
+          "value": 30,
+          "why": "Defibrillator wears out faster"
+        }
+      ]
+    },
+    "casual": {
+      "changes": [
+        {
+          "file": "HospitalReviveConfig.json",
+          "path": "minTimeBefore",
+          "value": 60,
+          "why": "Short wait before hospital revive"
+        },
+        {
+          "file": "HospitalReviveConfig.json",
+          "path": "damageConfig.health",
+          "value": 1,
+          "why": "Full health after revive"
+        },
+        {
+          "file": "MedicReviveConfig.json",
+          "path": "damageConfig.health",
+          "value": 1,
+          "why": "Medic revive fully heals"
+        }
+      ]
+    }
+  }
+}

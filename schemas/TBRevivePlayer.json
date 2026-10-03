@@ -1,0 +1,1520 @@
+{
+  "schemaVersion": 1,
+  "mod": {
+    "id": "TBRevivePlayer",
+    "folder": "TBRevivePlayer",
+    "name": "TB Revive Player",
+    "summary": "Gives dead players a second chance. They can be revived by a medic with a defibrillator, respawn at a hospital, or respawn at a house they own. Each way has its own wait time, price and health penalty, and premium players get their own settings files.",
+    "coverage": "in-depth",
+    "docs": "https://doc.themodbase.com/RevivePlayer/Readme.html",
+    "sources": [
+      "RevivePlayer/Readme.html",
+      "RevivePlayer/FAQ.html",
+      "RevivePlayer/Types.html",
+      "RevivePlayer/Configs/GeneralConfig.html",
+      "RevivePlayer/Configs/HospitalReviveConfig.html",
+      "RevivePlayer/Configs/MedicReviveConfig.html",
+      "RevivePlayer/Configs/RealEstateReviveConfig.html",
+      "RevivePlayer/Configs/logger.html"
+    ],
+    "notes": "The *Premium files have the same settings as the normal ones and apply to premium players. Remove \"Defibrillator\" from cfgIgnoreList.xml in the mission folder or defibrillators vanish at restart."
+  },
+  "files": [
+    {
+      "id": "generalconfig",
+      "match": "GeneralConfig.json",
+      "title": "General",
+      "summary": "Defibrillator and kill-button settings.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "2",
+          "label": "Config version",
+          "help": "Managed by the mod itself. Leave it as it is.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "defibrillatorHealthLoss": {
+          "type": "number",
+          "default": 0,
+          "label": "Defibrillator health loss",
+          "help": "Health the defibrillator loses per use, in percent. Higher means it wears out faster. The generated file has 0.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "defibrillatorCanBeRepaired": {
+          "type": "flag",
+          "default": 1,
+          "label": "Defibrillator repairable",
+          "help": "Whether a worn defibrillator can be repaired.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "minTimeBeforeKillButton": {
+          "type": "int",
+          "default": 5,
+          "label": "Respawn button delay",
+          "help": "Time before a downed player can press the respawn (kill) button instead of waiting for help.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "5-120"
+        },
+        "minTimeBeforePremiumKillButton": {
+          "type": "int",
+          "default": 5,
+          "label": "Respawn button delay (premium)",
+          "help": "Same delay for premium players.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "5-120"
+        },
+        "minTimeBeforeKillWhenNoOtherPlayerIsOnline": {
+          "type": "int",
+          "default": 5,
+          "label": "Respawn button delay when alone",
+          "help": "Delay used when no other player is online.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "5"
+        },
+        "minTimeBeforePremiumKillWhenNoOtherPlayerIsOnline": {
+          "type": "int",
+          "default": 5,
+          "label": "Respawn button delay when alone (premium)",
+          "help": "Delay for premium players when no one else is online.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "5"
+        }
+      }
+    },
+    {
+      "id": "hospitalreviveconfig",
+      "match": "HospitalReviveConfig.json",
+      "title": "Hospital revive",
+      "summary": "Respawn at a hospital after dying.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "4",
+          "label": "Config version",
+          "help": "Managed by the mod itself. Leave it as it is.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "enable": {
+          "type": "flag",
+          "default": 1,
+          "label": "Enabled",
+          "help": "Turns the hospital revive way on or off.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "minTimeBefore": {
+          "type": "int",
+          "default": 180,
+          "label": "Wait before revive",
+          "help": "Minimum time a downed player must wait before this revive is offered.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "60-300"
+        },
+        "minTimeBeforeWhenNoOtherPlayerIsOnline": {
+          "type": "int",
+          "default": 60,
+          "label": "Wait when alone",
+          "help": "Same wait, used when no other player is online.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "5-60"
+        },
+        "enabledInPVPZones": {
+          "type": "flag",
+          "default": 1,
+          "label": "Works in PvP zones",
+          "help": "Allows this revive inside PvP zones. Works with the PVEZ and Ninjins PvP-PvE mods.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "damageConfig.maxWounds": {
+          "type": "int",
+          "default": 2,
+          "label": "Max wounds after revive",
+          "help": "Most wounds (injuries) the revived player can get.",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "damageConfig.minWounds": {
+          "type": "int",
+          "default": 1,
+          "label": "Min wounds after revive",
+          "help": "Fewest wounds the revived player gets.",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "damageConfig.health": {
+          "type": "number",
+          "default": 0.699999988079071,
+          "label": "Health after revive",
+          "help": "Health the player has after the revive, from 0 to 1 (1 is full).",
+          "min": 0,
+          "max": 1,
+          "typical": "0.3-1",
+          "confidence": "documented"
+        },
+        "damageConfig.blood": {
+          "type": "number",
+          "default": 0.699999988079071,
+          "label": "Blood after revive",
+          "help": "Blood level after the revive, from 0 to 1 (1 is full).",
+          "min": 0,
+          "max": 1,
+          "typical": "0.3-1",
+          "confidence": "documented"
+        },
+        "damageConfig.shock": {
+          "type": "number",
+          "default": 0.699999988079071,
+          "label": "Shock after revive",
+          "help": "Shock after the revive, from 0 to 1. 0 means maximum shock, 1 means none.",
+          "min": 0,
+          "max": 1,
+          "confidence": "documented"
+        },
+        "blacklistAreas": {
+          "type": "list",
+          "default": [],
+          "label": "Blocked areas",
+          "help": "Circles on the map where this revive does not work.",
+          "confidence": "documented"
+        },
+        "saveItemInHand": {
+          "type": "flag",
+          "default": 1,
+          "label": "Keep item in hand",
+          "help": "Remembers the item the player held when dying.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "putItemInHand": {
+          "type": "flag",
+          "default": 1,
+          "label": "Return item to hand",
+          "help": "Puts the remembered item back in the hand. Needs Keep item in hand to be on.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "canSelectRespawnLocation": {
+          "type": "flag",
+          "default": 0,
+          "label": "Player picks the spot",
+          "help": "Lets the player choose where to respawn.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "enableSlotSave": {
+          "type": "flag",
+          "default": 0,
+          "label": "Keep only listed slots",
+          "help": "When on, only the slots in the list below are kept; the rest is lost on death.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "Players lose everything outside the listed slots."
+        },
+        "slotsToSave[].slotName": {
+          "type": "string",
+          "default": "Headgear",
+          "label": "Slot name",
+          "help": "DayZ slot name such as Headgear, Body or Vest.",
+          "confidence": "documented"
+        },
+        "slotsToSave[].saveCargo": {
+          "type": "flag",
+          "default": 1,
+          "label": "Keep contents",
+          "help": "Also keep what is inside the item in that slot.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "slotsToSave": {
+          "type": "list",
+          "label": "Slots to keep",
+          "help": "Inventory slots whose items are kept.",
+          "confidence": "documented"
+        },
+        "spawnPoints[].id": {
+          "type": "string",
+          "default": "022are72qg",
+          "label": "Id",
+          "help": "Unique id of the spawn point; leave as it is.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "spawnPoints[].orientation[]": {
+          "type": "number",
+          "default": 46.99998474121094,
+          "label": "Angle",
+          "help": "One value of the facing vector.",
+          "confidence": "documented"
+        },
+        "spawnPoints[].orientation": {
+          "type": "list",
+          "label": "Facing",
+          "help": "Direction the player faces after respawning.",
+          "confidence": "documented"
+        },
+        "spawnPoints[].point[]": {
+          "type": "number",
+          "default": 10283.5185546875,
+          "label": "Coordinate",
+          "help": "One of X, Y, Z (in that order).",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "spawnPoints[].point": {
+          "type": "list",
+          "label": "Position",
+          "help": "Respawn position as X, Y, Z.",
+          "confidence": "documented"
+        },
+        "spawnPoints[].name": {
+          "type": "string",
+          "default": "<10283.518555, 12.801783, 2293.035400>",
+          "label": "Name",
+          "help": "Name players see when choosing. The generated name is just the coordinates; rename it to something readable.",
+          "confidence": "documented"
+        },
+        "spawnPoints[].currencyType": {
+          "type": "string",
+          "default": "default",
+          "label": "Currency",
+          "help": "Currency for this hospital.",
+          "confidence": "documented",
+          "typical": "default"
+        },
+        "spawnPoints[].price": {
+          "type": "int",
+          "default": -1,
+          "label": "Price",
+          "help": "Cost to use this hospital. -1 means free.",
+          "unit": "coins",
+          "special": {
+            "-1": "free"
+          },
+          "min": -1,
+          "confidence": "documented"
+        },
+        "spawnPoints": {
+          "type": "list",
+          "label": "Hospitals",
+          "help": "Places where players respawn after dying.",
+          "confidence": "documented"
+        },
+        "currencyType": {
+          "type": "string",
+          "default": "deprecated",
+          "label": "Currency (old)",
+          "help": "Marked deprecated in the file. The price is set per hospital above.",
+          "confidence": "observed",
+          "level": "advanced"
+        },
+        "price": {
+          "type": "int",
+          "default": -1,
+          "label": "Price (old)",
+          "help": "Old global price, no longer used for hospitals. Set prices on each hospital.",
+          "unit": "coins",
+          "confidence": "observed",
+          "level": "advanced"
+        },
+        "damageConfig": {
+          "label": "Condition after revive",
+          "help": "Health, blood, shock and wounds of the player right after being revived.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "blacklistAreas[]": {
+          "label": "Area",
+          "help": "One circular area.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "blacklistAreas[].position": {
+          "label": "Centre",
+          "help": "Centre as X, Y, Z map coordinates.",
+          "type": "list",
+          "confidence": "documented"
+        },
+        "blacklistAreas[].position[]": {
+          "label": "Coordinate",
+          "help": "One of X, Y, Z (in that order).",
+          "type": "number",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "blacklistAreas[].radius": {
+          "label": "Radius",
+          "help": "Size of the area.",
+          "type": "number",
+          "unit": "metres",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "slotsToSave[]": {
+          "label": "Slot",
+          "help": "One slot entry.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "spawnPoints[]": {
+          "label": "Hospital",
+          "help": "One respawn location.",
+          "type": "object",
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "hospitalreviveconfigpremium",
+      "match": "HospitalReviveConfigPremium.json",
+      "title": "Hospital revive (premium)",
+      "summary": "Hospital revive settings for premium players.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "4",
+          "label": "Config version",
+          "help": "Managed by the mod itself. Leave it as it is.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "enable": {
+          "type": "flag",
+          "default": 1,
+          "label": "Enabled",
+          "help": "Turns the hospital revive way on or off.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "minTimeBefore": {
+          "type": "int",
+          "default": 180,
+          "label": "Wait before revive",
+          "help": "Minimum time a downed player must wait before this revive is offered.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "60-300"
+        },
+        "minTimeBeforeWhenNoOtherPlayerIsOnline": {
+          "type": "int",
+          "default": 60,
+          "label": "Wait when alone",
+          "help": "Same wait, used when no other player is online.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "5-60"
+        },
+        "enabledInPVPZones": {
+          "type": "flag",
+          "default": 1,
+          "label": "Works in PvP zones",
+          "help": "Allows this revive inside PvP zones. Works with the PVEZ and Ninjins PvP-PvE mods.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "damageConfig.maxWounds": {
+          "type": "int",
+          "default": 2,
+          "label": "Max wounds after revive",
+          "help": "Most wounds (injuries) the revived player can get.",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "damageConfig.minWounds": {
+          "type": "int",
+          "default": 1,
+          "label": "Min wounds after revive",
+          "help": "Fewest wounds the revived player gets.",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "damageConfig.health": {
+          "type": "number",
+          "default": 0.699999988079071,
+          "label": "Health after revive",
+          "help": "Health the player has after the revive, from 0 to 1 (1 is full).",
+          "min": 0,
+          "max": 1,
+          "typical": "0.3-1",
+          "confidence": "documented"
+        },
+        "damageConfig.blood": {
+          "type": "number",
+          "default": 0.699999988079071,
+          "label": "Blood after revive",
+          "help": "Blood level after the revive, from 0 to 1 (1 is full).",
+          "min": 0,
+          "max": 1,
+          "typical": "0.3-1",
+          "confidence": "documented"
+        },
+        "damageConfig.shock": {
+          "type": "number",
+          "default": 0.699999988079071,
+          "label": "Shock after revive",
+          "help": "Shock after the revive, from 0 to 1. 0 means maximum shock, 1 means none.",
+          "min": 0,
+          "max": 1,
+          "confidence": "documented"
+        },
+        "blacklistAreas": {
+          "type": "list",
+          "default": [],
+          "label": "Blocked areas",
+          "help": "Circles on the map where this revive does not work.",
+          "confidence": "documented"
+        },
+        "saveItemInHand": {
+          "type": "flag",
+          "default": 1,
+          "label": "Keep item in hand",
+          "help": "Remembers the item the player held when dying.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "putItemInHand": {
+          "type": "flag",
+          "default": 1,
+          "label": "Return item to hand",
+          "help": "Puts the remembered item back in the hand. Needs Keep item in hand to be on.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "canSelectRespawnLocation": {
+          "type": "flag",
+          "default": 0,
+          "label": "Player picks the spot",
+          "help": "Lets the player choose where to respawn.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "enableSlotSave": {
+          "type": "flag",
+          "default": 0,
+          "label": "Keep only listed slots",
+          "help": "When on, only the slots in the list below are kept; the rest is lost on death.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "Players lose everything outside the listed slots."
+        },
+        "slotsToSave[].slotName": {
+          "type": "string",
+          "default": "Headgear",
+          "label": "Slot name",
+          "help": "DayZ slot name such as Headgear, Body or Vest.",
+          "confidence": "documented"
+        },
+        "slotsToSave[].saveCargo": {
+          "type": "flag",
+          "default": 1,
+          "label": "Keep contents",
+          "help": "Also keep what is inside the item in that slot.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "slotsToSave": {
+          "type": "list",
+          "label": "Slots to keep",
+          "help": "Inventory slots whose items are kept.",
+          "confidence": "documented"
+        },
+        "spawnPoints[].id": {
+          "type": "string",
+          "default": "ek0jvb0cap",
+          "label": "Id",
+          "help": "Unique id of the spawn point; leave as it is.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "spawnPoints[].orientation[]": {
+          "type": "number",
+          "default": 46.99998474121094,
+          "label": "Angle",
+          "help": "One value of the facing vector.",
+          "confidence": "documented"
+        },
+        "spawnPoints[].orientation": {
+          "type": "list",
+          "label": "Facing",
+          "help": "Direction the player faces after respawning.",
+          "confidence": "documented"
+        },
+        "spawnPoints[].point[]": {
+          "type": "number",
+          "default": 10283.5185546875,
+          "label": "Coordinate",
+          "help": "One of X, Y, Z (in that order).",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "spawnPoints[].point": {
+          "type": "list",
+          "label": "Position",
+          "help": "Respawn position as X, Y, Z.",
+          "confidence": "documented"
+        },
+        "spawnPoints[].name": {
+          "type": "string",
+          "default": "<10283.518555, 12.801783, 2293.035400>",
+          "label": "Name",
+          "help": "Name players see when choosing. The generated name is just the coordinates; rename it to something readable.",
+          "confidence": "documented"
+        },
+        "spawnPoints[].currencyType": {
+          "type": "string",
+          "default": "default",
+          "label": "Currency",
+          "help": "Currency for this hospital.",
+          "confidence": "documented",
+          "typical": "default"
+        },
+        "spawnPoints[].price": {
+          "type": "int",
+          "default": -1,
+          "label": "Price",
+          "help": "Cost to use this hospital. -1 means free.",
+          "unit": "coins",
+          "special": {
+            "-1": "free"
+          },
+          "min": -1,
+          "confidence": "documented"
+        },
+        "spawnPoints": {
+          "type": "list",
+          "label": "Hospitals",
+          "help": "Places where players respawn after dying.",
+          "confidence": "documented"
+        },
+        "currencyType": {
+          "type": "string",
+          "default": "deprecated",
+          "label": "Currency (old)",
+          "help": "Marked deprecated in the file. The price is set per hospital above.",
+          "confidence": "observed",
+          "level": "advanced"
+        },
+        "price": {
+          "type": "int",
+          "default": -1,
+          "label": "Price (old)",
+          "help": "Old global price, no longer used for hospitals. Set prices on each hospital.",
+          "unit": "coins",
+          "confidence": "observed",
+          "level": "advanced"
+        },
+        "damageConfig": {
+          "label": "Condition after revive",
+          "help": "Health, blood, shock and wounds of the player right after being revived.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "blacklistAreas[]": {
+          "label": "Area",
+          "help": "One circular area.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "blacklistAreas[].position": {
+          "label": "Centre",
+          "help": "Centre as X, Y, Z map coordinates.",
+          "type": "list",
+          "confidence": "documented"
+        },
+        "blacklistAreas[].position[]": {
+          "label": "Coordinate",
+          "help": "One of X, Y, Z (in that order).",
+          "type": "number",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "blacklistAreas[].radius": {
+          "label": "Radius",
+          "help": "Size of the area.",
+          "type": "number",
+          "unit": "metres",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "slotsToSave[]": {
+          "label": "Slot",
+          "help": "One slot entry.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "spawnPoints[]": {
+          "label": "Hospital",
+          "help": "One respawn location.",
+          "type": "object",
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "logger",
+      "match": "logger.json",
+      "title": "Logging",
+      "summary": "Logging of revives to CSV and Discord.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Config version",
+          "help": "Managed by the mod itself. Leave it as it is.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised flag",
+          "help": "Set by the mod once the file was created. Leave it as it is.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "logSteamIdInLog": {
+          "type": "flag",
+          "default": 1,
+          "label": "Steam id in Discord log",
+          "help": "Include the Steam id in the Discord revive message.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logRevive": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log revives",
+          "help": "Write each revive to the CSV log.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logReviveToDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord: revives",
+          "help": "Also post revives to Discord.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordReviveWebhookURL": {
+          "type": "url",
+          "label": "Discord address: revives",
+          "help": "Webhook address for revive messages. Needed when Discord logging is on.",
+          "level": "advanced",
+          "confidence": "documented",
+          "risk": "The address works like a password for the channel: anyone who has it can post there. Do not share it."
+        }
+      }
+    },
+    {
+      "id": "medicreviveconfig",
+      "match": "MedicReviveConfig.json",
+      "title": "Medic revive",
+      "summary": "A medic revives a downed player with a defibrillator.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "2",
+          "label": "Config version",
+          "help": "Managed by the mod itself. Leave it as it is.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "enable": {
+          "type": "flag",
+          "default": 1,
+          "label": "Enabled",
+          "help": "Turns the medic revive way on or off.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "minTimeBefore": {
+          "type": "int",
+          "default": 180,
+          "label": "Wait before revive",
+          "help": "Minimum time a downed player must wait before this revive is offered.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "60-300"
+        },
+        "minTimeBeforeWhenNoOtherPlayerIsOnline": {
+          "type": "int",
+          "default": 60,
+          "label": "Wait when alone",
+          "help": "Same wait, used when no other player is online.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "5-60"
+        },
+        "enabledInPVPZones": {
+          "type": "flag",
+          "default": 1,
+          "label": "Works in PvP zones",
+          "help": "Allows this revive inside PvP zones. Works with the PVEZ and Ninjins PvP-PvE mods.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "damageConfig.maxWounds": {
+          "type": "int",
+          "default": 2,
+          "label": "Max wounds after revive",
+          "help": "Most wounds (injuries) the revived player can get.",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "damageConfig.minWounds": {
+          "type": "int",
+          "default": 1,
+          "label": "Min wounds after revive",
+          "help": "Fewest wounds the revived player gets.",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "damageConfig.health": {
+          "type": "number",
+          "default": 0.699999988079071,
+          "label": "Health after revive",
+          "help": "Health the player has after the revive, from 0 to 1 (1 is full).",
+          "min": 0,
+          "max": 1,
+          "typical": "0.3-1",
+          "confidence": "documented"
+        },
+        "damageConfig.blood": {
+          "type": "number",
+          "default": 0.699999988079071,
+          "label": "Blood after revive",
+          "help": "Blood level after the revive, from 0 to 1 (1 is full).",
+          "min": 0,
+          "max": 1,
+          "typical": "0.3-1",
+          "confidence": "documented"
+        },
+        "damageConfig.shock": {
+          "type": "number",
+          "default": 0.699999988079071,
+          "label": "Shock after revive",
+          "help": "Shock after the revive, from 0 to 1. 0 means maximum shock, 1 means none.",
+          "min": 0,
+          "max": 1,
+          "confidence": "documented"
+        },
+        "blacklistAreas": {
+          "type": "list",
+          "default": [],
+          "label": "Blocked areas",
+          "help": "Circles on the map where this revive does not work.",
+          "confidence": "documented"
+        },
+        "minMedicCountForHospitalTimer": {
+          "type": "int",
+          "default": 1,
+          "label": "Medics needed for hospital timer",
+          "help": "Minimum number of medics online for the hospital timer to apply. Only used with the DayZ Life medic system.",
+          "min": 0,
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "currencyType": {
+          "type": "string",
+          "default": "default",
+          "label": "Currency",
+          "help": "Currency used to pay for the revive, from the shared currency config.",
+          "confidence": "documented",
+          "typical": "default"
+        },
+        "price": {
+          "type": "int",
+          "default": -1,
+          "label": "Price",
+          "help": "Cost of the revive. -1 means free.",
+          "unit": "coins",
+          "special": {
+            "-1": "free"
+          },
+          "min": -1,
+          "confidence": "documented"
+        },
+        "damageConfig": {
+          "label": "Condition after revive",
+          "help": "Health, blood, shock and wounds of the player right after being revived.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "blacklistAreas[]": {
+          "label": "Area",
+          "help": "One circular area.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "blacklistAreas[].position": {
+          "label": "Centre",
+          "help": "Centre as X, Y, Z map coordinates.",
+          "type": "list",
+          "confidence": "documented"
+        },
+        "blacklistAreas[].position[]": {
+          "label": "Coordinate",
+          "help": "One of X, Y, Z (in that order).",
+          "type": "number",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "blacklistAreas[].radius": {
+          "label": "Radius",
+          "help": "Size of the area.",
+          "type": "number",
+          "unit": "metres",
+          "min": 0,
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "medicreviveconfigpremium",
+      "match": "MedicReviveConfigPremium.json",
+      "title": "Medic revive (premium)",
+      "summary": "Medic revive settings for premium players.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "2",
+          "label": "Config version",
+          "help": "Managed by the mod itself. Leave it as it is.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "enable": {
+          "type": "flag",
+          "default": 1,
+          "label": "Enabled",
+          "help": "Turns the medic revive way on or off.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "minTimeBefore": {
+          "type": "int",
+          "default": 180,
+          "label": "Wait before revive",
+          "help": "Minimum time a downed player must wait before this revive is offered.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "60-300"
+        },
+        "minTimeBeforeWhenNoOtherPlayerIsOnline": {
+          "type": "int",
+          "default": 60,
+          "label": "Wait when alone",
+          "help": "Same wait, used when no other player is online.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "5-60"
+        },
+        "enabledInPVPZones": {
+          "type": "flag",
+          "default": 1,
+          "label": "Works in PvP zones",
+          "help": "Allows this revive inside PvP zones. Works with the PVEZ and Ninjins PvP-PvE mods.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "damageConfig.maxWounds": {
+          "type": "int",
+          "default": 2,
+          "label": "Max wounds after revive",
+          "help": "Most wounds (injuries) the revived player can get.",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "damageConfig.minWounds": {
+          "type": "int",
+          "default": 1,
+          "label": "Min wounds after revive",
+          "help": "Fewest wounds the revived player gets.",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "damageConfig.health": {
+          "type": "number",
+          "default": 0.699999988079071,
+          "label": "Health after revive",
+          "help": "Health the player has after the revive, from 0 to 1 (1 is full).",
+          "min": 0,
+          "max": 1,
+          "typical": "0.3-1",
+          "confidence": "documented"
+        },
+        "damageConfig.blood": {
+          "type": "number",
+          "default": 0.699999988079071,
+          "label": "Blood after revive",
+          "help": "Blood level after the revive, from 0 to 1 (1 is full).",
+          "min": 0,
+          "max": 1,
+          "typical": "0.3-1",
+          "confidence": "documented"
+        },
+        "damageConfig.shock": {
+          "type": "number",
+          "default": 0.699999988079071,
+          "label": "Shock after revive",
+          "help": "Shock after the revive, from 0 to 1. 0 means maximum shock, 1 means none.",
+          "min": 0,
+          "max": 1,
+          "confidence": "documented"
+        },
+        "blacklistAreas": {
+          "type": "list",
+          "default": [],
+          "label": "Blocked areas",
+          "help": "Circles on the map where this revive does not work.",
+          "confidence": "documented"
+        },
+        "minMedicCountForHospitalTimer": {
+          "type": "int",
+          "default": 1,
+          "label": "Medics needed for hospital timer",
+          "help": "Minimum number of medics online for the hospital timer to apply. Only used with the DayZ Life medic system.",
+          "min": 0,
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "currencyType": {
+          "type": "string",
+          "default": "default",
+          "label": "Currency",
+          "help": "Currency used to pay for the revive, from the shared currency config.",
+          "confidence": "documented",
+          "typical": "default"
+        },
+        "price": {
+          "type": "int",
+          "default": -1,
+          "label": "Price",
+          "help": "Cost of the revive. -1 means free.",
+          "unit": "coins",
+          "special": {
+            "-1": "free"
+          },
+          "min": -1,
+          "confidence": "documented"
+        },
+        "damageConfig": {
+          "label": "Condition after revive",
+          "help": "Health, blood, shock and wounds of the player right after being revived.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "blacklistAreas[]": {
+          "label": "Area",
+          "help": "One circular area.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "blacklistAreas[].position": {
+          "label": "Centre",
+          "help": "Centre as X, Y, Z map coordinates.",
+          "type": "list",
+          "confidence": "documented"
+        },
+        "blacklistAreas[].position[]": {
+          "label": "Coordinate",
+          "help": "One of X, Y, Z (in that order).",
+          "type": "number",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "blacklistAreas[].radius": {
+          "label": "Radius",
+          "help": "Size of the area.",
+          "type": "number",
+          "unit": "metres",
+          "min": 0,
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "realestatereviveconfig",
+      "match": "RealEstateReviveConfig.json",
+      "title": "Real estate revive",
+      "summary": "Respawn at a house the player owns.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "3",
+          "label": "Config version",
+          "help": "Managed by the mod itself. Leave it as it is.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "enable": {
+          "type": "flag",
+          "default": 1,
+          "label": "Enabled",
+          "help": "Turns the real estate revive way on or off.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "minTimeBefore": {
+          "type": "int",
+          "default": 180,
+          "label": "Wait before revive",
+          "help": "Minimum time a downed player must wait before this revive is offered.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "60-300"
+        },
+        "minTimeBeforeWhenNoOtherPlayerIsOnline": {
+          "type": "int",
+          "default": 60,
+          "label": "Wait when alone",
+          "help": "Same wait, used when no other player is online.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "5-60"
+        },
+        "enabledInPVPZones": {
+          "type": "flag",
+          "default": 1,
+          "label": "Works in PvP zones",
+          "help": "Allows this revive inside PvP zones. Works with the PVEZ and Ninjins PvP-PvE mods.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "damageConfig.maxWounds": {
+          "type": "int",
+          "default": 2,
+          "label": "Max wounds after revive",
+          "help": "Most wounds (injuries) the revived player can get.",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "damageConfig.minWounds": {
+          "type": "int",
+          "default": 1,
+          "label": "Min wounds after revive",
+          "help": "Fewest wounds the revived player gets.",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "damageConfig.health": {
+          "type": "number",
+          "default": 0.699999988079071,
+          "label": "Health after revive",
+          "help": "Health the player has after the revive, from 0 to 1 (1 is full).",
+          "min": 0,
+          "max": 1,
+          "typical": "0.3-1",
+          "confidence": "documented"
+        },
+        "damageConfig.blood": {
+          "type": "number",
+          "default": 0.699999988079071,
+          "label": "Blood after revive",
+          "help": "Blood level after the revive, from 0 to 1 (1 is full).",
+          "min": 0,
+          "max": 1,
+          "typical": "0.3-1",
+          "confidence": "documented"
+        },
+        "damageConfig.shock": {
+          "type": "number",
+          "default": 0.699999988079071,
+          "label": "Shock after revive",
+          "help": "Shock after the revive, from 0 to 1. 0 means maximum shock, 1 means none.",
+          "min": 0,
+          "max": 1,
+          "confidence": "documented"
+        },
+        "blacklistAreas": {
+          "type": "list",
+          "default": [],
+          "label": "Blocked areas",
+          "help": "Circles on the map where this revive does not work.",
+          "confidence": "documented"
+        },
+        "saveItemInHand": {
+          "type": "flag",
+          "default": 1,
+          "label": "Keep item in hand",
+          "help": "Remembers the item the player held when dying.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "putItemInHand": {
+          "type": "flag",
+          "default": 1,
+          "label": "Return item to hand",
+          "help": "Puts the remembered item back in the hand. Needs Keep item in hand to be on.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "canSelectRespawnLocation": {
+          "type": "flag",
+          "default": 0,
+          "label": "Player picks the spot",
+          "help": "Lets the player choose where to respawn.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "enableSlotSave": {
+          "type": "flag",
+          "default": 0,
+          "label": "Keep only listed slots",
+          "help": "When on, only the slots in the list below are kept; the rest is lost on death.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "Players lose everything outside the listed slots."
+        },
+        "slotsToSave[].slotName": {
+          "type": "string",
+          "default": "Headgear",
+          "label": "Slot name",
+          "help": "DayZ slot name such as Headgear, Body or Vest.",
+          "confidence": "documented"
+        },
+        "slotsToSave[].saveCargo": {
+          "type": "flag",
+          "default": 1,
+          "label": "Keep contents",
+          "help": "Also keep what is inside the item in that slot.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "slotsToSave": {
+          "type": "list",
+          "label": "Slots to keep",
+          "help": "Inventory slots whose items are kept.",
+          "confidence": "documented"
+        },
+        "currencyType": {
+          "type": "string",
+          "default": "default",
+          "label": "Currency",
+          "help": "Currency used to pay for the revive, from the shared currency config.",
+          "confidence": "documented",
+          "typical": "default"
+        },
+        "price": {
+          "type": "int",
+          "default": -1,
+          "label": "Price",
+          "help": "Cost of the revive. -1 means free.",
+          "unit": "coins",
+          "special": {
+            "-1": "free"
+          },
+          "min": -1,
+          "confidence": "documented"
+        },
+        "damageConfig": {
+          "label": "Condition after revive",
+          "help": "Health, blood, shock and wounds of the player right after being revived.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "blacklistAreas[]": {
+          "label": "Area",
+          "help": "One circular area.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "blacklistAreas[].position": {
+          "label": "Centre",
+          "help": "Centre as X, Y, Z map coordinates.",
+          "type": "list",
+          "confidence": "documented"
+        },
+        "blacklistAreas[].position[]": {
+          "label": "Coordinate",
+          "help": "One of X, Y, Z (in that order).",
+          "type": "number",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "blacklistAreas[].radius": {
+          "label": "Radius",
+          "help": "Size of the area.",
+          "type": "number",
+          "unit": "metres",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "slotsToSave[]": {
+          "label": "Slot",
+          "help": "One slot entry.",
+          "type": "object",
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "realestatereviveconfigpremium",
+      "match": "RealEstateReviveConfigPremium.json",
+      "title": "Real estate revive (premium)",
+      "summary": "Real estate revive settings for premium players.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "3",
+          "label": "Config version",
+          "help": "Managed by the mod itself. Leave it as it is.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "enable": {
+          "type": "flag",
+          "default": 1,
+          "label": "Enabled",
+          "help": "Turns the real estate revive way on or off.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "minTimeBefore": {
+          "type": "int",
+          "default": 180,
+          "label": "Wait before revive",
+          "help": "Minimum time a downed player must wait before this revive is offered.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "60-300"
+        },
+        "minTimeBeforeWhenNoOtherPlayerIsOnline": {
+          "type": "int",
+          "default": 60,
+          "label": "Wait when alone",
+          "help": "Same wait, used when no other player is online.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "5-60"
+        },
+        "enabledInPVPZones": {
+          "type": "flag",
+          "default": 1,
+          "label": "Works in PvP zones",
+          "help": "Allows this revive inside PvP zones. Works with the PVEZ and Ninjins PvP-PvE mods.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "damageConfig.maxWounds": {
+          "type": "int",
+          "default": 2,
+          "label": "Max wounds after revive",
+          "help": "Most wounds (injuries) the revived player can get.",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "damageConfig.minWounds": {
+          "type": "int",
+          "default": 1,
+          "label": "Min wounds after revive",
+          "help": "Fewest wounds the revived player gets.",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "damageConfig.health": {
+          "type": "number",
+          "default": 0.699999988079071,
+          "label": "Health after revive",
+          "help": "Health the player has after the revive, from 0 to 1 (1 is full).",
+          "min": 0,
+          "max": 1,
+          "typical": "0.3-1",
+          "confidence": "documented"
+        },
+        "damageConfig.blood": {
+          "type": "number",
+          "default": 0.699999988079071,
+          "label": "Blood after revive",
+          "help": "Blood level after the revive, from 0 to 1 (1 is full).",
+          "min": 0,
+          "max": 1,
+          "typical": "0.3-1",
+          "confidence": "documented"
+        },
+        "damageConfig.shock": {
+          "type": "number",
+          "default": 0.699999988079071,
+          "label": "Shock after revive",
+          "help": "Shock after the revive, from 0 to 1. 0 means maximum shock, 1 means none.",
+          "min": 0,
+          "max": 1,
+          "confidence": "documented"
+        },
+        "blacklistAreas": {
+          "type": "list",
+          "default": [],
+          "label": "Blocked areas",
+          "help": "Circles on the map where this revive does not work.",
+          "confidence": "documented"
+        },
+        "saveItemInHand": {
+          "type": "flag",
+          "default": 1,
+          "label": "Keep item in hand",
+          "help": "Remembers the item the player held when dying.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "putItemInHand": {
+          "type": "flag",
+          "default": 1,
+          "label": "Return item to hand",
+          "help": "Puts the remembered item back in the hand. Needs Keep item in hand to be on.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "canSelectRespawnLocation": {
+          "type": "flag",
+          "default": 0,
+          "label": "Player picks the spot",
+          "help": "Lets the player choose where to respawn.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "enableSlotSave": {
+          "type": "flag",
+          "default": 0,
+          "label": "Keep only listed slots",
+          "help": "When on, only the slots in the list below are kept; the rest is lost on death.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "Players lose everything outside the listed slots."
+        },
+        "slotsToSave[].slotName": {
+          "type": "string",
+          "default": "Headgear",
+          "label": "Slot name",
+          "help": "DayZ slot name such as Headgear, Body or Vest.",
+          "confidence": "documented"
+        },
+        "slotsToSave[].saveCargo": {
+          "type": "flag",
+          "default": 1,
+          "label": "Keep contents",
+          "help": "Also keep what is inside the item in that slot.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "slotsToSave": {
+          "type": "list",
+          "label": "Slots to keep",
+          "help": "Inventory slots whose items are kept.",
+          "confidence": "documented"
+        },
+        "currencyType": {
+          "type": "string",
+          "default": "default",
+          "label": "Currency",
+          "help": "Currency used to pay for the revive, from the shared currency config.",
+          "confidence": "documented",
+          "typical": "default"
+        },
+        "price": {
+          "type": "int",
+          "default": -1,
+          "label": "Price",
+          "help": "Cost of the revive. -1 means free.",
+          "unit": "coins",
+          "special": {
+            "-1": "free"
+          },
+          "min": -1,
+          "confidence": "documented"
+        },
+        "damageConfig": {
+          "label": "Condition after revive",
+          "help": "Health, blood, shock and wounds of the player right after being revived.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "blacklistAreas[]": {
+          "label": "Area",
+          "help": "One circular area.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "blacklistAreas[].position": {
+          "label": "Centre",
+          "help": "Centre as X, Y, Z map coordinates.",
+          "type": "list",
+          "confidence": "documented"
+        },
+        "blacklistAreas[].position[]": {
+          "label": "Coordinate",
+          "help": "One of X, Y, Z (in that order).",
+          "type": "number",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "blacklistAreas[].radius": {
+          "label": "Radius",
+          "help": "Size of the area.",
+          "type": "number",
+          "unit": "metres",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "slotsToSave[]": {
+          "label": "Slot",
+          "help": "One slot entry.",
+          "type": "object",
+          "confidence": "documented"
+        }
+      }
+    }
+  ]
+}

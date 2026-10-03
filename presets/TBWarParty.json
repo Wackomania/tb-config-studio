@@ -1,0 +1,41 @@
+{
+  "mod": "TBWarParty",
+  "presets": {
+    "pvp": {
+      "changes": [
+        {
+          "file": "MainConfig.json",
+          "path": "playerCanOpenArenaMenuFromEverywhere",
+          "value": 1,
+          "why": "Players can start matches from anywhere, which suits an arena-focused server."
+        }
+      ]
+    },
+    "casual": {
+      "changes": [
+        {
+          "file": "MainConfig.json",
+          "path": "playerCanOpenArenaMenuFromEverywhere",
+          "value": 1,
+          "why": "Easier access to the arena menu for relaxed play."
+        },
+        {
+          "file": "MainConfig.json",
+          "path": "enableHitAnimation",
+          "value": 1,
+          "why": "Hit feedback makes arena fights easier to read."
+        }
+      ]
+    },
+    "hardcore": {
+      "changes": [
+        {
+          "file": "MainConfig.json",
+          "path": "playerCanOpenArenaMenuFromEverywhere",
+          "value": 0,
+          "why": "Players must travel to a lobby machine to start a match."
+        }
+      ]
+    }
+  }
+}

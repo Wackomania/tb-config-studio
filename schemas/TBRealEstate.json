@@ -1,0 +1,879 @@
+{
+  "schemaVersion": 1,
+  "mod": {
+    "id": "TBRealEstate",
+    "folder": "TBRealEstate",
+    "name": "TB Real Estate",
+    "summary": "Players can buy houses and other buildings on the map, lock them with keys, add extensions such as alarms, extra storage and respawn points, and keep their items from disappearing. Other players can raid houses with the right tools, optionally only inside time windows.",
+    "coverage": "in-depth",
+    "docs": "https://doc.themodbase.com/RealEstate/Readme.html",
+    "sources": [
+      "RealEstate/Readme.html",
+      "RealEstate/Configs/GlobalRaidConfig.html",
+      "RealEstate/Configs/house.html",
+      "RealEstate/Configs/HouseDefinition.html",
+      "RealEstate/Configs/houseExtension.html",
+      "RealEstate/Configs/logger.html",
+      "RealEstate/Configs/SpawnPoint.html"
+    ],
+    "notes": "The server needs storeHouseStateDisabled = 0 in serverDZ.cfg. Restart after every config change. SpawnPoint.json is documented but was not present in the sample folder."
+  },
+  "files": [
+    {
+      "id": "globalraidconfig",
+      "match": "GlobalRaidConfig.json",
+      "title": "Raid time windows",
+      "summary": "Global switch and time windows in which houses can be raided.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Config version",
+          "help": "Managed by the mod itself. Leave it as it is.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised flag",
+          "help": "Set by the mod once the file was created. Leave it as it is.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "useUTCTime": {
+          "type": "flag",
+          "default": 0,
+          "label": "Use UTC time",
+          "help": "1 reads the raid times as UTC, 0 as the local time of the server machine. Matters when your host is in a different time zone than your players.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "isEnabled": {
+          "type": "flag",
+          "default": 0,
+          "label": "Raid windows active",
+          "help": "1 turns the time windows on, so raids are only possible inside them. 0 turns them off. The doc lists 1 as default; the generated file has 0.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "raidTimes": {
+          "type": "list",
+          "label": "Raid windows",
+          "help": "List of windows. Each entry holds a start and an end time. In the generated file the start and end have random-looking names; the mod reads them as start and end.",
+          "confidence": "documented"
+        },
+        "raidTimes[]": {
+          "label": "Window",
+          "help": "One raid window with a start and an end time.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "raidTimes[].*": {
+          "label": "Start or end time",
+          "help": "A point in time with year, month, day, hour, minute and second.",
+          "type": "object",
+          "confidence": "observed"
+        },
+        "raidTimes[].*.year": {
+          "label": "Year",
+          "help": "0 repeats every year, a four digit year means that single year. For weekday rules use 1.",
+          "type": "int",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "raidTimes[].*.month": {
+          "label": "Month",
+          "help": "0 repeats every month, 1-12 means that month. For weekday rules use 1.",
+          "type": "int",
+          "min": 0,
+          "max": 12,
+          "confidence": "documented"
+        },
+        "raidTimes[].*.day": {
+          "label": "Day",
+          "help": "0 repeats daily, 1-31 means that day of the month. With year 1 and month 1, 0-6 means a weekday (0 Sunday to 6 Saturday).",
+          "type": "int",
+          "min": 0,
+          "max": 31,
+          "confidence": "documented"
+        },
+        "raidTimes[].*.hour": {
+          "label": "Hour",
+          "help": "Hour of the day, 24 hour clock.",
+          "type": "int",
+          "min": 0,
+          "max": 24,
+          "unit": "hours",
+          "confidence": "documented"
+        },
+        "raidTimes[].*.minute": {
+          "label": "Minute",
+          "help": "Minute of the hour.",
+          "type": "int",
+          "min": 0,
+          "max": 59,
+          "unit": "minutes",
+          "confidence": "documented"
+        },
+        "raidTimes[].*.second": {
+          "label": "Second",
+          "help": "Second of the minute.",
+          "type": "int",
+          "min": 0,
+          "max": 59,
+          "unit": "seconds",
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "house",
+      "match": "house.json",
+      "title": "House settings",
+      "summary": "Global rules for buying houses, locking, raids, disappearing items and no-buy or buy-only areas.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "14",
+          "label": "Config version",
+          "help": "Managed by the mod itself. Leave it as it is.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised flag",
+          "help": "Set by the mod once the file was created. Leave it as it is.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "showMap": {
+          "type": "flag",
+          "default": 1,
+          "label": "Show map in house menu",
+          "help": "Shows the map inside the house menu.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "howManyHousesCanPlayerBuy": {
+          "type": "int",
+          "default": 1,
+          "label": "Houses per player",
+          "help": "How many houses one player can own at the same time.",
+          "min": 1,
+          "typical": "1-3",
+          "confidence": "documented"
+        },
+        "stopDisappearingCheckIntervalInSeconds": {
+          "type": "int",
+          "default": 180,
+          "label": "Item protection check interval",
+          "help": "How often the mod refreshes items in houses that have the stop-disappearing extension. Restart needed to apply.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "180",
+          "level": "advanced"
+        },
+        "playerCanRespawnInHouse": {
+          "type": "flag",
+          "default": 1,
+          "label": "Respawn in house",
+          "help": "Allows the respawn extension, so owners can spawn in their house.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "useBlackListedAreas": {
+          "type": "flag",
+          "default": 0,
+          "label": "Use no-buy areas",
+          "help": "Houses inside the blacklisted areas below cannot be bought. Do not combine with the buy-only areas.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "useWhiteListedAreas": {
+          "type": "flag",
+          "default": 0,
+          "label": "Use buy-only areas",
+          "help": "Houses can only be bought inside the whitelisted areas below. Do not combine with the no-buy areas.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "notSoldHousesAreLocked": {
+          "type": "flag",
+          "default": 0,
+          "label": "Unsold houses locked",
+          "help": "Houses nobody owns stay locked, so nobody can walk in. Applies outside the listed areas.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "notSoldHousesInBlackListedAreasAreLocked": {
+          "type": "flag",
+          "default": 0,
+          "label": "Unsold houses locked in no-buy areas",
+          "help": "Unowned houses inside the no-buy areas stay locked.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "notSoldHousesInWhiteListedAreasAreLocked": {
+          "type": "flag",
+          "default": 0,
+          "label": "Unsold houses locked in buy-only areas",
+          "help": "Unowned houses inside the buy-only areas stay locked.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "stopGlobalStopDisappearingCheck": {
+          "type": "flag",
+          "default": 0,
+          "label": "Disable item protection",
+          "help": "Turns the background process that keeps house items from disappearing off. Items may then despawn by the normal lifetime.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "Items in houses can vanish."
+        },
+        "inactiveDaysBeforePlayerDataWillDeleted": {
+          "type": "int",
+          "default": 300,
+          "label": "Delete inactive owners after",
+          "help": "Player data of players who have not been online for this many days is removed.",
+          "unit": "days",
+          "min": 0,
+          "typical": "60-300",
+          "confidence": "documented",
+          "risk": "Their ownership data is lost for good.",
+          "level": "advanced"
+        },
+        "closeDoorsAtServerRestartAfterSeconds": {
+          "type": "int",
+          "default": 30,
+          "label": "Close doors after restart",
+          "help": "Doors of houses are closed this many seconds after the server starts.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "30"
+        },
+        "housesCanOnlyBeRaidWhenOwnerIsOnline": {
+          "type": "flag",
+          "default": 0,
+          "label": "Raid only with owner online",
+          "help": "When 1, a house can only be raided while its owner is online. Protects offline players.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "blackListedAreas[].position[]": {
+          "type": "number",
+          "default": 1000,
+          "label": "Coordinate",
+          "help": "One of X, Y, Z (in that order).",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "blackListedAreas[].position": {
+          "type": "list",
+          "label": "Centre",
+          "help": "Centre as X, Y, Z map coordinates.",
+          "confidence": "documented"
+        },
+        "blackListedAreas[].radius": {
+          "type": "int",
+          "default": 100,
+          "label": "Radius",
+          "help": "Size of the area around the centre.",
+          "unit": "metres",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "blackListedAreas": {
+          "type": "list",
+          "label": "No-buy areas",
+          "help": "Circles on the map used for no-buy purchase rules.",
+          "confidence": "documented"
+        },
+        "whiteListedAreas[].position[]": {
+          "type": "number",
+          "default": 2000,
+          "label": "Coordinate",
+          "help": "One of X, Y, Z (in that order).",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "whiteListedAreas[].position": {
+          "type": "list",
+          "label": "Centre",
+          "help": "Centre as X, Y, Z map coordinates.",
+          "confidence": "documented"
+        },
+        "whiteListedAreas[].radius": {
+          "type": "int",
+          "default": 100,
+          "label": "Radius",
+          "help": "Size of the area around the centre.",
+          "unit": "metres",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "whiteListedAreas": {
+          "type": "list",
+          "label": "Buy-only areas",
+          "help": "Circles on the map used for buy-only purchase rules.",
+          "confidence": "documented"
+        },
+        "houseDefinitionNames[]": {
+          "type": "classname",
+          "default": "Land_Garage_Row_Small",
+          "label": "Building class name",
+          "help": "Class name of one buildable/buyable building.",
+          "confidence": "documented"
+        },
+        "houseDefinitionNames": {
+          "type": "list",
+          "label": "Buyable building types",
+          "help": "Class names of the buildings that can be bought. For every name a file in HouseDefinitions is created with the prices and raid rules.",
+          "confidence": "documented"
+        },
+        "houseConfigs": {
+          "type": "list",
+          "default": [],
+          "label": "House data (internal)",
+          "help": "Reserved for the mod. Do not edit.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "blackListedObjectsForStopDisappearing": {
+          "type": "list",
+          "default": [],
+          "label": "Items excluded from protection",
+          "help": "Item class names that are not protected from disappearing. Wildcards: *start, end*, or exact names.",
+          "confidence": "documented"
+        },
+        "blackListedAreas[]": {
+          "label": "Area",
+          "help": "One circular area.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "whiteListedAreas[]": {
+          "label": "Area",
+          "help": "One circular area.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "blackListedObjectsForStopDisappearing[]": {
+          "label": "Item pattern",
+          "help": "Class name or pattern.",
+          "type": "string",
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "housedefinitions-files",
+      "match": "HouseDefinitions/*.json",
+      "title": "House definition (one file per building)",
+      "summary": "Price, raid rules, storage and key limits of one buyable building type. The file name is the building class name.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "label": "Config version",
+          "help": "Managed by the mod itself. Leave it as it is.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "label": "Initialised flag",
+          "help": "Set by the mod once the file was created. Leave it as it is.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "houseType": {
+          "type": "classname",
+          "label": "Building class name",
+          "help": "Class name of the building this file describes. Must match the file name.",
+          "confidence": "documented",
+          "level": "danger",
+          "risk": "A wrong class name makes the file useless."
+        },
+        "sellPrice": {
+          "type": "int",
+          "label": "Sell price",
+          "help": "What a player gets when giving up the house. Usually below the buy price.",
+          "unit": "coins",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "buyPrice": {
+          "type": "int",
+          "label": "Buy price",
+          "help": "What the house costs.",
+          "unit": "coins",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "currencyType": {
+          "type": "string",
+          "label": "Currency",
+          "help": "Currency used for this house, as defined in the shared currency config.",
+          "confidence": "documented",
+          "typical": "default"
+        },
+        "storageBuyFactor": {
+          "type": "number",
+          "label": "Storage price factor",
+          "help": "How much the price rises when a player buys storage upgrades. -1 turns it off.",
+          "special": {
+            "-1": "off"
+          },
+          "confidence": "documented"
+        },
+        "raidTools[]": {
+          "type": "classname",
+          "label": "Raid tool",
+          "help": "Class name of a tool, for example Crowbar.",
+          "confidence": "documented"
+        },
+        "raidTools": {
+          "type": "list",
+          "label": "Raid tools",
+          "help": "Items that can raid this house. The attacker needs only one of them.",
+          "confidence": "documented"
+        },
+        "inventoryItemsPerLevel": {
+          "type": "int",
+          "label": "Slots per storage level",
+          "help": "Storage slots gained with each storage level.",
+          "unit": "slots",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "maxHouseInventoryLevel": {
+          "type": "int",
+          "label": "Max storage level",
+          "help": "Highest storage level a house can reach.",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "raidTimeInSeconds": {
+          "type": "int",
+          "label": "Raid time per door",
+          "help": "How long breaking one door takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "300-900"
+        },
+        "maxKeys": {
+          "type": "int",
+          "label": "Max keys",
+          "help": "How many keys can be given out for this house. -1 means unlimited. Counted per house.",
+          "special": {
+            "-1": "unlimited"
+          },
+          "min": -1,
+          "confidence": "documented"
+        },
+        "raidCoolDownInSeconds": {
+          "type": "int",
+          "label": "Raid cooldown",
+          "help": "Waiting time after a breach before the next raid is possible.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "stopDisappearingRange": {
+          "type": "number",
+          "label": "Item protection range",
+          "help": "Radius around the house in which items are protected when the house has the stop-disappearing extension.",
+          "unit": "metres",
+          "min": 0,
+          "confidence": "documented"
+        }
+      },
+      "instances": 26,
+      "role": "records"
+    },
+    {
+      "id": "houseextensions",
+      "match": "houseExtensions.json",
+      "title": "House extensions",
+      "summary": "The upgrades players can buy for a house (alarm, storage, respawn, lock, item protection). Normally only prices are edited.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "8",
+          "label": "Config version",
+          "help": "Managed by the mod itself. Leave it as it is.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised flag",
+          "help": "Set by the mod once the file was created. Leave it as it is.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "extensions[].id": {
+          "type": "string",
+          "default": "18xso2dcly",
+          "label": "Extension id",
+          "help": "Identifier used internally. Never change it.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "extensions[].type": {
+          "type": "string",
+          "default": "#tbr_Alarm_system",
+          "label": "Menu label",
+          "help": "Label shown in the menu, as a translation key. Changing it loses the translations.",
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "extensions[].description": {
+          "type": "string",
+          "default": "#Alarm_system_desc_1",
+          "label": "Description",
+          "help": "Text shown to the player, as a translation key. Changing it loses the translations.",
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "extensions[].price": {
+          "type": "int",
+          "default": 10000,
+          "label": "Price",
+          "help": "Cost of the extension. For storage extensions the price is multiplied by the storage price factor of the house.",
+          "unit": "coins",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "extensions[].currencyType": {
+          "type": "string",
+          "default": "default",
+          "label": "Currency",
+          "help": "Currency used, as defined in the shared currency config.",
+          "confidence": "documented",
+          "typical": "default"
+        },
+        "extensions[].isHouseAlarm": {
+          "type": "flag",
+          "default": 1,
+          "label": "Is alarm",
+          "help": "Marks the extension type. Do not change.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "extensions[].isHouseInventory": {
+          "type": "flag",
+          "default": 0,
+          "label": "Is storage",
+          "help": "Marks the extension type. Do not change.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "extensions[].isSpawnPoint": {
+          "type": "flag",
+          "default": 0,
+          "label": "Is spawn point",
+          "help": "Marks the extension type. Do not change.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "extensions[].isLockSystem": {
+          "type": "flag",
+          "default": 0,
+          "label": "Is lock system",
+          "help": "Marks the extension type. Do not change.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "extensions[].isKeySpawnPoint": {
+          "type": "flag",
+          "default": 0,
+          "label": "Is key spawn point",
+          "help": "Marks the extension type. Do not change.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "extensions[].isStopDisappearing": {
+          "type": "flag",
+          "default": 0,
+          "label": "Is item protection",
+          "help": "Marks the extension type. Do not change.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "extensions[].isAutoLookDoorExtension": {
+          "type": "flag",
+          "default": 0,
+          "label": "Is auto lock doors",
+          "help": "Marks the extension type. Do not change.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "extensions[].message": {
+          "type": "string",
+          "default": "#Alarm_system_message_1",
+          "label": "Message",
+          "help": "System message text key. Do not change.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "extensions[].level": {
+          "type": "int",
+          "default": 1,
+          "label": "Level",
+          "help": "Tier of the extension. Do not change.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "extensions": {
+          "type": "list",
+          "label": "Extensions",
+          "help": "All extensions offered in the house menu. Edit prices and currency only.",
+          "confidence": "documented"
+        },
+        "extensions[]": {
+          "label": "Extension",
+          "help": "One purchasable extension.",
+          "type": "object",
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "logger",
+      "match": "logger.json",
+      "title": "Logging",
+      "summary": "Which real estate events are logged to CSV and to Discord, and the Discord addresses.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "5",
+          "label": "Config version",
+          "help": "Managed by the mod itself. Leave it as it is.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised flag",
+          "help": "Set by the mod once the file was created. Leave it as it is.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "logSteamIdInRaidDiscordLog": {
+          "type": "flag",
+          "default": 1,
+          "label": "Steam id in raid alerts",
+          "help": "Include the player Steam id in the Discord raid message.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logRaid": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log house raids",
+          "help": "Write house raids to the CSV log.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logRaidToDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord: house raids",
+          "help": "Also post house raids to Discord.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordRaidWebhookURL": {
+          "type": "url",
+          "label": "Discord address: house raids",
+          "help": "Webhook address for house raids.",
+          "level": "advanced",
+          "confidence": "documented",
+          "risk": "The address works like a password for the channel: anyone who has it can post there. Do not share it."
+        },
+        "logStore": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log storage purchases",
+          "help": "Write storage purchases to the CSV log.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logStoreToDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord: storage purchases",
+          "help": "Also post storage purchases to Discord.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordStoreWebhookURL": {
+          "type": "url",
+          "label": "Discord address: storage purchases",
+          "help": "Webhook address for storage purchases.",
+          "level": "advanced",
+          "confidence": "documented",
+          "risk": "The address works like a password for the channel: anyone who has it can post there. Do not share it."
+        },
+        "logHouseTrade": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log house sales",
+          "help": "Write house sales to the CSV log.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logHouseTradeToDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord: house sales",
+          "help": "Also post house sales to Discord.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordHouseTradeWebhookURL": {
+          "type": "url",
+          "label": "Discord address: house sales",
+          "help": "Webhook address for house sales.",
+          "level": "advanced",
+          "confidence": "documented",
+          "risk": "The address works like a password for the channel: anyone who has it can post there. Do not share it."
+        },
+        "logHouseExtensionTrade": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log extension purchases",
+          "help": "Write extension purchases to the CSV log.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logHouseExtensionTradeToDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord: extension purchases",
+          "help": "Also post extension purchases to Discord.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordHouseExtensionTradeWebhookURL": {
+          "type": "url",
+          "label": "Discord address: extension purchases",
+          "help": "Webhook address for extension purchases.",
+          "level": "advanced",
+          "confidence": "documented",
+          "risk": "The address works like a password for the channel: anyone who has it can post there. Do not share it."
+        },
+        "logHouseOwnerDelete": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log owner deletions",
+          "help": "Write owner deletions to the CSV log.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logHouseOwnerDeleteToDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord: owner deletions",
+          "help": "Also post owner deletions to Discord.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordHouseOwnerDeleteWebhookURL": {
+          "type": "url",
+          "label": "Discord address: owner deletions",
+          "help": "Webhook address for owner deletions.",
+          "level": "advanced",
+          "confidence": "documented",
+          "risk": "The address works like a password for the channel: anyone who has it can post there. Do not share it."
+        },
+        "logItemLifetimeIncreaseDetailsToScriptlog": {
+          "type": "flag",
+          "default": 0,
+          "label": "Verbose item lifetime log",
+          "help": "Writes detailed lines to the script log. Leave off unless you are debugging.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced"
+        }
+      }
+    },
+    {
+      "id": "spawnpoint",
+      "match": "SpawnPoint.json",
+      "title": "Spawn point cooldown",
+      "summary": "Cooldown players must wait before they can use a house spawn point again.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "label": "Config version",
+          "help": "Managed by the mod itself. Leave it as it is.",
+          "type": "string",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "coolDownTimeInSecondsForRespawnPointUsage": {
+          "label": "Spawn point cooldown",
+          "help": "How long a player must wait before using any house respawn point again.",
+          "type": "int",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "default": 300,
+          "typical": "300"
+        }
+      }
+    }
+  ]
+}

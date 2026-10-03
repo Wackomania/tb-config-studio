@@ -1,0 +1,13 @@
+{
+  "mod": "TBDynamicTrader",
+  "presets": {
+    "pvp": { "changes": [
+      { "file": "Logger.json", "path": "logBuyCSV", "value": 1, "why": "Keep a local record of purchases to investigate dupes and raids" },
+      { "file": "Logger.json", "path": "logSellCSV", "value": 1, "why": "Keep a local record of sales to investigate abuse" }
+    ] },
+    "hardcore": { "changes": [
+      { "file": "Logger.json", "path": "logBuyCSV", "value": 1, "why": "Keep a local record of purchases" },
+      { "file": "Logger.json", "path": "logSellCSV", "value": 1, "why": "Keep a local record of sales" }
+    ] }
+  }
+}

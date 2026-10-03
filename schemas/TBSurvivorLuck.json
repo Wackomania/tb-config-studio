@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "mod": {
+    "id": "TBSurvivorLuck",
+    "folder": "TBSurvivorLuck",
+    "name": "TB Survivor Luck",
+    "summary": "A gambling-style mod where players win items by scratching a scratch card. You decide the symbols, how often each wins and which items they give.",
+    "coverage": "in-depth",
+    "docs": "https://doc.themodbase.com/TBSurvivorLuck/Readme.html",
+    "sources": [
+      "TBSurvivorLuck/Readme",
+      "TBSurvivorLuck/Configs/ScratchCardConfig"
+    ],
+    "notes": "The sample file has empty reward lists, so no prize is given until RewardOptions are filled. How players obtain cards is not described in the docs; the card item has its own types entry (TBSLScratchCard). Admin rights come from Global/AdminConfig (survivorLuck)."
+  },
+  "files": [
+    {
+      "id": "scratchcardconfig",
+      "match": "ScratchCardConfig.json",
+      "title": "Scratch card prizes",
+      "summary": "Symbols of the scratch card, the chance of each to win and the items it pays out.",
+      "restart": true,
+      "role": "records",
+      "fields": {
+        "version": {
+          "label": "Config version",
+          "help": "Internal version number of this file format. The mod manages it; do not edit.",
+          "type": "string",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented",
+          "default": "3"
+        },
+        "isInitialized": {
+          "label": "Initialised marker",
+          "help": "Internal marker the mod sets after it has created the file. Do not change it.",
+          "type": "flag",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented",
+          "default": 1
+        },
+        "WinningCombinations": {
+          "label": "Winning combinations",
+          "help": "The possible outcomes of a scratch card, one entry per symbol. Each has a win chance and one or more reward sets.",
+          "type": "list",
+          "confidence": "documented"
+        },
+        "WinningCombinations[]": {
+          "label": "Combination",
+          "help": "One symbol with its win chance and rewards.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "WinningCombinations[].ImageSymbol": {
+          "label": "Symbol",
+          "help": "Picture shown on the card for this outcome. Only the nine built-in symbols exist.",
+          "type": "enum",
+          "enum": [
+            {
+              "value": "zombie",
+              "label": "zombie"
+            },
+            {
+              "value": "appel",
+              "label": "appel"
+            },
+            {
+              "value": "eat",
+              "label": "eat"
+            },
+            {
+              "value": "bottle",
+              "label": "bottle"
+            },
+            {
+              "value": "ducktape",
+              "label": "ducktape"
+            },
+            {
+              "value": "medical",
+              "label": "medical"
+            },
+            {
+              "value": "plum",
+              "label": "plum"
+            },
+            {
+              "value": "tires",
+              "label": "tires"
+            },
+            {
+              "value": "nvg",
+              "label": "nvg"
+            }
+          ],
+          "confidence": "documented",
+          "default": "zombie"
+        },
+        "WinningCombinations[].Chance": {
+          "label": "Win chance",
+          "help": "How likely this symbol is to be a winner, from 0 to 100. Higher values hand out its rewards more often.",
+          "type": "int",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "typical": "1-50 (rarer for better rewards)",
+          "risk": "High chances on valuable rewards will flood the server with loot.",
+          "confidence": "documented",
+          "default": 45
+        },
+        "WinningCombinations[].RewardVariations": {
+          "label": "Reward variations",
+          "help": "Alternative reward sets for this symbol. One set is picked at random when the symbol wins.",
+          "type": "list",
+          "confidence": "documented"
+        },
+        "WinningCombinations[].RewardVariations[]": {
+          "label": "Reward variation",
+          "help": "One reward set.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "WinningCombinations[].RewardVariations[].Rewards": {
+          "label": "Rewards (deprecated)",
+          "help": "Old reward list, marked for removal. Use RewardOptions instead and leave this empty.",
+          "type": "list",
+          "level": "advanced",
+          "confidence": "documented",
+          "default": []
+        },
+        "WinningCombinations[].RewardVariations[].RewardOptions": {
+          "label": "Reward options",
+          "help": "The items given to the player when this variation is picked.",
+          "type": "list",
+          "confidence": "documented",
+          "default": []
+        },
+        "WinningCombinations[].RewardVariations[].RewardOptions[]": {
+          "label": "Reward option",
+          "help": "One reward item.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "WinningCombinations[].RewardVariations[].RewardOptions[].Type": {
+          "label": "Item class",
+          "help": "Class name of the item given as a prize (case-sensitive).",
+          "type": "classname",
+          "confidence": "documented"
+        },
+        "WinningCombinations[].RewardVariations[].RewardOptions[].QuantityInPercent": {
+          "label": "Quantity",
+          "help": "How full or how much of the item is given, 100 meaning full.",
+          "type": "number",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        }
+      }
+    }
+  ]
+}

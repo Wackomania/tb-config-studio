@@ -1,0 +1,14 @@
+{
+  "name": "tb-config-studio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TB Config Studio: an unofficial offline Windows desktop app that explains and edits the config files of the TheModBase DayZ mods",
+  "license": "UNLICENSED",
+  "engines": { "node": ">=22.13" },
+  "scripts": {
+    "start": "node src/server/main.js",
+    "test": "node --test --test-concurrency=1 \"test/**/*.test.js\"",
+    "check-schemas": "node scripts/check-schemas.js"
+  },
+  "author": "DayzHUB"
+}

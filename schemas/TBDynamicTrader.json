@@ -1,0 +1,1063 @@
+{
+  "schemaVersion": 1,
+  "mod": {
+    "id": "TBDynamicTrader",
+    "folder": "TBDynamicTrader",
+    "name": "TB Dynamic Trader",
+    "summary": "Adds traders where players buy and sell items. Prices can move with stock, traders can be machines or NPCs, may relocate, and can have protected zones around them. It can also give players reputation points.",
+    "coverage": "in-depth",
+    "docs": "https://doc.themodbase.com/DynamicTrader/Readme.html",
+    "sources": [
+      "DynamicTrader/Readme",
+      "DynamicTrader/Configs/DealerPoint",
+      "DynamicTrader/Configs/DealerPoints",
+      "DynamicTrader/Configs/Logger",
+      "DynamicTrader/Configs/SafeZoneCleanUp",
+      "DynamicTrader/Configs/TraderItemConfigs",
+      "DynamicTrader/Configs/TraderItemCategorieOrder",
+      "DynamicTrader/Configs/BetterVendingMaschines",
+      "DynamicTrader/Converter/Converter",
+      "GlobalConfigs/ReputationSystem/Index"
+    ],
+    "notes": "Run the server once so the mod writes its files, stop it, edit, then start. Never edit the managed fields (format version, current position, next move time, stock record)."
+  },
+  "files": [
+    {
+      "id": "dealerpoints",
+      "match": "DealerPoints.json",
+      "title": "DealerPoints list",
+      "summary": "Names of all traders on the server.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Format version",
+          "help": "Version number of this file format. The mod uses it to upgrade old files. Never change it.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Never change it; resetting it can make the mod regenerate defaults.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "dealerPointsNames": {
+          "type": "list",
+          "label": "Trader names",
+          "help": "The traders that exist on your server. Each name must match a file in the DealerPoints folder (file name without .json). Removing a name hides that trader.",
+          "confidence": "documented"
+        },
+        "dealerPointsNames[]": {
+          "type": "string",
+          "default": "Chernogorsk",
+          "label": "Trader name",
+          "help": "Name of one trader; must match a file in the DealerPoints folder.",
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "dealerpoints-files",
+      "match": "DealerPoints/*.json",
+      "title": "Trader (one file per trader)",
+      "summary": "Settings of one trader: where it stands, sounds, opening hours, safe zone and which items it sells.",
+      "restart": true,
+      "fields": {
+        "uniqueName": {
+          "type": "string",
+          "default": "Chernogorsk",
+          "label": "Trader id",
+          "help": "Internal name of this trader. It must match the file name and the entry in DealerPoints.json. Used in admin menus only; players see the display name.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "version": {
+          "type": "string",
+          "default": "7",
+          "label": "Format version",
+          "help": "Version number of this file format. The mod uses it to upgrade old files. Never change it.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "displayName": {
+          "type": "string",
+          "default": "Chernogorsk trader",
+          "label": "Display name",
+          "help": "Name players see for this trader in notifications and the trading screen.",
+          "confidence": "documented"
+        },
+        "sellTax": {
+          "type": "number",
+          "default": 0,
+          "label": "Sell tax",
+          "help": "Share of the sell price the trader keeps when a player sells. 0 means no tax, 1 means 100 percent (the player gets nothing).",
+          "confidence": "documented",
+          "min": 0,
+          "max": 1,
+          "typical": "0 to 0.3",
+          "risk": "Values near 1 make selling worthless."
+        },
+        "acceptOnlyCash": {
+          "type": "flag",
+          "default": 0,
+          "label": "Cash only",
+          "help": "1 means players can only pay with cash they carry; 0 also allows other payment such as bank money where available.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "playSound": {
+          "type": "flag",
+          "default": 1,
+          "label": "Trader speaks",
+          "help": "When on, the trader plays random voice lines near players.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "gender": {
+          "type": "enum",
+          "default": "m",
+          "label": "Trader voice",
+          "help": "Voice set used for the trader sounds: m for male, f for female.",
+          "enum": [
+            {
+              "value": "m",
+              "label": "Male"
+            },
+            {
+              "value": "f",
+              "label": "Female"
+            }
+          ],
+          "confidence": "documented"
+        },
+        "minSoundTime": {
+          "type": "int",
+          "default": 15,
+          "label": "Shortest pause between sounds",
+          "help": "Minimum time between two voice lines.",
+          "confidence": "documented",
+          "unit": "seconds",
+          "min": 0,
+          "typical": "15-60"
+        },
+        "maxSoundTime": {
+          "type": "int",
+          "default": 60,
+          "label": "Longest pause between sounds",
+          "help": "Maximum time between two voice lines. Keep it at or above the minimum.",
+          "confidence": "documented",
+          "unit": "seconds",
+          "min": 0,
+          "typical": "15-60"
+        },
+        "enabledSounds": {
+          "type": "list",
+          "default": [],
+          "label": "Enabled sound lines",
+          "help": "Numbers (0 to 29) of the voice lines the trader may use. Empty uses the defaults.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "positions[].position": {
+          "type": "list",
+          "label": "Position",
+          "help": "World position [X, Y, Z] of the trader at this spot. Y is height; with exact position off the mod snaps the trader to the ground.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "positions[].position[]": {
+          "type": "number",
+          "default": 6560,
+          "label": "Coordinate value",
+          "help": "One number of an [X, Y, Z] triple: X is east-west, Y is height, Z is north-south on the map.",
+          "unit": "metres",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "positions[].orientation": {
+          "type": "list",
+          "label": "Orientation",
+          "help": "Facing of the trader as three angles in degrees. To turn a machine round, change the heading angle by 180.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "positions[].orientation[]": {
+          "type": "number",
+          "default": 0,
+          "label": "Angle value",
+          "help": "One angle of a three-value orientation, in degrees.",
+          "unit": "degrees",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "positions[].useExactPosition": {
+          "type": "flag",
+          "default": 0,
+          "label": "Use exact position",
+          "help": "0 places the trader on the ground below the position, 1 uses the coordinates exactly (for elevated or floating spots).",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "positions[].name": {
+          "type": "string",
+          "default": "Cherno docks",
+          "label": "Spot name",
+          "help": "Name of this location. Shown to players in the move notification when the trader relocates here.",
+          "confidence": "documented"
+        },
+        "positions[].enableNotification": {
+          "type": "flag",
+          "default": 1,
+          "label": "Notify on move",
+          "help": "When on, players get a message when the trader moves to this spot.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "positions[].showNameInNotification": {
+          "type": "flag",
+          "default": 1,
+          "label": "Show spot name in notification",
+          "help": "When on, the move message includes the spot name.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "positions[].vehicleSpawnPosition": {
+          "type": "list",
+          "label": "Vehicle spawn position",
+          "help": "Where vehicles bought at this trader appear [X, Y, Z]. Only matters for traders that sell vehicles.",
+          "confidence": "observed",
+          "level": "advanced"
+        },
+        "positions[].vehicleSpawnPosition[]": {
+          "type": "number",
+          "default": 0,
+          "label": "Coordinate value",
+          "help": "One number of an [X, Y, Z] triple: X is east-west, Y is height, Z is north-south on the map.",
+          "unit": "metres",
+          "confidence": "observed",
+          "level": "advanced"
+        },
+        "positions[].vehicleSpawnOrientation": {
+          "type": "list",
+          "label": "Vehicle spawn orientation",
+          "help": "Facing of vehicles that spawn at the vehicle position, in degrees.",
+          "confidence": "observed",
+          "level": "advanced"
+        },
+        "positions[].vehicleSpawnOrientation[]": {
+          "type": "number",
+          "default": 0,
+          "label": "Angle value",
+          "help": "One angle of a three-value orientation, in degrees.",
+          "unit": "degrees",
+          "confidence": "observed",
+          "level": "advanced"
+        },
+        "positions": {
+          "type": "list",
+          "label": "Possible positions",
+          "help": "Spots the trader can stand at. With more than one, the trader moves between them at random intervals (see move times). With one, it stays put.",
+          "confidence": "documented"
+        },
+        "useExactPosition": {
+          "type": "flag",
+          "default": 0,
+          "label": "Use exact position (deprecated)",
+          "help": "Old global switch that the documentation says will be removed. Each position now has its own setting; leave as is.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "useUTCTime": {
+          "type": "flag",
+          "default": 0,
+          "label": "Opening hours in UTC",
+          "help": "0 reads the opening times in server time, 1 reads them in UTC. Only matters when opening times are set.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "risk": "A wrong value shifts opening hours by your timezone offset."
+        },
+        "type": {
+          "type": "classname",
+          "default": "TBDTTraderMachine",
+          "label": "Trader object",
+          "help": "Class name of the object players use to trade, for example a trader machine. Vending machine mods can supply other classes here; the class must exist on the server.",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "An unknown class means no trader appears."
+        },
+        "minMoveTimeMinutes": {
+          "type": "int",
+          "default": 5,
+          "label": "Shortest time at a spot",
+          "help": "Minimum minutes the trader stays before moving to another possible position. Only used with more than one position.",
+          "confidence": "documented",
+          "unit": "minutes",
+          "min": 0
+        },
+        "maxMoveTimeMinutes": {
+          "type": "int",
+          "default": 10,
+          "label": "Longest time at a spot",
+          "help": "Maximum minutes the trader stays before moving on. Keep it at or above the minimum.",
+          "confidence": "documented",
+          "unit": "minutes",
+          "min": 0
+        },
+        "useTraderChar": {
+          "type": "flag",
+          "default": 0,
+          "label": "Show a trader character",
+          "help": "1 spawns an NPC character next to the machine; 0 uses the machine only.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "traderCharType": {
+          "type": "classname",
+          "default": "",
+          "label": "Trader character class",
+          "help": "Class name of the NPC model used when the character is on, for example a survivor type.",
+          "confidence": "documented"
+        },
+        "traderCharAttachments": {
+          "label": "Trader clothing",
+          "help": "Items the trader character wears, by slot (Gloves, Feet, Shoulder, Hips, Headgear, Legs, Melee, Eyewear, Mask, Armband, Body). Not present in every file.",
+          "type": "object",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "traderCharAttachments.*": {
+          "label": "Item in slot",
+          "help": "Class name of the item worn in this slot.",
+          "type": "classname",
+          "confidence": "documented"
+        },
+        "openTimes": {
+          "type": "list",
+          "default": [],
+          "label": "Opening times",
+          "help": "Daily time windows when the trader is open. Empty means always open.",
+          "confidence": "documented"
+        },
+        "openTimes[].openHour": {
+          "label": "Opens at hour",
+          "help": "Hour the trader opens, 24-hour clock.",
+          "type": "int",
+          "confidence": "documented",
+          "min": 0,
+          "max": 23,
+          "unit": "hours"
+        },
+        "openTimes[].openMinute": {
+          "label": "Opens at minute",
+          "help": "Minute the trader opens.",
+          "type": "int",
+          "confidence": "documented",
+          "min": 0,
+          "max": 59,
+          "unit": "minutes"
+        },
+        "openTimes[].closeHour": {
+          "label": "Closes at hour",
+          "help": "Hour the trader closes, 24-hour clock.",
+          "type": "int",
+          "confidence": "documented",
+          "min": 0,
+          "max": 23,
+          "unit": "hours"
+        },
+        "openTimes[].closeMinute": {
+          "label": "Closes at minute",
+          "help": "Minute the trader closes.",
+          "type": "int",
+          "confidence": "documented",
+          "min": 0,
+          "max": 59,
+          "unit": "minutes"
+        },
+        "safeZoneEnabled": {
+          "type": "flag",
+          "default": 1,
+          "label": "Safe zone",
+          "help": "Turns on a protected area around the trader where players are safe from damage.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "safeZoneRadius": {
+          "type": "int",
+          "default": 60,
+          "label": "Safe zone radius",
+          "help": "Size of the protected area around the trader.",
+          "confidence": "documented",
+          "unit": "metres",
+          "min": 0,
+          "typical": "30-100"
+        },
+        "safeZoneTimeout": {
+          "type": "int",
+          "default": 10,
+          "label": "Safe zone exit delay",
+          "help": "Seconds a player must be outside the area before they count as having left it and lose protection.",
+          "confidence": "documented",
+          "unit": "seconds",
+          "min": 0
+        },
+        "safeZoneEnableArmband": {
+          "type": "flag",
+          "default": 0,
+          "label": "Armband in safe zone",
+          "help": "Shows an armband on players while they are inside the safe zone so others can tell they are protected.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "safeZoneRemoveAnimals": {
+          "type": "flag",
+          "default": 1,
+          "label": "Remove animals in safe zone",
+          "help": "Removes wildlife that enters the area.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "safeZoneRemoveInfected": {
+          "type": "flag",
+          "default": 1,
+          "label": "Remove infected in safe zone",
+          "help": "Removes zombies that enter the area.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "safeZoneRemoveEAI": {
+          "type": "flag",
+          "default": 1,
+          "label": "Remove AI in safe zone",
+          "help": "Removes AI characters (from the Expansion AI mod) that enter the area.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "safeZoneCleanUp": {
+          "type": "flag",
+          "default": 0,
+          "label": "Clean up items in safe zone",
+          "help": "Removes items not on the SafeZoneCleanUp whitelist from the area, to stop junk piling up at the trader.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "risk": "Players can lose items left in the zone, including barrels and tents, unless whitelisted.",
+          "level": "advanced"
+        },
+        "currentPosition": {
+          "label": "Current position (managed)",
+          "help": "Where the trader stands right now. Managed by the mod; do not edit by hand.",
+          "type": "object",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "currentPosition.position": {
+          "type": "list",
+          "label": "Position",
+          "help": "World position [X, Y, Z] of the trader at this spot. Y is height; with exact position off the mod snaps the trader to the ground. Managed by the mod, do not edit.",
+          "confidence": "documented",
+          "level": "danger",
+          "internal": true
+        },
+        "currentPosition.position[]": {
+          "type": "number",
+          "default": 6560,
+          "label": "Coordinate value",
+          "help": "One number of an [X, Y, Z] triple: X is east-west, Y is height, Z is north-south on the map. Managed by the mod, do not edit.",
+          "unit": "metres",
+          "confidence": "documented",
+          "level": "danger",
+          "internal": true
+        },
+        "currentPosition.orientation": {
+          "type": "list",
+          "label": "Orientation",
+          "help": "Facing of the trader as three angles in degrees. To turn a machine round, change the heading angle by 180. Managed by the mod, do not edit.",
+          "confidence": "documented",
+          "level": "danger",
+          "internal": true
+        },
+        "currentPosition.orientation[]": {
+          "type": "number",
+          "default": 0,
+          "label": "Angle value",
+          "help": "One angle of a three-value orientation, in degrees. Managed by the mod, do not edit.",
+          "unit": "degrees",
+          "confidence": "documented",
+          "level": "danger",
+          "internal": true
+        },
+        "currentPosition.useExactPosition": {
+          "type": "flag",
+          "default": 0,
+          "label": "Use exact position",
+          "help": "0 places the trader on the ground below the position, 1 uses the coordinates exactly (for elevated or floating spots). Managed by the mod, do not edit.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "danger",
+          "internal": true
+        },
+        "currentPosition.name": {
+          "type": "string",
+          "default": "Cherno docks",
+          "label": "Spot name",
+          "help": "Name of this location. Shown to players in the move notification when the trader relocates here. Managed by the mod, do not edit.",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "currentPosition.enableNotification": {
+          "type": "flag",
+          "default": 1,
+          "label": "Notify on move",
+          "help": "When on, players get a message when the trader moves to this spot. Managed by the mod, do not edit.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "currentPosition.showNameInNotification": {
+          "type": "flag",
+          "default": 1,
+          "label": "Show spot name in notification",
+          "help": "When on, the move message includes the spot name. Managed by the mod, do not edit.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "currentPosition.vehicleSpawnPosition": {
+          "type": "list",
+          "label": "Vehicle spawn position",
+          "help": "Where vehicles bought at this trader appear [X, Y, Z]. Only matters for traders that sell vehicles. Managed by the mod, do not edit.",
+          "confidence": "observed",
+          "level": "danger",
+          "internal": true
+        },
+        "currentPosition.vehicleSpawnPosition[]": {
+          "type": "number",
+          "default": 0,
+          "label": "Coordinate value",
+          "help": "One number of an [X, Y, Z] triple: X is east-west, Y is height, Z is north-south on the map. Managed by the mod, do not edit.",
+          "unit": "metres",
+          "confidence": "observed",
+          "level": "danger",
+          "internal": true
+        },
+        "currentPosition.vehicleSpawnOrientation": {
+          "type": "list",
+          "label": "Vehicle spawn orientation",
+          "help": "Facing of vehicles that spawn at the vehicle position, in degrees. Managed by the mod, do not edit.",
+          "confidence": "observed",
+          "level": "danger",
+          "internal": true
+        },
+        "currentPosition.vehicleSpawnOrientation[]": {
+          "type": "number",
+          "default": 0,
+          "label": "Angle value",
+          "help": "One angle of a three-value orientation, in degrees. Managed by the mod, do not edit.",
+          "unit": "degrees",
+          "confidence": "observed",
+          "level": "danger",
+          "internal": true
+        },
+        "nextMoveTime": {
+          "label": "Next move time (managed)",
+          "help": "When the trader will next relocate. Managed by the mod; do not edit by hand.",
+          "type": "object",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "nextMoveTime.year": {
+          "type": "int",
+          "default": 2026,
+          "label": "Next move: year",
+          "help": "Part of the scheduled next relocation time. Managed by the mod; do not edit by hand.",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "nextMoveTime.month": {
+          "type": "int",
+          "default": 9,
+          "label": "Next move: month",
+          "help": "Part of the scheduled next relocation time. Managed by the mod; do not edit by hand.",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "nextMoveTime.day": {
+          "type": "int",
+          "default": 27,
+          "label": "Next move: day",
+          "help": "Part of the scheduled next relocation time. Managed by the mod; do not edit by hand.",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "nextMoveTime.hour": {
+          "type": "int",
+          "default": 22,
+          "label": "Next move: hour",
+          "help": "Part of the scheduled next relocation time. Managed by the mod; do not edit by hand.",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "nextMoveTime.minute": {
+          "type": "int",
+          "default": 45,
+          "label": "Next move: minute",
+          "help": "Part of the scheduled next relocation time. Managed by the mod; do not edit by hand.",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "nextMoveTime.second": {
+          "type": "int",
+          "default": 47,
+          "label": "Next move: second",
+          "help": "Part of the scheduled next relocation time. Managed by the mod; do not edit by hand.",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "nextMoveTime.inSeconds": {
+          "type": "int",
+          "default": 25742387,
+          "label": "Next move: inSeconds",
+          "help": "Part of the scheduled next relocation time. Managed by the mod; do not edit by hand.",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "uniqueFileNames": {
+          "type": "list",
+          "label": "Items for sale",
+          "help": "Names of the item files (in TraderItemConfigs) this trader deals in. An item only shows at traders that list it here.",
+          "confidence": "documented"
+        },
+        "uniqueFileNames[]": {
+          "type": "string",
+          "default": "Apple",
+          "label": "Item file name",
+          "help": "Name of one item file in TraderItemConfigs (without .json).",
+          "confidence": "documented"
+        }
+      },
+      "instances": 1
+    },
+    {
+      "id": "logger",
+      "match": "Logger.json",
+      "title": "Transaction logging",
+      "summary": "Where purchases and sales are logged (CSV and Discord).",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Format version",
+          "help": "Version number of this file format. The mod uses it to upgrade old files. Never change it.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "logBuyCSV": {
+          "type": "flag",
+          "default": 0,
+          "label": "Log buys to CSV",
+          "help": "Writes every purchase to a CSV file on the server.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logBuyDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log buys to Discord",
+          "help": "Posts every purchase to the buy webhook address.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordBuyWebhookURL": {
+          "type": "url",
+          "label": "Discord webhook address",
+          "help": "Web address that purchases are posted to when the matching Discord switch is on. Treat it like a password: anyone holding it can post to that channel. Leave empty if you do not use it.",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "A wrong or revoked address silently loses the messages."
+        },
+        "logSellCSV": {
+          "type": "flag",
+          "default": 0,
+          "label": "Log sells to CSV",
+          "help": "Writes every sale to a CSV file on the server.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logSellDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log sells to Discord",
+          "help": "Posts every sale to the sell webhook address.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordSellWebhookURL": {
+          "type": "url",
+          "label": "Discord webhook address",
+          "help": "Web address that sales are posted to when the matching Discord switch is on. Treat it like a password: anyone holding it can post to that channel. Leave empty if you do not use it.",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "A wrong or revoked address silently loses the messages."
+        }
+      }
+    },
+    {
+      "id": "safezonecleanup",
+      "match": "SafeZoneCleanUp.json",
+      "title": "Safe zone clean-up whitelist",
+      "summary": "Items that safe-zone clean-up must leave alone.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Format version",
+          "help": "Version number of this file format. The mod uses it to upgrade old files. Never change it.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "safeZoneCleanUpWhitelist": {
+          "type": "list",
+          "default": [],
+          "label": "Items kept in safe zones",
+          "help": "Class names of items the safe zone clean-up must not remove at restart, for example barrels. Only used by traders with clean-up on.",
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "traderitemcategorieorder",
+      "match": "TraderItemCategorieOrder.json",
+      "title": "Category order",
+      "summary": "Order of item categories at each trader.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Format version",
+          "help": "Version number of this file format. The mod uses it to upgrade old files. Never change it.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "categorieOrder.*": {
+          "label": "Category order of this trader",
+          "help": "Order in which item categories are listed at the trader. The key is the trader name. The mod adds new categories automatically; you only reorder them.",
+          "type": "list",
+          "confidence": "documented"
+        },
+        "categorieOrder.*[]": {
+          "label": "Category name",
+          "help": "One category name as used in item files. Move lines to reorder; do not invent names that no item uses.",
+          "type": "string",
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "traderitemconfigs-files",
+      "match": "TraderItemConfigs/*.json",
+      "title": "Trade item (one file per item)",
+      "summary": "Price, stock and reputation rules of one item.",
+      "restart": true,
+      "fields": {
+        "uniqueName": {
+          "type": "string",
+          "label": "Item id",
+          "help": "Name of the item entry. Must match the file name and what the traders list. Players do not see it.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "type": {
+          "type": "classname",
+          "label": "Item class",
+          "help": "Class name of the DayZ item sold or bought, as in types.xml.",
+          "confidence": "documented",
+          "risk": "A class the server does not know breaks the entry."
+        },
+        "currency": {
+          "type": "string",
+          "label": "Currency",
+          "help": "Which currency is used. \"default\" uses the main one; other names come from the shared currency config.",
+          "confidence": "documented",
+          "typical": "default"
+        },
+        "category": {
+          "type": "string",
+          "label": "Category",
+          "help": "Group the item appears under at the trader (for example Food). A new name adds a new tab.",
+          "confidence": "documented"
+        },
+        "quantity": {
+          "type": "number",
+          "label": "Quantity per deal",
+          "help": "Amount of the item in each transaction (count, rounds or liquid, depending on the item). -1 means the maximum amount, in which case the quantity the seller holds does not affect price.",
+          "confidence": "documented",
+          "special": {
+            "-1": "maximum / full"
+          },
+          "typical": "-1 or 1",
+          "default": -1
+        },
+        "isPremium": {
+          "type": "flag",
+          "label": "Premium only",
+          "help": "Only players with premium status can buy this item.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "isStorageItem": {
+          "type": "flag",
+          "label": "Limited stock",
+          "help": "Gives the item a trader stock. Prices then move between the base and the maximum price as stock changes, and stock is limited by max storage.",
+          "typical": "0 or 1",
+          "confidence": "observed"
+        },
+        "ignoreHealth": {
+          "type": "flag",
+          "label": "Ignore condition when selling",
+          "help": "When on, damaged items sell for the full price instead of a reduced one.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "buyPrice": {
+          "type": "int",
+          "label": "Buy price",
+          "help": "Price a player pays to buy the item. With limited stock, this is the base price.",
+          "confidence": "documented",
+          "unit": "coins",
+          "min": 0
+        },
+        "maxBuyPrice": {
+          "type": "int",
+          "label": "Highest buy price",
+          "help": "Upper price used for limited-stock items when stock runs low.",
+          "confidence": "documented",
+          "unit": "coins",
+          "min": 0
+        },
+        "emptyStorageOnServerRestart": {
+          "type": "flag",
+          "label": "Empty stock at restart",
+          "help": "Removes all stock of this item at every server restart.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "fillStorageOnServerRestart": {
+          "type": "flag",
+          "label": "Fill stock at restart",
+          "help": "Fills stock to the maximum at every server restart.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "ignoreBuyStorageLimit": {
+          "type": "flag",
+          "label": "Ignore stock when buying",
+          "help": "Players can buy even when the stock is empty.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "ignoreSellStorageLimit": {
+          "type": "flag",
+          "label": "Ignore stock limit when selling",
+          "help": "Players can sell even when the stock is already full.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "sellPrice": {
+          "type": "int",
+          "label": "Sell price",
+          "help": "What the player gets for selling the item. With limited stock this is the base price.",
+          "confidence": "documented",
+          "unit": "coins",
+          "min": 0
+        },
+        "maxSellPrice": {
+          "type": "int",
+          "label": "Highest sell price",
+          "help": "Upper price used for limited-stock items when stock is low.",
+          "confidence": "documented",
+          "unit": "coins",
+          "min": 0
+        },
+        "maxStorage": {
+          "type": "int",
+          "label": "Maximum stock",
+          "help": "Most units the trader can hold of this item.",
+          "confidence": "documented",
+          "min": 0
+        },
+        "reducePerTick": {
+          "type": "int",
+          "label": "Stock change per tick",
+          "help": "Stock removed every tick, so the trader stock slowly drains. Negative values add stock instead; 0 means no change over time.",
+          "confidence": "documented",
+          "typical": "0"
+        },
+        "tickLengthInMinutes": {
+          "type": "int",
+          "label": "Tick length",
+          "help": "Minutes between stock ticks.",
+          "confidence": "documented",
+          "unit": "minutes",
+          "min": 1,
+          "typical": "10",
+          "default": 10
+        },
+        "premiumPriceReduce": {
+          "type": "number",
+          "label": "Premium discount",
+          "help": "Discount for premium players.",
+          "confidence": "documented",
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        },
+        "maxCountThatPlayerCanBuyAsAttachment": {
+          "type": "int",
+          "label": "Included attachment limit",
+          "help": "How many of the included attachments (not optional ones) a player can take.",
+          "confidence": "documented",
+          "min": 0,
+          "typical": "1"
+        },
+        "maxCountThatPlayerCanBuyAsOptionalAttachment": {
+          "type": "int",
+          "label": "Optional attachment limit",
+          "help": "How many optional attachments a player can add.",
+          "confidence": "documented",
+          "min": 0,
+          "typical": "1"
+        },
+        "maxBuyCount": {
+          "type": "int",
+          "label": "Max per purchase",
+          "help": "Most units a player can buy in one go.",
+          "confidence": "documented",
+          "min": 1,
+          "typical": "20",
+          "default": 20
+        },
+        "enablePoints": {
+          "type": "flag",
+          "label": "Use reputation",
+          "help": "Switches on the reputation rules (limits and rewards below) for this item.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "minPointsNeededForSell": {
+          "type": "int",
+          "label": "Minimum reputation to sell",
+          "help": "Lowest reputation to sell this item. The default (about minus 2.1 billion) means no limit.",
+          "confidence": "documented",
+          "unit": "points",
+          "level": "advanced"
+        },
+        "minPointsNeededForBuy": {
+          "type": "int",
+          "label": "Minimum reputation to buy",
+          "help": "Lowest reputation to buy this item. The default means no limit.",
+          "confidence": "documented",
+          "unit": "points",
+          "level": "advanced"
+        },
+        "maxPointsNeededForSell": {
+          "type": "int",
+          "label": "Maximum reputation to sell",
+          "help": "Highest reputation allowed to sell this item. The default (about 2.1 billion) means no limit.",
+          "confidence": "documented",
+          "unit": "points",
+          "level": "advanced"
+        },
+        "maxPointsNeededForBuy": {
+          "type": "int",
+          "label": "Maximum reputation to buy",
+          "help": "Highest reputation allowed to buy this item. The default means no limit.",
+          "confidence": "documented",
+          "unit": "points",
+          "level": "advanced"
+        },
+        "givePlayerPointsForSell": {
+          "type": "int",
+          "label": "Points for selling",
+          "help": "Reputation gained when the player sells this item. Negative values remove points.",
+          "confidence": "documented",
+          "unit": "points",
+          "level": "advanced"
+        },
+        "givePlayerPointsForBuy": {
+          "type": "int",
+          "label": "Points for buying",
+          "help": "Reputation gained when the player buys this item. Negative values remove points.",
+          "confidence": "documented",
+          "unit": "points",
+          "level": "advanced"
+        },
+        "storageItem": {
+          "label": "Stock record (managed)",
+          "help": "Current stock of the item, kept by the mod. Do not edit.",
+          "type": "object",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "attachmentUniqueNames": {
+          "type": "list",
+          "label": "Included attachments",
+          "help": "Item ids bought together with the item at no extra cost.",
+          "confidence": "documented"
+        },
+        "optionalAttachmentUniqueNames": {
+          "type": "list",
+          "label": "Optional attachments",
+          "help": "Item ids a player may add for extra payment.",
+          "confidence": "documented"
+        },
+        "variations": {
+          "type": "list",
+          "label": "Variations",
+          "help": "Other class names counted as the same item, such as colour variants of clothing.",
+          "confidence": "documented"
+        },
+        "version": {
+          "type": "string",
+          "label": "Format version",
+          "help": "Version number of this file format. The mod uses it to upgrade old files. Never change it.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        }
+      },
+      "instances": 4
+    }
+  ]
+}

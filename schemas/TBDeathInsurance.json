@@ -1,0 +1,520 @@
+{
+  "schemaVersion": 1,
+  "mod": {
+    "id": "TBDeathInsurance",
+    "folder": "TBDeathInsurance",
+    "name": "TB Death Insurance",
+    "summary": "Players buy insurance at insurance points; when they die, they can claim their insured gear from an insurance case. Plans differ in price, duration and premium status.",
+    "coverage": "in-depth",
+    "docs": "https://doc.themodbase.com/DeathInsurance/Readme.html",
+    "sources": [
+      "DeathInsurance/Readme",
+      "DeathInsurance/Configs/Config",
+      "DeathInsurance/Configs/BlacklistConfig",
+      "DeathInsurance/Configs/InsurancePointConfig",
+      "DeathInsurance/Configs/Logger"
+    ],
+    "notes": "Docs list different defaults than the sample for some values (for example heirs 10 vs 2, transfer delay 10 vs 20); the app shows the sample defaults. With inventory-expanding mods not all gear may be saved. Admin rights come from Global/AdminConfig (deathInsurance); prices use Global/CurrencyConfig."
+  },
+  "files": [
+    {
+      "id": "blacklistconfig",
+      "match": "BlacklistConfig.json",
+      "title": "Insurance blacklist",
+      "summary": "Items that are never insured. Supports wildcard patterns.",
+      "restart": true,
+      "role": "list",
+      "fields": {
+        "version": {
+          "label": "Config version",
+          "help": "Internal version number of this file format. The mod manages it; do not edit.",
+          "type": "string",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented",
+          "default": "1"
+        },
+        "isInitialized": {
+          "label": "Initialised marker",
+          "help": "Internal marker the mod sets after it has created the file. Do not change it.",
+          "type": "flag",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented",
+          "default": 1
+        },
+        "blacklistedItems": {
+          "label": "Blacklisted items",
+          "help": "Item class names that are never insured. Supports exact names and wildcards: *text*, text* and *text.",
+          "type": "list",
+          "confidence": "documented",
+          "risk": "The blacklist does nothing when an insurance uses insureOnlyItemsThatAreAtTheMomentInCargoAndInventory = 1."
+        },
+        "blacklistedItems[]": {
+          "label": "Item or pattern",
+          "help": "Class name or wildcard pattern (for example *Rifle*) of items to exclude from insurance. Case-sensitive.",
+          "type": "string",
+          "confidence": "documented",
+          "pattern": "^[A-Za-z0-9_*]{1,120}$",
+          "default": "ItemToBlacklistA"
+        }
+      }
+    },
+    {
+      "id": "config",
+      "match": "Config.json",
+      "title": "Death Insurance settings",
+      "summary": "Main settings and the list of insurance plans players can buy.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "label": "Config version",
+          "help": "Internal version number of this file format. The mod manages it; do not edit.",
+          "type": "string",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented",
+          "default": "10"
+        },
+        "isInitialized": {
+          "label": "Initialised marker",
+          "help": "Internal marker the mod sets after it has created the file. Do not change it.",
+          "type": "flag",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented",
+          "default": 0
+        },
+        "maximumHeirsForOneInheritance": {
+          "label": "Max heirs per inheritance",
+          "help": "Caps how many heirs can be named for one inheritance.",
+          "type": "int",
+          "min": 0,
+          "typical": "1-10",
+          "confidence": "documented",
+          "default": 2
+        },
+        "insuranceCaseWillDeletedAfterSeconds": {
+          "label": "Delete unclaimed case after",
+          "help": "How long an insurance case (the stored gear after a death) waits for the player before it is deleted for good.",
+          "type": "int",
+          "unit": "seconds",
+          "min": 0,
+          "typical": "86400 (1 day) to 604800 (7 days)",
+          "risk": "Short times make players lose their gear if they are offline.",
+          "confidence": "documented",
+          "default": 86400
+        },
+        "useLocalTime": {
+          "label": "Use server local time",
+          "help": "1 uses the server local clock for times shown or calculated; 0 uses UTC.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "default": 0
+        },
+        "timeInSecondsWhenItemsWillBeTransferAfterDeathOfPlayer": {
+          "label": "Transfer delay after death",
+          "help": "Seconds after death before the items are moved into the insurance case. If above 0, items held in hands cannot be saved (see saveItemInHands).",
+          "type": "int",
+          "unit": "seconds",
+          "min": 0,
+          "typical": "0 or 10-30",
+          "risk": "While it is above 0, insurances with saveItemInHands = 1 cannot save hand items.",
+          "confidence": "documented",
+          "default": 20
+        },
+        "storeAllItemsInCargoOfMainItems": {
+          "label": "Put all items in main item cargo",
+          "help": "1 packs everything into the cargo of the main items (clothing) when saving; 0 keeps items where they were. Do not combine with insureOnlyItemsThatAreAtTheMomentInCargoAndInventory.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "default": 0
+        },
+        "globalInsuranceBuyCooldownInSeconds": {
+          "label": "Global buy cooldown",
+          "help": "Waiting time between any two insurance purchases by a player, overriding the per-insurance cooldown.",
+          "type": "int",
+          "unit": "seconds",
+          "special": {
+            "-1": "no global cooldown"
+          },
+          "min": -1,
+          "confidence": "documented",
+          "default": -1
+        },
+        "defaultInsuranceIDForNewPlayers": {
+          "label": "Default insurance for new players",
+          "help": "Id of the insurance given automatically to players when they first spawn. Empty means none. It must match an id in the insurances list.",
+          "type": "string",
+          "confidence": "documented",
+          "default": ""
+        },
+        "maximumFreeInsuranceCountForPlayers": {
+          "label": "Max free insurances",
+          "help": "Limit on how many of the free default insurances one player can receive.",
+          "type": "int",
+          "special": {
+            "-1": "unlimited"
+          },
+          "min": -1,
+          "confidence": "documented",
+          "default": -1
+        },
+        "hideDeleteItemsButton": {
+          "label": "Hide delete button",
+          "help": "1 hides the button players use to delete the items in an insurance case; 0 shows it.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "observed",
+          "default": 0
+        },
+        "insurances": {
+          "label": "Insurances",
+          "help": "The insurance plans players can buy at an insurance point.",
+          "type": "list",
+          "confidence": "documented"
+        },
+        "insurances[]": {
+          "label": "Insurance plan",
+          "help": "One purchasable insurance plan.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "insurances[].id": {
+          "label": "Plan id",
+          "help": "Unique name of the plan. Other settings (such as the default insurance) refer to it, so keep it unique and unchanged once players own it.",
+          "type": "string",
+          "level": "advanced",
+          "risk": "Duplicate or changed ids can orphan existing player insurances.",
+          "confidence": "documented",
+          "default": "5u6pcgxey2"
+        },
+        "insurances[].price": {
+          "label": "Price",
+          "help": "Cost of the plan in the configured currency.",
+          "type": "int",
+          "unit": "coins",
+          "min": 0,
+          "risk": "A price of 0 makes the plan free for everyone.",
+          "confidence": "documented",
+          "default": 1000
+        },
+        "insurances[].durationInSeconds": {
+          "label": "Duration",
+          "help": "How long the plan stays active after purchase.",
+          "type": "int",
+          "unit": "seconds",
+          "min": 1,
+          "typical": "86400 (1 day) to 2592000 (30 days)",
+          "confidence": "documented",
+          "default": 86400
+        },
+        "insurances[].stayActiveAfterDeath": {
+          "label": "Stay active after death",
+          "help": "1 keeps the plan active after it paid out, so it covers the next death too; 0 uses it up on the first death.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "default": 0
+        },
+        "insurances[].insureOnlyItemsThatAreAtTheMomentInCargoAndInventory": {
+          "label": "Insure only inventory and cargo",
+          "help": "1 insures only what is in inventory and cargo at the moment of death. This needs storeAllItemsInCargoOfMainItems = 0 and makes the blacklist ineffective.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced",
+          "default": 0
+        },
+        "insurances[].canBuyAgainAfterSeconds": {
+          "label": "Re-buy cooldown",
+          "help": "How long a player must wait before buying this plan again. The global cooldown overrides it when set.",
+          "type": "int",
+          "unit": "seconds",
+          "special": {
+            "-1": "can buy again at any time"
+          },
+          "min": -1,
+          "confidence": "documented",
+          "default": -1
+        },
+        "insurances[].isPremium": {
+          "label": "Premium only",
+          "help": "1 makes the plan available only to premium players; 0 for everyone.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "default": 0
+        },
+        "insurances[].isBuyable": {
+          "label": "Buyable",
+          "help": "0 hides the plan from the shop so it can only be given automatically (for example as a free starter plan); 1 lets players buy it.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "default": 1
+        },
+        "insurances[].saveItemInHands": {
+          "label": "Save item in hands",
+          "help": "1 also saves the item the player held in the hands. It only works when timeInSecondsWhenItemsWillBeTransferAfterDeathOfPlayer is 0.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "risk": "Ignored while the transfer delay is above 0.",
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "insurancepointconfig",
+      "match": "InsurancePointConfig.json",
+      "title": "Insurance points",
+      "summary": "Where the insurance machines or NPCs stand on the map.",
+      "restart": true,
+      "role": "records",
+      "fields": {
+        "version": {
+          "label": "Config version",
+          "help": "Internal version number of this file format. The mod manages it; do not edit.",
+          "type": "string",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented",
+          "default": "3"
+        },
+        "isInitialized": {
+          "label": "Initialised marker",
+          "help": "Internal marker the mod sets after it has created the file. Do not change it.",
+          "type": "flag",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented",
+          "default": 1
+        },
+        "insurancePoints": {
+          "label": "Insurance points",
+          "help": "Places on the map where players can buy and claim insurance.",
+          "type": "list",
+          "confidence": "documented"
+        },
+        "insurancePoints[]": {
+          "label": "Insurance point",
+          "help": "One insurance machine or NPC with its place.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "insurancePoints[].position": {
+          "label": "Position",
+          "help": "World coordinates of the point as three numbers: x, y (height) and z.",
+          "type": "list",
+          "confidence": "documented"
+        },
+        "insurancePoints[].position[]": {
+          "label": "Coordinate",
+          "help": "One of the three world coordinates (x, height, z).",
+          "type": "number",
+          "unit": "metres",
+          "confidence": "documented",
+          "default": 6543.68017578125
+        },
+        "insurancePoints[].orientation": {
+          "label": "Orientation",
+          "help": "Facing angles of the point as three numbers; usually only the first one matters and the others stay 0.",
+          "type": "list",
+          "confidence": "documented"
+        },
+        "insurancePoints[].orientation[]": {
+          "label": "Angle",
+          "help": "One of the three angles in degrees.",
+          "type": "number",
+          "unit": "degrees",
+          "confidence": "documented",
+          "default": 314
+        },
+        "insurancePoints[].machineType": {
+          "label": "Machine class",
+          "help": "Class name of the insurance machine. Custom types must extend TBDIMachine.",
+          "type": "classname",
+          "level": "advanced",
+          "confidence": "documented",
+          "default": "TBDIMachine"
+        },
+        "insurancePoints[].useExactPosition": {
+          "label": "Use exact position",
+          "help": "1 places the point exactly at the given coordinates; 0 snaps it to the ground.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "default": 0
+        },
+        "insurancePoints[].enableNpcTrader": {
+          "label": "Spawn NPC",
+          "help": "1 also spawns an NPC at the point; 0 places the machine only.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "default": 0
+        },
+        "insurancePoints[].npcType": {
+          "label": "NPC class",
+          "help": "Class name of the NPC. Only used when Spawn NPC is 1.",
+          "type": "classname",
+          "confidence": "documented",
+          "default": ""
+        },
+        "insurancePoints[].npcGearSetName": {
+          "label": "NPC gear set",
+          "help": "Name of the outfit for the NPC (a file in Global/GearSets, created if missing). Only used with an NPC.",
+          "type": "string",
+          "confidence": "documented",
+          "default": ""
+        }
+      }
+    },
+    {
+      "id": "logger",
+      "match": "Logger.json",
+      "title": "Logging",
+      "summary": "CSV and Discord logging of insurance events.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "label": "Config version",
+          "help": "Internal version number of this file format. The mod manages it; do not edit.",
+          "type": "string",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented",
+          "default": "1"
+        },
+        "isInitialized": {
+          "label": "Initialised marker",
+          "help": "Internal marker the mod sets after it has created the file. Do not change it.",
+          "type": "flag",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented",
+          "default": 1
+        },
+        "logBuyInsurance": {
+          "label": "Log purchases (CSV)",
+          "help": "1 writes a CSV log line when a player buys insurance.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "default": 1
+        },
+        "logBuyInsuranceDiscord": {
+          "label": "Log purchases (Discord)",
+          "help": "1 posts to Discord when a player buys insurance. Needs the webhook below.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "default": 1
+        },
+        "discordBuyInsuranceWebhookURL": {
+          "label": "Purchase webhook",
+          "help": "Address of the Discord webhook that receives insurance purchases. Leave empty to send nothing. Treat it like a password: anyone who has it can post to your channel.",
+          "type": "url",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "logPlayerDied": {
+          "label": "Log deaths (CSV)",
+          "help": "1 writes a CSV log line when a player dies.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "default": 1
+        },
+        "logPlayerDiedDiscord": {
+          "label": "Log deaths (Discord)",
+          "help": "1 posts to Discord when a player dies. Needs the webhook below.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "default": 1
+        },
+        "discordPlayerDiedWebhookURL": {
+          "label": "Death webhook",
+          "help": "Address of the Discord webhook that receives death events. Leave empty to send nothing. Treat it like a password: anyone who has it can post to your channel.",
+          "type": "url",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "logInsuranceUsed": {
+          "label": "Log payouts (CSV)",
+          "help": "1 writes a CSV log line when an insurance activates after a death.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "default": 1
+        },
+        "logInsuranceUsedDiscord": {
+          "label": "Log payouts (Discord)",
+          "help": "1 posts to Discord when an insurance activates after a death. Needs the webhook below.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "default": 1
+        },
+        "discordInsuranceUsedWebhookURL": {
+          "label": "Payout webhook",
+          "help": "Address of the Discord webhook that receives insurance activations. Leave empty to send nothing. Treat it like a password: anyone who has it can post to your channel.",
+          "type": "url",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "logInsuranceItemTaken": {
+          "label": "Log item retrievals (CSV)",
+          "help": "1 writes a CSV log line when a player takes items from a case.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "default": 1
+        },
+        "logInsuranceItemTakenDiscord": {
+          "label": "Log item retrievals (Discord)",
+          "help": "1 posts to Discord when a player takes items from a case. Needs the webhook below.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "default": 1
+        },
+        "discordInsuranceItemTakenWebhookURL": {
+          "label": "Item taken webhook",
+          "help": "Address of the Discord webhook that receives item retrieval events. Leave empty to send nothing. Treat it like a password: anyone who has it can post to your channel.",
+          "type": "url",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "logInsuranceDelete": {
+          "label": "Log case deletions (CSV)",
+          "help": "1 writes a CSV log line when an insurance case is deleted.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "default": 1
+        },
+        "logInsuranceDeleteDiscord": {
+          "label": "Log case deletions (Discord)",
+          "help": "1 posts to Discord when an insurance case is deleted. Needs the webhook below.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "default": 1
+        },
+        "discordInsuranceDeleteWebhookURL": {
+          "label": "Case deleted webhook",
+          "help": "Address of the Discord webhook that receives case deletions. Leave empty to send nothing. Treat it like a password: anyone who has it can post to your channel.",
+          "type": "url",
+          "level": "advanced",
+          "confidence": "documented"
+        }
+      }
+    }
+  ]
+}

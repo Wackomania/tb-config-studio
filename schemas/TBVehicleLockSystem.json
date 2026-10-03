@@ -1,0 +1,790 @@
+{
+  "schemaVersion": 1,
+  "mod": {
+    "id": "TBVehicleLockSystem",
+    "folder": "TBVehicleLockSystem",
+    "name": "TB Vehicle Lock System",
+    "summary": "Lets players own vehicles, lock them and hand out keys to friends or groups. Other players can break in or short-circuit a vehicle with tools or by waiting, which can set off an alarm the owner can buy. Owners can also pack a vehicle away and unpack it later, except in blacklisted areas.",
+    "coverage": "in-depth",
+    "docs": "https://doc.themodbase.com/TBVehicleLockSystem/Readme.html",
+    "sources": [
+      "TBVehicleLockSystem/Readme.html",
+      "TBVehicleLockSystem/Configs/GeneralConfig.html",
+      "TBVehicleLockSystem/Configs/LoggerConfig.html",
+      "TBVehicleLockSystem/Configs/PackVehicleConfig.html",
+      "TBVehicleLockSystem/Configs/RaidVehicleConfig.html",
+      "TBVehicleLockSystem/Configs/ShortCircuitVehicleConfig.html"
+    ],
+    "notes": "Install order: add the server and client PBOs, start the server once so the configs are generated, stop it, edit, then start again. Changes need a restart."
+  },
+  "files": [
+    {
+      "id": "generalconfig",
+      "match": "GeneralConfig.json",
+      "title": "General settings and shop extensions",
+      "summary": "Alarm durations and the purchasable vehicle extensions (alarm, packing, Discord alerts) with their prices.",
+      "restart": true,
+      "fields": {
+        "alarmTimeInSeconds": {
+          "type": "int",
+          "default": 600,
+          "label": "Alarm duration",
+          "help": "How long the alarm sounds after a raid or short circuit on a vehicle with an alarm.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "300-900"
+        },
+        "stopAlarmTimeInSeconds": {
+          "type": "int",
+          "default": 600,
+          "label": "Time to switch the alarm off",
+          "help": "Time window raiders get to switch the alarm off again.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "300-900"
+        },
+        "extensions[].id": {
+          "type": "string",
+          "default": "ALARM_SYSTEM",
+          "label": "Extension id",
+          "help": "Fixed identifier of the extension (ALARM_SYSTEM, PACK_VEHICLE, DISCORD_RAID_ALERT, DISCORD_SHORT_CIRCUIT_ALERT). Used by the mod internally.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "extensions[].price": {
+          "type": "int",
+          "default": 5000,
+          "label": "Base price",
+          "help": "What the extension costs for any vehicle without its own price entry below.",
+          "unit": "coins",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "extensions[].currencyType": {
+          "type": "string",
+          "default": "default",
+          "label": "Currency",
+          "help": "Name of the currency used to pay, as defined in the shared currency config. \"default\" uses the standard currency.",
+          "confidence": "documented",
+          "typical": "default"
+        },
+        "extensions[].requiresDiscordWebhook": {
+          "type": "flag",
+          "default": 0,
+          "label": "Needs Discord webhook",
+          "help": "Set by the mod: 1 for the two Discord alert extensions, which need a webhook address. Do not change.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "internal": true,
+          "level": "danger"
+        },
+        "extensions[].vehicleTypPrices[].carType": {
+          "type": "classname",
+          "default": "ExampleCar",
+          "label": "Vehicle type",
+          "help": "Class name of the vehicle this price applies to. The shipped value ExampleCar is only a placeholder.",
+          "confidence": "documented"
+        },
+        "extensions[].vehicleTypPrices[].price": {
+          "type": "int",
+          "default": 4000,
+          "label": "Price for this vehicle",
+          "help": "Price used instead of the base price for this vehicle type.",
+          "unit": "coins",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "extensions[].vehicleTypPrices[].currencyType": {
+          "type": "string",
+          "default": "default",
+          "label": "Currency for this vehicle",
+          "help": "Currency used for this vehicle-specific price.",
+          "confidence": "documented",
+          "typical": "default"
+        },
+        "extensions[].vehicleTypPrices": {
+          "type": "list",
+          "label": "Price per vehicle type",
+          "help": "Optional prices that replace the base price for specific vehicles.",
+          "confidence": "documented"
+        },
+        "extensions[].disabledVehicleTypes": {
+          "type": "list",
+          "default": [],
+          "label": "Vehicles that cannot buy it",
+          "help": "Vehicle class names that may not buy this extension. Wildcards work: Example*, *CarType, *Car* or an exact name.",
+          "confidence": "documented"
+        },
+        "extensions": {
+          "type": "list",
+          "label": "Extensions",
+          "help": "The four purchasable vehicle extensions. Only prices, currencies and the excluded vehicle types are meant to be edited.",
+          "confidence": "documented"
+        },
+        "extensions[]": {
+          "label": "Extension",
+          "help": "One purchasable extension.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "extensions[].vehicleTypPrices[]": {
+          "label": "Price override",
+          "help": "One vehicle-specific price.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "extensions[].disabledVehicleTypes[]": {
+          "label": "Vehicle pattern",
+          "help": "A vehicle class name or a pattern with * at the start and/or end.",
+          "type": "string",
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "loggerconfig",
+      "match": "LoggerConfig.json",
+      "title": "Logging",
+      "summary": "Which events are written to the log and which are also sent to Discord, plus the four Discord channel addresses.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Config version",
+          "help": "Managed by the mod itself. Leave it as it is.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "logBuyExtension": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log extension purchases",
+          "help": "Write extension purchases to the mod log. Belongs to the General channel.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logBuyExtensionToDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord: extension purchases",
+          "help": "Also post extension purchases to the General Discord channel. Needs the matching webhook address and the log switch above.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logShortCircuit": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log short circuits of vehicles",
+          "help": "Write short circuits of vehicles to the mod log. Belongs to the Raid actions channel.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logShortCircuitToDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord: short circuits of vehicles",
+          "help": "Also post short circuits of vehicles to the Raid actions Discord channel. Needs the matching webhook address and the log switch above.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logRepairShortCircuit": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log repairs of a short circuit",
+          "help": "Write repairs of a short circuit to the mod log. Belongs to the Raid actions channel.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logRepairShortCircuitToDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord: repairs of a short circuit",
+          "help": "Also post repairs of a short circuit to the Raid actions Discord channel. Needs the matching webhook address and the log switch above.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logRaid": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log vehicle raids",
+          "help": "Write vehicle raids to the mod log. Belongs to the Raid actions channel.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logRaidToDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord: vehicle raids",
+          "help": "Also post vehicle raids to the Raid actions Discord channel. Needs the matching webhook address and the log switch above.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logAlarmOn": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log alarms switching on",
+          "help": "Write alarms switching on to the mod log. Belongs to the Raid actions channel.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logAlarmOnToDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord: alarms switching on",
+          "help": "Also post alarms switching on to the Raid actions Discord channel. Needs the matching webhook address and the log switch above.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logAlarmOff": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log alarms switching off",
+          "help": "Write alarms switching off to the mod log. Belongs to the Raid actions channel.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logAlarmOffToDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord: alarms switching off",
+          "help": "Also post alarms switching off to the Raid actions Discord channel. Needs the matching webhook address and the log switch above.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logAdminDeleteOwner": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log admins removing a vehicle owner",
+          "help": "Write admins removing a vehicle owner to the mod log. Belongs to the Admin channel.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logAdminDeleteOwnerToDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord: admins removing a vehicle owner",
+          "help": "Also post admins removing a vehicle owner to the Admin Discord channel. Needs the matching webhook address and the log switch above.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logAdminSaveKeyAccess": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log admins changing key access",
+          "help": "Write admins changing key access to the mod log. Belongs to the Admin channel.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logAdminSaveKeyAccessToDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord: admins changing key access",
+          "help": "Also post admins changing key access to the Admin Discord channel. Needs the matching webhook address and the log switch above.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logUserSaveKeyAccess": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log players changing key access",
+          "help": "Write players changing key access to the mod log. Belongs to the Key channel.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logUserSaveKeyAccessToDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord: players changing key access",
+          "help": "Also post players changing key access to the Key Discord channel. Needs the matching webhook address and the log switch above.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logUserTransferOwner": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log ownership transfers",
+          "help": "Write ownership transfers to the mod log. Belongs to the Key channel.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logUserTransferOwnerToDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord: ownership transfers",
+          "help": "Also post ownership transfers to the Key Discord channel. Needs the matching webhook address and the log switch above.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logUserGroupAccess": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log group access changes",
+          "help": "Write group access changes to the mod log. Belongs to the Key channel.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logUserGroupAccessToDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord: group access changes",
+          "help": "Also post group access changes to the Key Discord channel. Needs the matching webhook address and the log switch above.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logVehiclePack": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log vehicles being packed",
+          "help": "Write vehicles being packed to the mod log. Belongs to the Key channel.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logVehiclePackToDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord: vehicles being packed",
+          "help": "Also post vehicles being packed to the Key Discord channel. Needs the matching webhook address and the log switch above.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logVehicleUnpack": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log vehicles being unpacked",
+          "help": "Write vehicles being unpacked to the mod log. Belongs to the Key channel.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logVehicleUnpackToDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord: vehicles being unpacked",
+          "help": "Also post vehicles being unpacked to the Key Discord channel. Needs the matching webhook address and the log switch above.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logOwnVehicle": {
+          "type": "flag",
+          "default": 1,
+          "label": "Log players claiming a vehicle",
+          "help": "Write players claiming a vehicle to the mod log. Belongs to the Key channel.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logOwnVehicleToDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord: players claiming a vehicle",
+          "help": "Also post players claiming a vehicle to the Key Discord channel. Needs the matching webhook address and the log switch above.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordGeneralWebhookURL": {
+          "type": "url",
+          "label": "Discord address: General",
+          "help": "Webhook address for the General channel (extension purchases).",
+          "level": "advanced",
+          "confidence": "documented",
+          "risk": "The address works like a password for the channel: anyone who has it can post there. Do not share it."
+        },
+        "discordRaidActionsWebhookURL": {
+          "type": "url",
+          "label": "Discord address: Raid actions",
+          "help": "Webhook address for raids, short circuits, repairs and alarms.",
+          "level": "advanced",
+          "confidence": "documented",
+          "risk": "The address works like a password for the channel: anyone who has it can post there. Do not share it."
+        },
+        "discordAdminWebhookURL": {
+          "type": "url",
+          "label": "Discord address: Admin",
+          "help": "Webhook address for admin actions.",
+          "level": "advanced",
+          "confidence": "documented",
+          "risk": "The address works like a password for the channel: anyone who has it can post there. Do not share it."
+        },
+        "discordKeyWebhookURL": {
+          "type": "url",
+          "label": "Discord address: Key",
+          "help": "Webhook address for key, ownership and pack/unpack events.",
+          "level": "advanced",
+          "confidence": "documented",
+          "risk": "The address works like a password for the channel: anyone who has it can post there. Do not share it."
+        }
+      }
+    },
+    {
+      "id": "packvehicleconfig",
+      "match": "PackVehicleConfig.json",
+      "title": "Pack vehicle",
+      "summary": "Rules for packing a vehicle away and unpacking it again, including areas where unpacking is not allowed.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "2",
+          "label": "Config version",
+          "help": "Managed by the mod itself. Leave it as it is.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "canPackVehicle": {
+          "type": "flag",
+          "default": 1,
+          "label": "Packing allowed",
+          "help": "Switch the whole pack/unpack feature on or off. Players still need the pack extension.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "vehicleCargoMustBeEmpty": {
+          "type": "flag",
+          "default": 1,
+          "label": "Cargo must be empty",
+          "help": "When on, the vehicle has to be emptied before it can be packed, so nothing gets lost inside.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "handNeedsToBeEmpty": {
+          "type": "flag",
+          "default": 1,
+          "label": "Hands must be empty",
+          "help": "When on, the player cannot hold an item while packing.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "packTimeInSeconds": {
+          "type": "int",
+          "default": 60,
+          "label": "Packing time",
+          "help": "How long packing a vehicle takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "30-120"
+        },
+        "unpackTimeInSeconds": {
+          "type": "int",
+          "default": 60,
+          "label": "Unpacking time",
+          "help": "How long unpacking a vehicle takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "30-120"
+        },
+        "unpackBlacklistAreas[].name": {
+          "type": "string",
+          "default": "Example Blacklist Area",
+          "label": "Area name",
+          "help": "Free text name so you can recognise the area.",
+          "confidence": "documented"
+        },
+        "unpackBlacklistAreas[].position[]": {
+          "type": "number",
+          "default": 0,
+          "label": "Coordinate",
+          "help": "One of X, Y, Z (in that order). X and Z are the map position, Y is the height.",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "unpackBlacklistAreas[].position": {
+          "type": "list",
+          "label": "Centre",
+          "help": "Centre of the area as X, Y, Z map coordinates.",
+          "confidence": "documented"
+        },
+        "unpackBlacklistAreas[].radius": {
+          "type": "int",
+          "default": 10,
+          "label": "Radius",
+          "help": "Size of the area around the centre.",
+          "unit": "metres",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "unpackBlacklistAreas": {
+          "type": "list",
+          "label": "No-unpack areas",
+          "help": "Circles on the map where vehicles cannot be unpacked, for example safe zones.",
+          "confidence": "documented"
+        },
+        "unpackBlacklistAreas[]": {
+          "label": "Area",
+          "help": "One circular no-unpack area.",
+          "type": "object",
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "raidvehicleconfig",
+      "match": "RaidVehicleConfig.json",
+      "title": "Vehicle raiding",
+      "summary": "Whether vehicles can be broken into, how, and with which tools.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Config version",
+          "help": "Managed by the mod itself. Leave it as it is.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "vehiclesCanBeRaided": {
+          "type": "flag",
+          "default": 1,
+          "label": "Vehicles can be raided",
+          "help": "Master switch. With 0 nobody can break into a locked vehicle, which is typical for PvE.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "needToolForRaid": {
+          "type": "flag",
+          "default": 1,
+          "label": "Tool required",
+          "help": "When 1, a raid needs one of the tools listed below. When 0, players raid bare-handed by waiting for the time below and rolling the chance below.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "carRaidTimeInSeconds": {
+          "type": "int",
+          "default": 600,
+          "label": "Raid time without a tool",
+          "help": "How long a bare-handed raid takes. Only used when no tool is required.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "300-900"
+        },
+        "chanceToRaid": {
+          "type": "int",
+          "default": 20,
+          "label": "Chance without a tool",
+          "help": "Chance in percent that a bare-handed raid succeeds. Only used when no tool is required.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "carRaidTools[].toolType": {
+          "type": "classname",
+          "default": "Screwdriver",
+          "label": "Tool item",
+          "help": "Class name of the item that works as the tool (for example Screwdriver or Lockpick). It has to be a real item that exists in the game.",
+          "confidence": "documented",
+          "typical": "Screwdriver, Lockpick"
+        },
+        "carRaidTools[].quote": {
+          "type": "int",
+          "default": 30,
+          "label": "Success chance",
+          "help": "Chance in percent that an attempt with this tool succeeds. 100 means it always works.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented",
+          "typical": "20-60"
+        },
+        "carRaidTools[].damage": {
+          "type": "int",
+          "default": 100,
+          "label": "Tool wear",
+          "help": "How much health the tool loses per use, in percent of its health. 100 usually means it breaks after one use.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "carRaidTools[].minHealth": {
+          "type": "int",
+          "default": 1,
+          "label": "Minimum tool health",
+          "help": "The tool stops working when its health is below this value (percent). The shipped files use 1.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "carRaidTools[].timeInSeconds": {
+          "type": "int",
+          "default": 300,
+          "label": "Time with this tool",
+          "help": "How long the action takes when this tool is used.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "carRaidTools[].vehicleTypes": {
+          "type": "list",
+          "default": [],
+          "label": "Allowed vehicle types",
+          "help": "Vehicles this tool works on, as class names. Leave the list empty for all vehicles.",
+          "confidence": "documented"
+        },
+        "carRaidTools": {
+          "type": "list",
+          "label": "Tools",
+          "help": "The list of tools that can be used. Needed when the tool requirement is switched on.",
+          "confidence": "documented"
+        },
+        "carRaidTools[]": {
+          "label": "Tool entry",
+          "help": "One tool that can be used to break into a vehicle. Add one entry per tool item; each has its own success chance, wear and duration.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "carRaidTools[].vehicleTypes[]": {
+          "label": "Vehicle type",
+          "help": "Class name of a vehicle this tool is allowed on.",
+          "type": "classname",
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "shortcircuitvehicleconfig",
+      "match": "ShortCircuitVehicleConfig.json",
+      "title": "Vehicle short circuit",
+      "summary": "Whether a vehicle can be short-circuited (disabled) by other players, how, and how long the owner needs to repair it.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Config version",
+          "help": "Managed by the mod itself. Leave it as it is.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "vehiclesCanBeShortCircuited": {
+          "type": "flag",
+          "default": 1,
+          "label": "Short circuit allowed",
+          "help": "Master switch for the short circuit mechanic.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "needToolForShortCircuit": {
+          "type": "flag",
+          "default": 0,
+          "label": "Tool required",
+          "help": "When 1, a tool from the list below is needed; when 0, players can do it bare-handed using the time and chance below.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "shortCircuitTimeInSeconds": {
+          "type": "int",
+          "default": 300,
+          "label": "Time without a tool",
+          "help": "How long a bare-handed short circuit takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "120-600"
+        },
+        "repairShortCircuitTimeInSeconds": {
+          "type": "int",
+          "default": 30,
+          "label": "Repair time",
+          "help": "How long the owner needs to repair a short-circuited vehicle.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented",
+          "typical": "15-60"
+        },
+        "chanceToShortCircuit": {
+          "type": "int",
+          "default": 20,
+          "label": "Chance without a tool",
+          "help": "Chance in percent that a bare-handed attempt succeeds.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "shortCircuitTools[].toolType": {
+          "type": "classname",
+          "default": "Screwdriver",
+          "label": "Tool item",
+          "help": "Class name of the item that works as the tool (for example Screwdriver or Lockpick). It has to be a real item that exists in the game.",
+          "confidence": "documented",
+          "typical": "Screwdriver, Lockpick"
+        },
+        "shortCircuitTools[].quote": {
+          "type": "int",
+          "default": 30,
+          "label": "Success chance",
+          "help": "Chance in percent that an attempt with this tool succeeds. 100 means it always works.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented",
+          "typical": "20-60"
+        },
+        "shortCircuitTools[].damage": {
+          "type": "int",
+          "default": 100,
+          "label": "Tool wear",
+          "help": "How much health the tool loses per use, in percent of its health. 100 usually means it breaks after one use.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "shortCircuitTools[].minHealth": {
+          "type": "int",
+          "default": 1,
+          "label": "Minimum tool health",
+          "help": "The tool stops working when its health is below this value (percent). The shipped files use 1.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "shortCircuitTools[].timeInSeconds": {
+          "type": "int",
+          "default": 300,
+          "label": "Time with this tool",
+          "help": "How long the action takes when this tool is used.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "shortCircuitTools[].vehicleTypes": {
+          "type": "list",
+          "default": [],
+          "label": "Allowed vehicle types",
+          "help": "Vehicles this tool works on, as class names. Leave the list empty for all vehicles.",
+          "confidence": "documented"
+        },
+        "shortCircuitTools": {
+          "type": "list",
+          "label": "Tools",
+          "help": "The list of tools that can be used. Needed when the tool requirement is switched on.",
+          "confidence": "documented"
+        },
+        "shortCircuitTools[]": {
+          "label": "Tool entry",
+          "help": "One tool that can be used to short-circuit a vehicle. Add one entry per tool item; each has its own success chance, wear and duration.",
+          "type": "object",
+          "confidence": "documented"
+        },
+        "shortCircuitTools[].vehicleTypes[]": {
+          "label": "Vehicle type",
+          "help": "Class name of a vehicle this tool is allowed on.",
+          "type": "classname",
+          "confidence": "documented"
+        }
+      }
+    }
+  ]
+}

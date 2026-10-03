@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "mod": {
+    "id": "TBCarry",
+    "folder": "TBCarry",
+    "name": "TB Carry",
+    "summary": "Lets players pick up and carry other players. Carried players are handled with the TBCPlayerBaseBodyBag item. It has one small config file.",
+    "coverage": "in-depth",
+    "docs": "https://doc.themodbase.com/Carry/Readme.html",
+    "sources": [
+      "Carry/Readme",
+      "Carry/TBCarryGlobalConfig"
+    ],
+    "notes": "Needs TBLib on server and clients. Admin rights come from Global/AdminConfig (carry)."
+  },
+  "files": [
+    {
+      "id": "tbcarryglobalconfig",
+      "match": "TBCarryGlobalConfig.json",
+      "title": "Carry settings",
+      "summary": "The only setting of the mod: whether bot (NPC) corpses can be packed and carried.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "label": "Config version",
+          "help": "Internal version number of this file format. The mod manages it; do not edit.",
+          "type": "string",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented",
+          "default": "1"
+        },
+        "isInitialized": {
+          "label": "Initialised marker",
+          "help": "Internal marker the mod sets after it has created the file. Do not change it.",
+          "type": "flag",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented",
+          "default": 1
+        },
+        "enablePackActionOnBots": {
+          "label": "Allow packing bots",
+          "help": "1 lets players pack bot (NPC) corpses like players; 0 blocks it, which suits servers with NPC characters that must stay in place.",
+          "type": "flag",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "default": 1
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "mod": "TBDeathInsurance",
+  "presets": {
+    "pve": {
+      "changes": [
+        {
+          "file": "Config.json",
+          "path": "insuranceCaseWillDeletedAfterSeconds",
+          "value": 604800,
+          "why": "Cases wait a week so players who are offline do not lose gear"
+        }
+      ]
+    },
+    "pvp": {
+      "changes": [
+        {
+          "file": "Config.json",
+          "path": "globalInsuranceBuyCooldownInSeconds",
+          "value": 3600,
+          "why": "Stops players from re-buying cover every life"
+        }
+      ]
+    },
+    "hardcore": {
+      "changes": [
+        {
+          "file": "Config.json",
+          "path": "insuranceCaseWillDeletedAfterSeconds",
+          "value": 3600,
+          "why": "Unclaimed gear disappears quickly"
+        },
+        {
+          "file": "Config.json",
+          "path": "globalInsuranceBuyCooldownInSeconds",
+          "value": 86400,
+          "why": "At most one purchase per day"
+        }
+      ]
+    },
+    "casual": {
+      "changes": [
+        {
+          "file": "Config.json",
+          "path": "insuranceCaseWillDeletedAfterSeconds",
+          "value": 604800,
+          "why": "Cases wait a week for relaxed play"
+        },
+        {
+          "file": "Config.json",
+          "path": "globalInsuranceBuyCooldownInSeconds",
+          "value": -1,
+          "why": "No purchase cooldown"
+        }
+      ]
+    }
+  }
+}

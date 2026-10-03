@@ -1,0 +1,2660 @@
+{
+  "schemaVersion": 1,
+  "mod": {
+    "id": "TBJewelsOfSurvival",
+    "folder": "TBJewelsOfSurvival",
+    "name": "TB Jewels of Survival",
+    "summary": "A mining and crafting chain. Players mine ores at spawn areas, smelt metals, grind diamonds into gems, and forge magic rings on an anvil. Seven ring types (Attack, Defense, Dragon Blood, Eagle Eye, Life, Owl, Perseverance) give bonuses in three levels, and higher levels are made by combining two rings of the previous level.",
+    "coverage": "in-depth",
+    "docs": "https://doc.themodbase.com/TBJewelsOfSurvival/Readme.html",
+    "sources": [
+      "/TBJewelsOfSurvival/Readme.html",
+      "/TBJewelsOfSurvival/Effects.html",
+      "/TBJewelsOfSurvival/Rings/TBJOFRingOf*.html (7 pages, images only)",
+      "/TBJewelsOfSurvival/Configs/AnvilConfig.html",
+      "/TBJewelsOfSurvival/Configs/GrinderConfig.html",
+      "/TBJewelsOfSurvival/Configs/GrinderRecipeConfiguration.html",
+      "/TBJewelsOfSurvival/Configs/JewelRecoveryConfig.html",
+      "/TBJewelsOfSurvival/Configs/MineConfig.html",
+      "/TBJewelsOfSurvival/Configs/OreChanceConfig.html",
+      "/TBJewelsOfSurvival/Configs/OreSpawnAreasConfig.html",
+      "/TBJewelsOfSurvival/Configs/RingEnableConfig.html",
+      "/TBJewelsOfSurvival/Configs/SmelterConfig.html"
+    ],
+    "notes": "The ring pages on the doc site only show pictures, so what each ring does is not described there; the field help therefore avoids claiming exact ring effect values. Installation needs two server starts: once to generate the files, once after editing them. The doc page for GrinderRecipeConfiguration describes a file named GrinderRecipeConfig.json on disk."
+  },
+  "files": [
+    {
+      "id": "anvilconfig",
+      "match": "AnvilConfig.json",
+      "title": "Anvil (ring crafting)",
+      "summary": "Recipes for forging the rings on the anvil: ingots and gems for level 1, and two rings of the previous level plus a gem for levels 2 and 3.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "5",
+          "label": "Config version",
+          "help": "Version number the mod writes into this file so it can upgrade older files. Leave it exactly as it is.",
+          "internal": true,
+          "level": "danger",
+          "risk": "Changing it can make the mod reset or reject the file.",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Leave it alone.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "damageOnCraftingItem": {
+          "type": "number",
+          "default": 10,
+          "label": "Wear on crafting tool",
+          "help": "How much damage the crafting tool takes each time something is forged.",
+          "unit": "damage points",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "configMode": {
+          "type": "flag",
+          "default": 0,
+          "label": "Portable use",
+          "help": "1 allows the device to be picked up and carried in the hands and inventory; 0 keeps it as a fixed object.",
+          "confidence": "documented"
+        },
+        "ringOfPerseveranceLevel1Recipe.targetType": {
+          "type": "classname",
+          "default": "TBJOFRingOfPerseveranceLevel1",
+          "label": "Perseverance ring level 1: result",
+          "help": "Class name of the ring this recipe creates. Do not change it unless you know the item exists.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfPerseveranceLevel1Recipe.timeToCraftInSeconds": {
+          "type": "int",
+          "default": 5,
+          "label": "Perseverance ring level 1: craft time",
+          "help": "How long forging this ring takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfPerseveranceLevel1Recipe.copperIngredient.quantity": {
+          "type": "int",
+          "default": 10,
+          "label": "Perseverance ring level 1: copper ingots",
+          "help": "Number of copper ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfPerseveranceLevel1Recipe.ironIngredient.quantity": {
+          "type": "int",
+          "default": 7,
+          "label": "Perseverance ring level 1: iron ingots",
+          "help": "Number of iron ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfPerseveranceLevel1Recipe.silverIngredient.quantity": {
+          "type": "int",
+          "default": 3,
+          "label": "Perseverance ring level 1: silver ingots",
+          "help": "Number of silver ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfPerseveranceLevel1Recipe.goldIngredient.quantity": {
+          "type": "int",
+          "default": 2,
+          "label": "Perseverance ring level 1: gold ingots",
+          "help": "Number of gold ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfPerseveranceLevel1Recipe.gemStoneGreenIngredient.quantity": {
+          "type": "int",
+          "default": 1,
+          "label": "Perseverance ring level 1: green gemstones",
+          "help": "Number of green gemstones needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfPerseveranceLevel2Recipe.targetType": {
+          "type": "classname",
+          "default": "TBJOFRingOfPerseveranceLevel2",
+          "label": "Perseverance ring level 2: result",
+          "help": "Class name of the ring this recipe creates. Do not change it unless you know the item exists.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfPerseveranceLevel2Recipe.timeToCraftInSeconds": {
+          "type": "int",
+          "default": 10,
+          "label": "Perseverance ring level 2: craft time",
+          "help": "How long forging this ring takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfPerseveranceLevel2Recipe.gemStoneBlueIngredient.quantity": {
+          "type": "int",
+          "default": 1,
+          "label": "Perseverance ring level 2: blue gemstones",
+          "help": "Number of blue gemstones needed on top of the two rings. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfPerseveranceLevel2Recipe.firstRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfPerseveranceLevel1",
+          "label": "Perseverance ring level 2: first ring",
+          "help": "Class name of the first ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfPerseveranceLevel2Recipe.secondRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfPerseveranceLevel1",
+          "label": "Perseverance ring level 2: second ring",
+          "help": "Class name of the second ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfPerseveranceLevel3Recipe.targetType": {
+          "type": "classname",
+          "default": "TBJOFRingOfPerseveranceLevel3",
+          "label": "Perseverance ring level 3: result",
+          "help": "Class name of the ring this recipe creates. Do not change it unless you know the item exists.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfPerseveranceLevel3Recipe.timeToCraftInSeconds": {
+          "type": "int",
+          "default": 10,
+          "label": "Perseverance ring level 3: craft time",
+          "help": "How long forging this ring takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfPerseveranceLevel3Recipe.gemStoneRedIngredient.quantity": {
+          "type": "int",
+          "default": 1,
+          "label": "Perseverance ring level 3: red gemstones",
+          "help": "Number of red gemstones needed on top of the two rings. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfPerseveranceLevel3Recipe.firstRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfPerseveranceLevel2",
+          "label": "Perseverance ring level 3: first ring",
+          "help": "Class name of the first ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfPerseveranceLevel3Recipe.secondRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfPerseveranceLevel2",
+          "label": "Perseverance ring level 3: second ring",
+          "help": "Class name of the second ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfLifeLevel1Recipe.targetType": {
+          "type": "classname",
+          "default": "TBJOFRingOfLifeLevel1",
+          "label": "Life ring level 1: result",
+          "help": "Class name of the ring this recipe creates. Do not change it unless you know the item exists.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfLifeLevel1Recipe.timeToCraftInSeconds": {
+          "type": "int",
+          "default": 5,
+          "label": "Life ring level 1: craft time",
+          "help": "How long forging this ring takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfLifeLevel1Recipe.copperIngredient.quantity": {
+          "type": "int",
+          "default": 10,
+          "label": "Life ring level 1: copper ingots",
+          "help": "Number of copper ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfLifeLevel1Recipe.ironIngredient.quantity": {
+          "type": "int",
+          "default": 7,
+          "label": "Life ring level 1: iron ingots",
+          "help": "Number of iron ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfLifeLevel1Recipe.silverIngredient.quantity": {
+          "type": "int",
+          "default": 3,
+          "label": "Life ring level 1: silver ingots",
+          "help": "Number of silver ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfLifeLevel1Recipe.goldIngredient.quantity": {
+          "type": "int",
+          "default": 2,
+          "label": "Life ring level 1: gold ingots",
+          "help": "Number of gold ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfLifeLevel1Recipe.gemStoneGreenIngredient.quantity": {
+          "type": "int",
+          "default": 1,
+          "label": "Life ring level 1: green gemstones",
+          "help": "Number of green gemstones needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfLifeLevel2Recipe.targetType": {
+          "type": "classname",
+          "default": "TBJOFRingOfLifeLevel2",
+          "label": "Life ring level 2: result",
+          "help": "Class name of the ring this recipe creates. Do not change it unless you know the item exists.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfLifeLevel2Recipe.timeToCraftInSeconds": {
+          "type": "int",
+          "default": 10,
+          "label": "Life ring level 2: craft time",
+          "help": "How long forging this ring takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfLifeLevel2Recipe.gemStoneBlueIngredient.quantity": {
+          "type": "int",
+          "default": 1,
+          "label": "Life ring level 2: blue gemstones",
+          "help": "Number of blue gemstones needed on top of the two rings. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfLifeLevel2Recipe.firstRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfLifeLevel1",
+          "label": "Life ring level 2: first ring",
+          "help": "Class name of the first ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfLifeLevel2Recipe.secondRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfLifeLevel1",
+          "label": "Life ring level 2: second ring",
+          "help": "Class name of the second ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfLifeLevel3Recipe.targetType": {
+          "type": "classname",
+          "default": "TBJOFRingOfLifeLevel3",
+          "label": "Life ring level 3: result",
+          "help": "Class name of the ring this recipe creates. Do not change it unless you know the item exists.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfLifeLevel3Recipe.timeToCraftInSeconds": {
+          "type": "int",
+          "default": 10,
+          "label": "Life ring level 3: craft time",
+          "help": "How long forging this ring takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfLifeLevel3Recipe.gemStoneRedIngredient.quantity": {
+          "type": "int",
+          "default": 1,
+          "label": "Life ring level 3: red gemstones",
+          "help": "Number of red gemstones needed on top of the two rings. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfLifeLevel3Recipe.firstRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfLifeLevel2",
+          "label": "Life ring level 3: first ring",
+          "help": "Class name of the first ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfLifeLevel3Recipe.secondRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfLifeLevel2",
+          "label": "Life ring level 3: second ring",
+          "help": "Class name of the second ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfAttackLevel1Recipe.targetType": {
+          "type": "classname",
+          "default": "TBJOFRingOfAttackLevel1",
+          "label": "Attack ring level 1: result",
+          "help": "Class name of the ring this recipe creates. Do not change it unless you know the item exists.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfAttackLevel1Recipe.timeToCraftInSeconds": {
+          "type": "int",
+          "default": 5,
+          "label": "Attack ring level 1: craft time",
+          "help": "How long forging this ring takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfAttackLevel1Recipe.copperIngredient.quantity": {
+          "type": "int",
+          "default": 10,
+          "label": "Attack ring level 1: copper ingots",
+          "help": "Number of copper ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfAttackLevel1Recipe.ironIngredient.quantity": {
+          "type": "int",
+          "default": 7,
+          "label": "Attack ring level 1: iron ingots",
+          "help": "Number of iron ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfAttackLevel1Recipe.silverIngredient.quantity": {
+          "type": "int",
+          "default": 3,
+          "label": "Attack ring level 1: silver ingots",
+          "help": "Number of silver ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfAttackLevel1Recipe.goldIngredient.quantity": {
+          "type": "int",
+          "default": 2,
+          "label": "Attack ring level 1: gold ingots",
+          "help": "Number of gold ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfAttackLevel1Recipe.gemStoneGreenIngredient.quantity": {
+          "type": "int",
+          "default": 1,
+          "label": "Attack ring level 1: green gemstones",
+          "help": "Number of green gemstones needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfAttackLevel2Recipe.targetType": {
+          "type": "classname",
+          "default": "TBJOFRingOfAttackLevel2",
+          "label": "Attack ring level 2: result",
+          "help": "Class name of the ring this recipe creates. Do not change it unless you know the item exists.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfAttackLevel2Recipe.timeToCraftInSeconds": {
+          "type": "int",
+          "default": 10,
+          "label": "Attack ring level 2: craft time",
+          "help": "How long forging this ring takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfAttackLevel2Recipe.gemStoneBlueIngredient.quantity": {
+          "type": "int",
+          "default": 1,
+          "label": "Attack ring level 2: blue gemstones",
+          "help": "Number of blue gemstones needed on top of the two rings. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfAttackLevel2Recipe.firstRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfAttackLevel1",
+          "label": "Attack ring level 2: first ring",
+          "help": "Class name of the first ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfAttackLevel2Recipe.secondRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfAttackLevel1",
+          "label": "Attack ring level 2: second ring",
+          "help": "Class name of the second ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfAttackLevel3Recipe.targetType": {
+          "type": "classname",
+          "default": "TBJOFRingOfAttackLevel3",
+          "label": "Attack ring level 3: result",
+          "help": "Class name of the ring this recipe creates. Do not change it unless you know the item exists.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfAttackLevel3Recipe.timeToCraftInSeconds": {
+          "type": "int",
+          "default": 10,
+          "label": "Attack ring level 3: craft time",
+          "help": "How long forging this ring takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfAttackLevel3Recipe.gemStoneRedIngredient.quantity": {
+          "type": "int",
+          "default": 1,
+          "label": "Attack ring level 3: red gemstones",
+          "help": "Number of red gemstones needed on top of the two rings. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfAttackLevel3Recipe.firstRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfAttackLevel2",
+          "label": "Attack ring level 3: first ring",
+          "help": "Class name of the first ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfAttackLevel3Recipe.secondRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfAttackLevel2",
+          "label": "Attack ring level 3: second ring",
+          "help": "Class name of the second ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfDefenseLevel1Recipe.targetType": {
+          "type": "classname",
+          "default": "TBJOFRingOfDefenseLevel1",
+          "label": "Defense ring level 1: result",
+          "help": "Class name of the ring this recipe creates. Do not change it unless you know the item exists.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfDefenseLevel1Recipe.timeToCraftInSeconds": {
+          "type": "int",
+          "default": 5,
+          "label": "Defense ring level 1: craft time",
+          "help": "How long forging this ring takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfDefenseLevel1Recipe.copperIngredient.quantity": {
+          "type": "int",
+          "default": 10,
+          "label": "Defense ring level 1: copper ingots",
+          "help": "Number of copper ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfDefenseLevel1Recipe.ironIngredient.quantity": {
+          "type": "int",
+          "default": 7,
+          "label": "Defense ring level 1: iron ingots",
+          "help": "Number of iron ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfDefenseLevel1Recipe.silverIngredient.quantity": {
+          "type": "int",
+          "default": 3,
+          "label": "Defense ring level 1: silver ingots",
+          "help": "Number of silver ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfDefenseLevel1Recipe.goldIngredient.quantity": {
+          "type": "int",
+          "default": 2,
+          "label": "Defense ring level 1: gold ingots",
+          "help": "Number of gold ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfDefenseLevel1Recipe.gemStoneGreenIngredient.quantity": {
+          "type": "int",
+          "default": 1,
+          "label": "Defense ring level 1: green gemstones",
+          "help": "Number of green gemstones needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfDefenseLevel2Recipe.targetType": {
+          "type": "classname",
+          "default": "TBJOFRingOfDefenseLevel2",
+          "label": "Defense ring level 2: result",
+          "help": "Class name of the ring this recipe creates. Do not change it unless you know the item exists.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfDefenseLevel2Recipe.timeToCraftInSeconds": {
+          "type": "int",
+          "default": 10,
+          "label": "Defense ring level 2: craft time",
+          "help": "How long forging this ring takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfDefenseLevel2Recipe.gemStoneBlueIngredient.quantity": {
+          "type": "int",
+          "default": 1,
+          "label": "Defense ring level 2: blue gemstones",
+          "help": "Number of blue gemstones needed on top of the two rings. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfDefenseLevel2Recipe.firstRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfDefenseLevel1",
+          "label": "Defense ring level 2: first ring",
+          "help": "Class name of the first ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfDefenseLevel2Recipe.secondRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfDefenseLevel1",
+          "label": "Defense ring level 2: second ring",
+          "help": "Class name of the second ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfDefenseLevel3Recipe.targetType": {
+          "type": "classname",
+          "default": "TBJOFRingOfDefenseLevel3",
+          "label": "Defense ring level 3: result",
+          "help": "Class name of the ring this recipe creates. Do not change it unless you know the item exists.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfDefenseLevel3Recipe.timeToCraftInSeconds": {
+          "type": "int",
+          "default": 10,
+          "label": "Defense ring level 3: craft time",
+          "help": "How long forging this ring takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfDefenseLevel3Recipe.gemStoneRedIngredient.quantity": {
+          "type": "int",
+          "default": 1,
+          "label": "Defense ring level 3: red gemstones",
+          "help": "Number of red gemstones needed on top of the two rings. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfDefenseLevel3Recipe.firstRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfDefenseLevel2",
+          "label": "Defense ring level 3: first ring",
+          "help": "Class name of the first ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfDefenseLevel3Recipe.secondRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfDefenseLevel2",
+          "label": "Defense ring level 3: second ring",
+          "help": "Class name of the second ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfDragonBloodLevel1Recipe.targetType": {
+          "type": "classname",
+          "default": "TBJOFRingOfDragonBloodLevel1",
+          "label": "Dragon Blood ring level 1: result",
+          "help": "Class name of the ring this recipe creates. Do not change it unless you know the item exists.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfDragonBloodLevel1Recipe.timeToCraftInSeconds": {
+          "type": "int",
+          "default": 5,
+          "label": "Dragon Blood ring level 1: craft time",
+          "help": "How long forging this ring takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfDragonBloodLevel1Recipe.copperIngredient.quantity": {
+          "type": "int",
+          "default": 10,
+          "label": "Dragon Blood ring level 1: copper ingots",
+          "help": "Number of copper ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfDragonBloodLevel1Recipe.ironIngredient.quantity": {
+          "type": "int",
+          "default": 7,
+          "label": "Dragon Blood ring level 1: iron ingots",
+          "help": "Number of iron ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfDragonBloodLevel1Recipe.silverIngredient.quantity": {
+          "type": "int",
+          "default": 3,
+          "label": "Dragon Blood ring level 1: silver ingots",
+          "help": "Number of silver ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfDragonBloodLevel1Recipe.goldIngredient.quantity": {
+          "type": "int",
+          "default": 2,
+          "label": "Dragon Blood ring level 1: gold ingots",
+          "help": "Number of gold ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfDragonBloodLevel1Recipe.gemStoneGreenIngredient.quantity": {
+          "type": "int",
+          "default": 1,
+          "label": "Dragon Blood ring level 1: green gemstones",
+          "help": "Number of green gemstones needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfDragonBloodLevel2Recipe.targetType": {
+          "type": "classname",
+          "default": "TBJOFRingOfDragonBloodLevel2",
+          "label": "Dragon Blood ring level 2: result",
+          "help": "Class name of the ring this recipe creates. Do not change it unless you know the item exists.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfDragonBloodLevel2Recipe.timeToCraftInSeconds": {
+          "type": "int",
+          "default": 10,
+          "label": "Dragon Blood ring level 2: craft time",
+          "help": "How long forging this ring takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfDragonBloodLevel2Recipe.gemStoneBlueIngredient.quantity": {
+          "type": "int",
+          "default": 1,
+          "label": "Dragon Blood ring level 2: blue gemstones",
+          "help": "Number of blue gemstones needed on top of the two rings. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfDragonBloodLevel2Recipe.firstRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfDragonBloodLevel1",
+          "label": "Dragon Blood ring level 2: first ring",
+          "help": "Class name of the first ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfDragonBloodLevel2Recipe.secondRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfDragonBloodLevel1",
+          "label": "Dragon Blood ring level 2: second ring",
+          "help": "Class name of the second ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfDragonBloodLevel3Recipe.targetType": {
+          "type": "classname",
+          "default": "TBJOFRingOfDragonBloodLevel3",
+          "label": "Dragon Blood ring level 3: result",
+          "help": "Class name of the ring this recipe creates. Do not change it unless you know the item exists.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfDragonBloodLevel3Recipe.timeToCraftInSeconds": {
+          "type": "int",
+          "default": 10,
+          "label": "Dragon Blood ring level 3: craft time",
+          "help": "How long forging this ring takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfDragonBloodLevel3Recipe.gemStoneRedIngredient.quantity": {
+          "type": "int",
+          "default": 1,
+          "label": "Dragon Blood ring level 3: red gemstones",
+          "help": "Number of red gemstones needed on top of the two rings. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfDragonBloodLevel3Recipe.firstRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfDragonBloodLevel2",
+          "label": "Dragon Blood ring level 3: first ring",
+          "help": "Class name of the first ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfDragonBloodLevel3Recipe.secondRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfDragonBloodLevel2",
+          "label": "Dragon Blood ring level 3: second ring",
+          "help": "Class name of the second ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfOwlLevel1Recipe.targetType": {
+          "type": "classname",
+          "default": "TBJOFRingOfOwlLevel1",
+          "label": "Owl ring level 1: result",
+          "help": "Class name of the ring this recipe creates. Do not change it unless you know the item exists.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfOwlLevel1Recipe.timeToCraftInSeconds": {
+          "type": "int",
+          "default": 5,
+          "label": "Owl ring level 1: craft time",
+          "help": "How long forging this ring takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfOwlLevel1Recipe.copperIngredient.quantity": {
+          "type": "int",
+          "default": 10,
+          "label": "Owl ring level 1: copper ingots",
+          "help": "Number of copper ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfOwlLevel1Recipe.ironIngredient.quantity": {
+          "type": "int",
+          "default": 7,
+          "label": "Owl ring level 1: iron ingots",
+          "help": "Number of iron ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfOwlLevel1Recipe.silverIngredient.quantity": {
+          "type": "int",
+          "default": 3,
+          "label": "Owl ring level 1: silver ingots",
+          "help": "Number of silver ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfOwlLevel1Recipe.goldIngredient.quantity": {
+          "type": "int",
+          "default": 2,
+          "label": "Owl ring level 1: gold ingots",
+          "help": "Number of gold ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfOwlLevel1Recipe.gemStoneGreenIngredient.quantity": {
+          "type": "int",
+          "default": 1,
+          "label": "Owl ring level 1: green gemstones",
+          "help": "Number of green gemstones needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfOwlLevel2Recipe.targetType": {
+          "type": "classname",
+          "default": "TBJOFRingOfOwlLevel2",
+          "label": "Owl ring level 2: result",
+          "help": "Class name of the ring this recipe creates. Do not change it unless you know the item exists.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfOwlLevel2Recipe.timeToCraftInSeconds": {
+          "type": "int",
+          "default": 10,
+          "label": "Owl ring level 2: craft time",
+          "help": "How long forging this ring takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfOwlLevel2Recipe.gemStoneBlueIngredient.quantity": {
+          "type": "int",
+          "default": 1,
+          "label": "Owl ring level 2: blue gemstones",
+          "help": "Number of blue gemstones needed on top of the two rings. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfOwlLevel2Recipe.firstRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfOwlLevel1",
+          "label": "Owl ring level 2: first ring",
+          "help": "Class name of the first ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfOwlLevel2Recipe.secondRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfOwlLevel1",
+          "label": "Owl ring level 2: second ring",
+          "help": "Class name of the second ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfOwlLevel3Recipe.targetType": {
+          "type": "classname",
+          "default": "TBJOFRingOfOwlLevel3",
+          "label": "Owl ring level 3: result",
+          "help": "Class name of the ring this recipe creates. Do not change it unless you know the item exists.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfOwlLevel3Recipe.timeToCraftInSeconds": {
+          "type": "int",
+          "default": 10,
+          "label": "Owl ring level 3: craft time",
+          "help": "How long forging this ring takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfOwlLevel3Recipe.gemStoneRedIngredient.quantity": {
+          "type": "int",
+          "default": 1,
+          "label": "Owl ring level 3: red gemstones",
+          "help": "Number of red gemstones needed on top of the two rings. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfOwlLevel3Recipe.firstRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfOwlLevel2",
+          "label": "Owl ring level 3: first ring",
+          "help": "Class name of the first ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfOwlLevel3Recipe.secondRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfOwlLevel2",
+          "label": "Owl ring level 3: second ring",
+          "help": "Class name of the second ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfEagleEyeLevel1Recipe.targetType": {
+          "type": "classname",
+          "default": "TBJOFRingOfEagleEyeLevel1",
+          "label": "Eagle Eye ring level 1: result",
+          "help": "Class name of the ring this recipe creates. Do not change it unless you know the item exists.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfEagleEyeLevel1Recipe.timeToCraftInSeconds": {
+          "type": "int",
+          "default": 5,
+          "label": "Eagle Eye ring level 1: craft time",
+          "help": "How long forging this ring takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfEagleEyeLevel1Recipe.copperIngredient.quantity": {
+          "type": "int",
+          "default": 10,
+          "label": "Eagle Eye ring level 1: copper ingots",
+          "help": "Number of copper ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfEagleEyeLevel1Recipe.ironIngredient.quantity": {
+          "type": "int",
+          "default": 7,
+          "label": "Eagle Eye ring level 1: iron ingots",
+          "help": "Number of iron ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfEagleEyeLevel1Recipe.silverIngredient.quantity": {
+          "type": "int",
+          "default": 3,
+          "label": "Eagle Eye ring level 1: silver ingots",
+          "help": "Number of silver ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfEagleEyeLevel1Recipe.goldIngredient.quantity": {
+          "type": "int",
+          "default": 2,
+          "label": "Eagle Eye ring level 1: gold ingots",
+          "help": "Number of gold ingots needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfEagleEyeLevel1Recipe.gemStoneGreenIngredient.quantity": {
+          "type": "int",
+          "default": 1,
+          "label": "Eagle Eye ring level 1: green gemstones",
+          "help": "Number of green gemstones needed for this recipe. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfEagleEyeLevel2Recipe.targetType": {
+          "type": "classname",
+          "default": "TBJOFRingOfEagleEyeLevel2",
+          "label": "Eagle Eye ring level 2: result",
+          "help": "Class name of the ring this recipe creates. Do not change it unless you know the item exists.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfEagleEyeLevel2Recipe.timeToCraftInSeconds": {
+          "type": "int",
+          "default": 10,
+          "label": "Eagle Eye ring level 2: craft time",
+          "help": "How long forging this ring takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfEagleEyeLevel2Recipe.gemStoneBlueIngredient.quantity": {
+          "type": "int",
+          "default": 1,
+          "label": "Eagle Eye ring level 2: blue gemstones",
+          "help": "Number of blue gemstones needed on top of the two rings. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfEagleEyeLevel2Recipe.firstRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfEagleEyeLevel1",
+          "label": "Eagle Eye ring level 2: first ring",
+          "help": "Class name of the first ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfEagleEyeLevel2Recipe.secondRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfEagleEyeLevel1",
+          "label": "Eagle Eye ring level 2: second ring",
+          "help": "Class name of the second ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfEagleEyeLevel3Recipe.targetType": {
+          "type": "classname",
+          "default": "TBJOFRingOfEagleEyeLevel3",
+          "label": "Eagle Eye ring level 3: result",
+          "help": "Class name of the ring this recipe creates. Do not change it unless you know the item exists.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfEagleEyeLevel3Recipe.timeToCraftInSeconds": {
+          "type": "int",
+          "default": 10,
+          "label": "Eagle Eye ring level 3: craft time",
+          "help": "How long forging this ring takes.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfEagleEyeLevel3Recipe.gemStoneRedIngredient.quantity": {
+          "type": "int",
+          "default": 1,
+          "label": "Eagle Eye ring level 3: red gemstones",
+          "help": "Number of red gemstones needed on top of the two rings. 0 means not needed.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ringOfEagleEyeLevel3Recipe.firstRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfEagleEyeLevel2",
+          "label": "Eagle Eye ring level 3: first ring",
+          "help": "Class name of the first ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ringOfEagleEyeLevel3Recipe.secondRingIngredient.type": {
+          "type": "classname",
+          "default": "TBJOFRingOfEagleEyeLevel2",
+          "label": "Eagle Eye ring level 3: second ring",
+          "help": "Class name of the second ring consumed (normally the previous level of the same ring).",
+          "level": "advanced",
+          "confidence": "documented"
+        }
+      },
+      "role": "settings"
+    },
+    {
+      "id": "grinderconfig",
+      "match": "GrinderConfig.json",
+      "title": "Grinder (gem grinding machine)",
+      "summary": "Power use and portability of the grinder that turns diamonds into gems.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "3",
+          "label": "Config version",
+          "help": "Version number the mod writes into this file so it can upgrade older files. Leave it exactly as it is.",
+          "internal": true,
+          "level": "danger",
+          "risk": "Changing it can make the mod reset or reject the file.",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Leave it alone.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "energyQuantityConsumptionPerTick": {
+          "type": "int",
+          "default": 10,
+          "label": "Energy per tick",
+          "help": "How much stored energy the grinder uses every processing tick.",
+          "unit": "energy units",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "tickLengthInSeconds": {
+          "type": "int",
+          "default": 10,
+          "label": "Tick length",
+          "help": "Length of one processing cycle of the grinder.",
+          "unit": "seconds",
+          "min": 1,
+          "confidence": "documented"
+        },
+        "staticGrinderNeedsBattery": {
+          "type": "flag",
+          "default": 1,
+          "label": "Fixed grinder needs a battery",
+          "help": "1 means the fixed grinder needs a battery to run, 0 means it works without power. The doc text calls the off value 2 but the sample uses 0/1.",
+          "confidence": "documented"
+        },
+        "configMode": {
+          "type": "flag",
+          "default": 0,
+          "label": "Portable use",
+          "help": "1 allows the device to be picked up and carried in the hands and inventory; 0 keeps it as a fixed object.",
+          "confidence": "documented"
+        }
+      },
+      "role": "settings"
+    },
+    {
+      "id": "grinderrecipeconfig",
+      "match": "GrinderRecipeConfig.json",
+      "title": "Grinder recipes",
+      "summary": "How long it takes to grind each type of diamond.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Config version",
+          "help": "Version number the mod writes into this file so it can upgrade older files. Leave it exactly as it is.",
+          "internal": true,
+          "level": "danger",
+          "risk": "Changing it can make the mod reset or reject the file.",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Leave it alone.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "timeInSecondsToGrindGreenDiamond": {
+          "type": "int",
+          "default": 10,
+          "label": "Grind time, green diamond",
+          "help": "How long it takes to grind a green diamond.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "timeInSecondsToGrindBlueDiamond": {
+          "type": "int",
+          "default": 15,
+          "label": "Grind time, blue diamond",
+          "help": "How long it takes to grind a blue diamond.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "timeInSecondsToGrindRedDiamond": {
+          "type": "int",
+          "default": 20,
+          "label": "Grind time, red diamond",
+          "help": "How long it takes to grind a red diamond.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        }
+      },
+      "role": "settings"
+    },
+    {
+      "id": "jewelrecoveryconfig",
+      "match": "JewelRecoveryConfig.json",
+      "title": "Ring use and recovery times",
+      "summary": "For every ring level: how long the effect stays active and how long the ring must rest before it can be used again. -1 means no limit.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "2",
+          "label": "Config version",
+          "help": "Version number the mod writes into this file so it can upgrade older files. Leave it exactly as it is.",
+          "internal": true,
+          "level": "danger",
+          "risk": "Changing it can make the mod reset or reject the file.",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Leave it alone.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "ringOfAttackLevel1.recoveryTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Attack ring level 1: recovery time",
+          "help": "Rest time before the ring can be used again after its effect ends. -1 means no recovery time applies.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no recovery time"
+          },
+          "confidence": "documented"
+        },
+        "ringOfAttackLevel1.usageTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Attack ring level 1: active time",
+          "help": "How long the ring effect stays active once used. -1 means no time limit.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no time limit"
+          },
+          "confidence": "documented"
+        },
+        "ringOfAttackLevel2.recoveryTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Attack ring level 2: recovery time",
+          "help": "Rest time before the ring can be used again after its effect ends. -1 means no recovery time applies.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no recovery time"
+          },
+          "confidence": "documented"
+        },
+        "ringOfAttackLevel2.usageTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Attack ring level 2: active time",
+          "help": "How long the ring effect stays active once used. -1 means no time limit.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no time limit"
+          },
+          "confidence": "documented"
+        },
+        "ringOfAttackLevel3.recoveryTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Attack ring level 3: recovery time",
+          "help": "Rest time before the ring can be used again after its effect ends. -1 means no recovery time applies.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no recovery time"
+          },
+          "confidence": "documented"
+        },
+        "ringOfAttackLevel3.usageTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Attack ring level 3: active time",
+          "help": "How long the ring effect stays active once used. -1 means no time limit.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no time limit"
+          },
+          "confidence": "documented"
+        },
+        "ringOfDefenseLevel1.recoveryTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Defense ring level 1: recovery time",
+          "help": "Rest time before the ring can be used again after its effect ends. -1 means no recovery time applies.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no recovery time"
+          },
+          "confidence": "documented"
+        },
+        "ringOfDefenseLevel1.usageTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Defense ring level 1: active time",
+          "help": "How long the ring effect stays active once used. -1 means no time limit.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no time limit"
+          },
+          "confidence": "documented"
+        },
+        "ringOfDefenseLevel2.recoveryTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Defense ring level 2: recovery time",
+          "help": "Rest time before the ring can be used again after its effect ends. -1 means no recovery time applies.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no recovery time"
+          },
+          "confidence": "documented"
+        },
+        "ringOfDefenseLevel2.usageTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Defense ring level 2: active time",
+          "help": "How long the ring effect stays active once used. -1 means no time limit.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no time limit"
+          },
+          "confidence": "documented"
+        },
+        "ringOfDefenseLevel3.recoveryTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Defense ring level 3: recovery time",
+          "help": "Rest time before the ring can be used again after its effect ends. -1 means no recovery time applies.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no recovery time"
+          },
+          "confidence": "documented"
+        },
+        "ringOfDefenseLevel3.usageTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Defense ring level 3: active time",
+          "help": "How long the ring effect stays active once used. -1 means no time limit.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no time limit"
+          },
+          "confidence": "documented"
+        },
+        "ringOfDragonBloodLevel1.recoveryTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Dragon Blood ring level 1: recovery time",
+          "help": "Rest time before the ring can be used again after its effect ends. -1 means no recovery time applies.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no recovery time"
+          },
+          "confidence": "documented"
+        },
+        "ringOfDragonBloodLevel1.usageTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Dragon Blood ring level 1: active time",
+          "help": "How long the ring effect stays active once used. -1 means no time limit.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no time limit"
+          },
+          "confidence": "documented"
+        },
+        "ringOfDragonBloodLevel2.recoveryTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Dragon Blood ring level 2: recovery time",
+          "help": "Rest time before the ring can be used again after its effect ends. -1 means no recovery time applies.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no recovery time"
+          },
+          "confidence": "documented"
+        },
+        "ringOfDragonBloodLevel2.usageTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Dragon Blood ring level 2: active time",
+          "help": "How long the ring effect stays active once used. -1 means no time limit.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no time limit"
+          },
+          "confidence": "documented"
+        },
+        "ringOfDragonBloodLevel3.recoveryTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Dragon Blood ring level 3: recovery time",
+          "help": "Rest time before the ring can be used again after its effect ends. -1 means no recovery time applies.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no recovery time"
+          },
+          "confidence": "documented"
+        },
+        "ringOfDragonBloodLevel3.usageTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Dragon Blood ring level 3: active time",
+          "help": "How long the ring effect stays active once used. -1 means no time limit.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no time limit"
+          },
+          "confidence": "documented"
+        },
+        "ringOfEagleEyeLevel1.recoveryTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Eagle Eye ring level 1: recovery time",
+          "help": "Rest time before the ring can be used again after its effect ends. -1 means no recovery time applies.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no recovery time"
+          },
+          "confidence": "documented"
+        },
+        "ringOfEagleEyeLevel1.usageTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Eagle Eye ring level 1: active time",
+          "help": "How long the ring effect stays active once used. -1 means no time limit.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no time limit"
+          },
+          "confidence": "documented"
+        },
+        "ringOfEagleEyeLevel2.recoveryTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Eagle Eye ring level 2: recovery time",
+          "help": "Rest time before the ring can be used again after its effect ends. -1 means no recovery time applies.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no recovery time"
+          },
+          "confidence": "documented"
+        },
+        "ringOfEagleEyeLevel2.usageTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Eagle Eye ring level 2: active time",
+          "help": "How long the ring effect stays active once used. -1 means no time limit.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no time limit"
+          },
+          "confidence": "documented"
+        },
+        "ringOfEagleEyeLevel3.recoveryTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Eagle Eye ring level 3: recovery time",
+          "help": "Rest time before the ring can be used again after its effect ends. -1 means no recovery time applies.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no recovery time"
+          },
+          "confidence": "documented"
+        },
+        "ringOfEagleEyeLevel3.usageTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Eagle Eye ring level 3: active time",
+          "help": "How long the ring effect stays active once used. -1 means no time limit.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no time limit"
+          },
+          "confidence": "documented"
+        },
+        "ringOfLifeLevel1.recoveryTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Life ring level 1: recovery time",
+          "help": "Rest time before the ring can be used again after its effect ends. -1 means no recovery time applies.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no recovery time"
+          },
+          "confidence": "documented"
+        },
+        "ringOfLifeLevel1.usageTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Life ring level 1: active time",
+          "help": "How long the ring effect stays active once used. -1 means no time limit.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no time limit"
+          },
+          "confidence": "documented"
+        },
+        "ringOfLifeLevel2.recoveryTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Life ring level 2: recovery time",
+          "help": "Rest time before the ring can be used again after its effect ends. -1 means no recovery time applies.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no recovery time"
+          },
+          "confidence": "documented"
+        },
+        "ringOfLifeLevel2.usageTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Life ring level 2: active time",
+          "help": "How long the ring effect stays active once used. -1 means no time limit.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no time limit"
+          },
+          "confidence": "documented"
+        },
+        "ringOfLifeLevel3.recoveryTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Life ring level 3: recovery time",
+          "help": "Rest time before the ring can be used again after its effect ends. -1 means no recovery time applies.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no recovery time"
+          },
+          "confidence": "documented"
+        },
+        "ringOfLifeLevel3.usageTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Life ring level 3: active time",
+          "help": "How long the ring effect stays active once used. -1 means no time limit.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no time limit"
+          },
+          "confidence": "documented"
+        },
+        "ringOfOwlLevel1.recoveryTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Owl ring level 1: recovery time",
+          "help": "Rest time before the ring can be used again after its effect ends. -1 means no recovery time applies.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no recovery time"
+          },
+          "confidence": "documented"
+        },
+        "ringOfOwlLevel1.usageTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Owl ring level 1: active time",
+          "help": "How long the ring effect stays active once used. -1 means no time limit.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no time limit"
+          },
+          "confidence": "documented"
+        },
+        "ringOfOwlLevel2.recoveryTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Owl ring level 2: recovery time",
+          "help": "Rest time before the ring can be used again after its effect ends. -1 means no recovery time applies.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no recovery time"
+          },
+          "confidence": "documented"
+        },
+        "ringOfOwlLevel2.usageTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Owl ring level 2: active time",
+          "help": "How long the ring effect stays active once used. -1 means no time limit.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no time limit"
+          },
+          "confidence": "documented"
+        },
+        "ringOfOwlLevel3.recoveryTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Owl ring level 3: recovery time",
+          "help": "Rest time before the ring can be used again after its effect ends. -1 means no recovery time applies.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no recovery time"
+          },
+          "confidence": "documented"
+        },
+        "ringOfOwlLevel3.usageTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Owl ring level 3: active time",
+          "help": "How long the ring effect stays active once used. -1 means no time limit.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no time limit"
+          },
+          "confidence": "documented"
+        },
+        "ringOfPerseveranceLevel1.recoveryTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Perseverance ring level 1: recovery time",
+          "help": "Rest time before the ring can be used again after its effect ends. -1 means no recovery time applies.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no recovery time"
+          },
+          "confidence": "documented"
+        },
+        "ringOfPerseveranceLevel1.usageTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Perseverance ring level 1: active time",
+          "help": "How long the ring effect stays active once used. -1 means no time limit.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no time limit"
+          },
+          "confidence": "documented"
+        },
+        "ringOfPerseveranceLevel2.recoveryTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Perseverance ring level 2: recovery time",
+          "help": "Rest time before the ring can be used again after its effect ends. -1 means no recovery time applies.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no recovery time"
+          },
+          "confidence": "documented"
+        },
+        "ringOfPerseveranceLevel2.usageTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Perseverance ring level 2: active time",
+          "help": "How long the ring effect stays active once used. -1 means no time limit.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no time limit"
+          },
+          "confidence": "documented"
+        },
+        "ringOfPerseveranceLevel3.recoveryTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Perseverance ring level 3: recovery time",
+          "help": "Rest time before the ring can be used again after its effect ends. -1 means no recovery time applies.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no recovery time"
+          },
+          "confidence": "documented"
+        },
+        "ringOfPerseveranceLevel3.usageTimeInSeconds": {
+          "type": "int",
+          "default": -1,
+          "label": "Perseverance ring level 3: active time",
+          "help": "How long the ring effect stays active once used. -1 means no time limit.",
+          "unit": "seconds",
+          "special": {
+            "-1": "no time limit"
+          },
+          "confidence": "documented"
+        }
+      },
+      "role": "settings"
+    },
+    {
+      "id": "mineconfig",
+      "match": "MineConfig.json",
+      "title": "Mining",
+      "summary": "How long mining each ore takes and how much the pickaxe wears.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "2",
+          "label": "Config version",
+          "help": "Version number the mod writes into this file so it can upgrade older files. Leave it exactly as it is.",
+          "internal": true,
+          "level": "danger",
+          "risk": "Changing it can make the mod reset or reject the file.",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Leave it alone.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "mineTimeCopperInSeconds": {
+          "type": "int",
+          "default": 30,
+          "label": "Mining time, copper",
+          "help": "How long a player has to mine copper ore for one attempt.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "mineTimeIronInSeconds": {
+          "type": "int",
+          "default": 40,
+          "label": "Mining time, iron",
+          "help": "How long a player has to mine iron ore for one attempt.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "mineTimeSilverInSeconds": {
+          "type": "int",
+          "default": 50,
+          "label": "Mining time, silver",
+          "help": "How long a player has to mine silver ore for one attempt.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "mineTimeGoldInSeconds": {
+          "type": "int",
+          "default": 60,
+          "label": "Mining time, gold",
+          "help": "How long a player has to mine gold ore for one attempt.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "mineTimeGreenDiamondInSeconds": {
+          "type": "int",
+          "default": 70,
+          "label": "Mining time, green diamond",
+          "help": "How long a player has to mine green diamond ore for one attempt.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "mineTimeBlueDiamondInSeconds": {
+          "type": "int",
+          "default": 80,
+          "label": "Mining time, blue diamond",
+          "help": "How long a player has to mine blue diamond ore for one attempt.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "mineTimeRedDiamondInSeconds": {
+          "type": "int",
+          "default": 90,
+          "label": "Mining time, red diamond",
+          "help": "How long a player has to mine red diamond ore for one attempt.",
+          "unit": "seconds",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "damageOnCraftingItem": {
+          "type": "number",
+          "default": 10,
+          "label": "Wear on mining tool",
+          "help": "How much damage the tool takes for each mining action.",
+          "unit": "damage points",
+          "min": 0,
+          "confidence": "documented"
+        }
+      },
+      "role": "settings"
+    },
+    {
+      "id": "orechanceconfig",
+      "match": "OreChanceConfig.json",
+      "title": "Ore drop chances",
+      "summary": "Chance in percent to actually receive each ore after a mining action finishes.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Config version",
+          "help": "Version number the mod writes into this file so it can upgrade older files. Leave it exactly as it is.",
+          "internal": true,
+          "level": "danger",
+          "risk": "Changing it can make the mod reset or reject the file.",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Leave it alone.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "chanceToGetCopperOreWhenMined": {
+          "type": "int",
+          "default": 85,
+          "label": "Chance, copper",
+          "help": "Chance to receive copper when it is mined. 100 always gives it; 0 never does.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "chanceToGetIronOreWhenMined": {
+          "type": "int",
+          "default": 70,
+          "label": "Chance, iron",
+          "help": "Chance to receive iron when it is mined. 100 always gives it; 0 never does.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "chanceToGetSilverOreWhenMined": {
+          "type": "int",
+          "default": 55,
+          "label": "Chance, silver",
+          "help": "Chance to receive silver when it is mined. 100 always gives it; 0 never does.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "chanceToGetGoldOreWhenMined": {
+          "type": "int",
+          "default": 50,
+          "label": "Chance, gold",
+          "help": "Chance to receive gold when it is mined. 100 always gives it; 0 never does.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "chanceToGetGreenDiamondOreWhenMined": {
+          "type": "int",
+          "default": 25,
+          "label": "Chance, green diamond",
+          "help": "Chance to receive green diamond when it is mined. 100 always gives it; 0 never does.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "chanceToGetBlueDiamondOreWhenMined": {
+          "type": "int",
+          "default": 15,
+          "label": "Chance, blue diamond",
+          "help": "Chance to receive blue diamond when it is mined. 100 always gives it; 0 never does.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        },
+        "chanceToGetRedDiamondOreWhenMined": {
+          "type": "int",
+          "default": 10,
+          "label": "Chance, red diamond",
+          "help": "Chance to receive red diamond when it is mined. 100 always gives it; 0 never does.",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "confidence": "documented"
+        }
+      },
+      "role": "settings"
+    },
+    {
+      "id": "orespawnareasconfig",
+      "match": "OreSpawnAreasConfig.json",
+      "title": "Ore spawn areas",
+      "summary": "Where each ore appears on the map, how many pieces of it exist in total and how often the mod checks that enough are present.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "2",
+          "label": "Config version",
+          "help": "Version number the mod writes into this file so it can upgrade older files. Leave it exactly as it is.",
+          "internal": true,
+          "level": "danger",
+          "risk": "Changing it can make the mod reset or reject the file.",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Leave it alone.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "copperOreSpawnAreas.minOreCountInArea": {
+          "type": "int",
+          "default": 1,
+          "label": "Copper: minimum ore count",
+          "help": "The mod refills copper ore when fewer than this many pieces exist across the positions below.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "copperOreSpawnAreas.maxOreCountInArea": {
+          "type": "int",
+          "default": 5,
+          "label": "Copper: maximum ore count",
+          "help": "Upper limit of copper ore pieces spawned across the positions below. Keep it at or above the minimum.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "copperOreSpawnAreas.checkTimeIfEnoughItemsInAreaInSeconds": {
+          "type": "int",
+          "default": 10,
+          "label": "Copper: check interval",
+          "help": "How often the mod checks whether enough ore is still there and spawns more if not.",
+          "unit": "seconds",
+          "min": 1,
+          "confidence": "documented"
+        },
+        "copperOreSpawnAreas.oreSpawnPositions[].position[]": {
+          "type": "number",
+          "default": 13276,
+          "label": "Copper: position coordinate",
+          "help": "One coordinate of the position (X, Y, Z).",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "copperOreSpawnAreas.oreSpawnPositions[].position": {
+          "type": "list",
+          "label": "Copper: position",
+          "help": "World position X, Y, Z. Height is worked out by the mod unless exact positions are on.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "copperOreSpawnAreas.oreSpawnPositions[].radius": {
+          "type": "int",
+          "default": 10,
+          "label": "Copper: scatter radius",
+          "help": "Ore is spread within this distance around the position. Ignored when exact positions are on.",
+          "unit": "metres",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "copperOreSpawnAreas.oreSpawnPositions": {
+          "type": "list",
+          "label": "Copper: spawn positions",
+          "help": "List of places where this ore can appear, each with a position and a radius.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "copperOreSpawnAreas.useExactPosition": {
+          "type": "flag",
+          "default": 0,
+          "label": "Copper: exact positions",
+          "help": "0 scatters ore randomly within the radius of each position; 1 places it exactly at the position given.",
+          "confidence": "documented"
+        },
+        "ironOreSpawnAreas.minOreCountInArea": {
+          "type": "int",
+          "default": 1,
+          "label": "Iron: minimum ore count",
+          "help": "The mod refills iron ore when fewer than this many pieces exist across the positions below.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ironOreSpawnAreas.maxOreCountInArea": {
+          "type": "int",
+          "default": 5,
+          "label": "Iron: maximum ore count",
+          "help": "Upper limit of iron ore pieces spawned across the positions below. Keep it at or above the minimum.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ironOreSpawnAreas.checkTimeIfEnoughItemsInAreaInSeconds": {
+          "type": "int",
+          "default": 10,
+          "label": "Iron: check interval",
+          "help": "How often the mod checks whether enough ore is still there and spawns more if not.",
+          "unit": "seconds",
+          "min": 1,
+          "confidence": "documented"
+        },
+        "ironOreSpawnAreas.oreSpawnPositions[].position[]": {
+          "type": "number",
+          "default": 8749.0634765625,
+          "label": "Iron: position coordinate",
+          "help": "One coordinate of the position (X, Y, Z).",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "ironOreSpawnAreas.oreSpawnPositions[].position": {
+          "type": "list",
+          "label": "Iron: position",
+          "help": "World position X, Y, Z. Height is worked out by the mod unless exact positions are on.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ironOreSpawnAreas.oreSpawnPositions[].radius": {
+          "type": "int",
+          "default": 10,
+          "label": "Iron: scatter radius",
+          "help": "Ore is spread within this distance around the position. Ignored when exact positions are on.",
+          "unit": "metres",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "ironOreSpawnAreas.oreSpawnPositions": {
+          "type": "list",
+          "label": "Iron: spawn positions",
+          "help": "List of places where this ore can appear, each with a position and a radius.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "ironOreSpawnAreas.useExactPosition": {
+          "type": "flag",
+          "default": 0,
+          "label": "Iron: exact positions",
+          "help": "0 scatters ore randomly within the radius of each position; 1 places it exactly at the position given.",
+          "confidence": "documented"
+        },
+        "silverOreSpawnAreas.minOreCountInArea": {
+          "type": "int",
+          "default": 1,
+          "label": "Silver: minimum ore count",
+          "help": "The mod refills silver ore when fewer than this many pieces exist across the positions below.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "silverOreSpawnAreas.maxOreCountInArea": {
+          "type": "int",
+          "default": 5,
+          "label": "Silver: maximum ore count",
+          "help": "Upper limit of silver ore pieces spawned across the positions below. Keep it at or above the minimum.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "silverOreSpawnAreas.checkTimeIfEnoughItemsInAreaInSeconds": {
+          "type": "int",
+          "default": 10,
+          "label": "Silver: check interval",
+          "help": "How often the mod checks whether enough ore is still there and spawns more if not.",
+          "unit": "seconds",
+          "min": 1,
+          "confidence": "documented"
+        },
+        "silverOreSpawnAreas.oreSpawnPositions[].position[]": {
+          "type": "number",
+          "default": 4037.83056640625,
+          "label": "Silver: position coordinate",
+          "help": "One coordinate of the position (X, Y, Z).",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "silverOreSpawnAreas.oreSpawnPositions[].position": {
+          "type": "list",
+          "label": "Silver: position",
+          "help": "World position X, Y, Z. Height is worked out by the mod unless exact positions are on.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "silverOreSpawnAreas.oreSpawnPositions[].radius": {
+          "type": "int",
+          "default": 10,
+          "label": "Silver: scatter radius",
+          "help": "Ore is spread within this distance around the position. Ignored when exact positions are on.",
+          "unit": "metres",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "silverOreSpawnAreas.oreSpawnPositions": {
+          "type": "list",
+          "label": "Silver: spawn positions",
+          "help": "List of places where this ore can appear, each with a position and a radius.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "silverOreSpawnAreas.useExactPosition": {
+          "type": "flag",
+          "default": 0,
+          "label": "Silver: exact positions",
+          "help": "0 scatters ore randomly within the radius of each position; 1 places it exactly at the position given.",
+          "confidence": "documented"
+        },
+        "goldOreSpawnAreas.minOreCountInArea": {
+          "type": "int",
+          "default": 1,
+          "label": "Gold: minimum ore count",
+          "help": "The mod refills gold ore when fewer than this many pieces exist across the positions below.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "goldOreSpawnAreas.maxOreCountInArea": {
+          "type": "int",
+          "default": 5,
+          "label": "Gold: maximum ore count",
+          "help": "Upper limit of gold ore pieces spawned across the positions below. Keep it at or above the minimum.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "goldOreSpawnAreas.checkTimeIfEnoughItemsInAreaInSeconds": {
+          "type": "int",
+          "default": 10,
+          "label": "Gold: check interval",
+          "help": "How often the mod checks whether enough ore is still there and spawns more if not.",
+          "unit": "seconds",
+          "min": 1,
+          "confidence": "documented"
+        },
+        "goldOreSpawnAreas.oreSpawnPositions[].position[]": {
+          "type": "number",
+          "default": 2592.15234375,
+          "label": "Gold: position coordinate",
+          "help": "One coordinate of the position (X, Y, Z).",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "goldOreSpawnAreas.oreSpawnPositions[].position": {
+          "type": "list",
+          "label": "Gold: position",
+          "help": "World position X, Y, Z. Height is worked out by the mod unless exact positions are on.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "goldOreSpawnAreas.oreSpawnPositions[].radius": {
+          "type": "int",
+          "default": 10,
+          "label": "Gold: scatter radius",
+          "help": "Ore is spread within this distance around the position. Ignored when exact positions are on.",
+          "unit": "metres",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "goldOreSpawnAreas.oreSpawnPositions": {
+          "type": "list",
+          "label": "Gold: spawn positions",
+          "help": "List of places where this ore can appear, each with a position and a radius.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "goldOreSpawnAreas.useExactPosition": {
+          "type": "flag",
+          "default": 0,
+          "label": "Gold: exact positions",
+          "help": "0 scatters ore randomly within the radius of each position; 1 places it exactly at the position given.",
+          "confidence": "documented"
+        },
+        "greenDiamondOreSpawnAreas.minOreCountInArea": {
+          "type": "int",
+          "default": 1,
+          "label": "Green diamond: minimum ore count",
+          "help": "The mod refills green diamond ore when fewer than this many pieces exist across the positions below.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "greenDiamondOreSpawnAreas.maxOreCountInArea": {
+          "type": "int",
+          "default": 5,
+          "label": "Green diamond: maximum ore count",
+          "help": "Upper limit of green diamond ore pieces spawned across the positions below. Keep it at or above the minimum.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "greenDiamondOreSpawnAreas.checkTimeIfEnoughItemsInAreaInSeconds": {
+          "type": "int",
+          "default": 10,
+          "label": "Green diamond: check interval",
+          "help": "How often the mod checks whether enough ore is still there and spawns more if not.",
+          "unit": "seconds",
+          "min": 1,
+          "confidence": "documented"
+        },
+        "greenDiamondOreSpawnAreas.oreSpawnPositions[].position[]": {
+          "type": "number",
+          "default": 14839.9111328125,
+          "label": "Green diamond: position coordinate",
+          "help": "One coordinate of the position (X, Y, Z).",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "greenDiamondOreSpawnAreas.oreSpawnPositions[].position": {
+          "type": "list",
+          "label": "Green diamond: position",
+          "help": "World position X, Y, Z. Height is worked out by the mod unless exact positions are on.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "greenDiamondOreSpawnAreas.oreSpawnPositions[].radius": {
+          "type": "int",
+          "default": 10,
+          "label": "Green diamond: scatter radius",
+          "help": "Ore is spread within this distance around the position. Ignored when exact positions are on.",
+          "unit": "metres",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "greenDiamondOreSpawnAreas.oreSpawnPositions": {
+          "type": "list",
+          "label": "Green diamond: spawn positions",
+          "help": "List of places where this ore can appear, each with a position and a radius.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "greenDiamondOreSpawnAreas.useExactPosition": {
+          "type": "flag",
+          "default": 0,
+          "label": "Green diamond: exact positions",
+          "help": "0 scatters ore randomly within the radius of each position; 1 places it exactly at the position given.",
+          "confidence": "documented"
+        },
+        "blueDiamondOreSpawnAreas.minOreCountInArea": {
+          "type": "int",
+          "default": 1,
+          "label": "Blue diamond: minimum ore count",
+          "help": "The mod refills blue diamond ore when fewer than this many pieces exist across the positions below.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "blueDiamondOreSpawnAreas.maxOreCountInArea": {
+          "type": "int",
+          "default": 5,
+          "label": "Blue diamond: maximum ore count",
+          "help": "Upper limit of blue diamond ore pieces spawned across the positions below. Keep it at or above the minimum.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "blueDiamondOreSpawnAreas.checkTimeIfEnoughItemsInAreaInSeconds": {
+          "type": "int",
+          "default": 10,
+          "label": "Blue diamond: check interval",
+          "help": "How often the mod checks whether enough ore is still there and spawns more if not.",
+          "unit": "seconds",
+          "min": 1,
+          "confidence": "documented"
+        },
+        "blueDiamondOreSpawnAreas.oreSpawnPositions[].position[]": {
+          "type": "number",
+          "default": 13747.5615234375,
+          "label": "Blue diamond: position coordinate",
+          "help": "One coordinate of the position (X, Y, Z).",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "blueDiamondOreSpawnAreas.oreSpawnPositions[].position": {
+          "type": "list",
+          "label": "Blue diamond: position",
+          "help": "World position X, Y, Z. Height is worked out by the mod unless exact positions are on.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "blueDiamondOreSpawnAreas.oreSpawnPositions[].radius": {
+          "type": "int",
+          "default": 10,
+          "label": "Blue diamond: scatter radius",
+          "help": "Ore is spread within this distance around the position. Ignored when exact positions are on.",
+          "unit": "metres",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "blueDiamondOreSpawnAreas.oreSpawnPositions": {
+          "type": "list",
+          "label": "Blue diamond: spawn positions",
+          "help": "List of places where this ore can appear, each with a position and a radius.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "blueDiamondOreSpawnAreas.useExactPosition": {
+          "type": "flag",
+          "default": 0,
+          "label": "Blue diamond: exact positions",
+          "help": "0 scatters ore randomly within the radius of each position; 1 places it exactly at the position given.",
+          "confidence": "documented"
+        },
+        "redDiamondOreSpawnAreas.minOreCountInArea": {
+          "type": "int",
+          "default": 1,
+          "label": "Red diamond: minimum ore count",
+          "help": "The mod refills red diamond ore when fewer than this many pieces exist across the positions below.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "redDiamondOreSpawnAreas.maxOreCountInArea": {
+          "type": "int",
+          "default": 5,
+          "label": "Red diamond: maximum ore count",
+          "help": "Upper limit of red diamond ore pieces spawned across the positions below. Keep it at or above the minimum.",
+          "unit": "pieces",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "redDiamondOreSpawnAreas.checkTimeIfEnoughItemsInAreaInSeconds": {
+          "type": "int",
+          "default": 10,
+          "label": "Red diamond: check interval",
+          "help": "How often the mod checks whether enough ore is still there and spawns more if not.",
+          "unit": "seconds",
+          "min": 1,
+          "confidence": "documented"
+        },
+        "redDiamondOreSpawnAreas.oreSpawnPositions[].position[]": {
+          "type": "number",
+          "default": 7040.52978515625,
+          "label": "Red diamond: position coordinate",
+          "help": "One coordinate of the position (X, Y, Z).",
+          "unit": "metres",
+          "confidence": "documented"
+        },
+        "redDiamondOreSpawnAreas.oreSpawnPositions[].position": {
+          "type": "list",
+          "label": "Red diamond: position",
+          "help": "World position X, Y, Z. Height is worked out by the mod unless exact positions are on.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "redDiamondOreSpawnAreas.oreSpawnPositions[].radius": {
+          "type": "int",
+          "default": 10,
+          "label": "Red diamond: scatter radius",
+          "help": "Ore is spread within this distance around the position. Ignored when exact positions are on.",
+          "unit": "metres",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "redDiamondOreSpawnAreas.oreSpawnPositions": {
+          "type": "list",
+          "label": "Red diamond: spawn positions",
+          "help": "List of places where this ore can appear, each with a position and a radius.",
+          "level": "advanced",
+          "confidence": "documented"
+        },
+        "redDiamondOreSpawnAreas.useExactPosition": {
+          "type": "flag",
+          "default": 0,
+          "label": "Red diamond: exact positions",
+          "help": "0 scatters ore randomly within the radius of each position; 1 places it exactly at the position given.",
+          "confidence": "documented"
+        }
+      },
+      "role": "settings"
+    },
+    {
+      "id": "ringenableconfig",
+      "match": "RingEnableConfig.json",
+      "title": "Enable or disable rings",
+      "summary": "One switch per ring and level. A disabled ring is not available on the server.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "3",
+          "label": "Config version",
+          "help": "Version number the mod writes into this file so it can upgrade older files. Leave it exactly as it is.",
+          "internal": true,
+          "level": "danger",
+          "risk": "Changing it can make the mod reset or reject the file.",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Leave it alone.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "enableTBJOFRingOfPerseveranceLevel1": {
+          "type": "flag",
+          "default": 1,
+          "label": "Perseverance ring level 1",
+          "help": "1 makes the Perseverance ring level 1 available, 0 switches it off.",
+          "confidence": "documented"
+        },
+        "enableTBJOFRingOfPerseveranceLevel2": {
+          "type": "flag",
+          "default": 1,
+          "label": "Perseverance ring level 2",
+          "help": "1 makes the Perseverance ring level 2 available, 0 switches it off.",
+          "confidence": "documented"
+        },
+        "enableTBJOFRingOfPerseveranceLevel3": {
+          "type": "flag",
+          "default": 1,
+          "label": "Perseverance ring level 3",
+          "help": "1 makes the Perseverance ring level 3 available, 0 switches it off.",
+          "confidence": "documented"
+        },
+        "enableTBJOFRingOfLifeLevel1": {
+          "type": "flag",
+          "default": 1,
+          "label": "Life ring level 1",
+          "help": "1 makes the Life ring level 1 available, 0 switches it off.",
+          "confidence": "documented"
+        },
+        "enableTBJOFRingOfLifeLevel2": {
+          "type": "flag",
+          "default": 1,
+          "label": "Life ring level 2",
+          "help": "1 makes the Life ring level 2 available, 0 switches it off.",
+          "confidence": "documented"
+        },
+        "enableTBJOFRingOfLifeLevel3": {
+          "type": "flag",
+          "default": 1,
+          "label": "Life ring level 3",
+          "help": "1 makes the Life ring level 3 available, 0 switches it off.",
+          "confidence": "documented"
+        },
+        "enableTBJOFRingOfAttackLevel1": {
+          "type": "flag",
+          "default": 1,
+          "label": "Attack ring level 1",
+          "help": "1 makes the Attack ring level 1 available, 0 switches it off.",
+          "confidence": "documented"
+        },
+        "enableTBJOFRingOfAttackLevel2": {
+          "type": "flag",
+          "default": 1,
+          "label": "Attack ring level 2",
+          "help": "1 makes the Attack ring level 2 available, 0 switches it off.",
+          "confidence": "documented"
+        },
+        "enableTBJOFRingOfAttackLevel3": {
+          "type": "flag",
+          "default": 1,
+          "label": "Attack ring level 3",
+          "help": "1 makes the Attack ring level 3 available, 0 switches it off.",
+          "confidence": "documented"
+        },
+        "enableTBJOFRingOfDefenseLevel1": {
+          "type": "flag",
+          "default": 1,
+          "label": "Defense ring level 1",
+          "help": "1 makes the Defense ring level 1 available, 0 switches it off.",
+          "confidence": "documented"
+        },
+        "enableTBJOFRingOfDefenseLevel2": {
+          "type": "flag",
+          "default": 1,
+          "label": "Defense ring level 2",
+          "help": "1 makes the Defense ring level 2 available, 0 switches it off.",
+          "confidence": "documented"
+        },
+        "enableTBJOFRingOfDefenseLevel3": {
+          "type": "flag",
+          "default": 1,
+          "label": "Defense ring level 3",
+          "help": "1 makes the Defense ring level 3 available, 0 switches it off.",
+          "confidence": "documented"
+        },
+        "enableTBJOFRingOfDragonBloodLevel1": {
+          "type": "flag",
+          "default": 1,
+          "label": "Dragon Blood ring level 1",
+          "help": "1 makes the Dragon Blood ring level 1 available, 0 switches it off.",
+          "confidence": "documented"
+        },
+        "enableTBJOFRingOfDragonBloodLevel2": {
+          "type": "flag",
+          "default": 1,
+          "label": "Dragon Blood ring level 2",
+          "help": "1 makes the Dragon Blood ring level 2 available, 0 switches it off.",
+          "confidence": "documented"
+        },
+        "enableTBJOFRingOfDragonBloodLevel3": {
+          "type": "flag",
+          "default": 1,
+          "label": "Dragon Blood ring level 3",
+          "help": "1 makes the Dragon Blood ring level 3 available, 0 switches it off.",
+          "confidence": "documented"
+        },
+        "enableTBJOFRingOfOwlLevel1": {
+          "type": "flag",
+          "default": 1,
+          "label": "Owl ring level 1",
+          "help": "1 makes the Owl ring level 1 available, 0 switches it off.",
+          "confidence": "documented"
+        },
+        "enableTBJOFRingOfOwlLevel2": {
+          "type": "flag",
+          "default": 1,
+          "label": "Owl ring level 2",
+          "help": "1 makes the Owl ring level 2 available, 0 switches it off.",
+          "confidence": "documented"
+        },
+        "enableTBJOFRingOfOwlLevel3": {
+          "type": "flag",
+          "default": 1,
+          "label": "Owl ring level 3",
+          "help": "1 makes the Owl ring level 3 available, 0 switches it off.",
+          "confidence": "documented"
+        },
+        "enableTBJOFRingOfEagleEyeLevel1": {
+          "type": "flag",
+          "default": 1,
+          "label": "Eagle Eye ring level 1",
+          "help": "1 makes the Eagle Eye ring level 1 available, 0 switches it off.",
+          "confidence": "documented"
+        },
+        "enableTBJOFRingOfEagleEyeLevel2": {
+          "type": "flag",
+          "default": 1,
+          "label": "Eagle Eye ring level 2",
+          "help": "1 makes the Eagle Eye ring level 2 available, 0 switches it off.",
+          "confidence": "documented"
+        },
+        "enableTBJOFRingOfEagleEyeLevel3": {
+          "type": "flag",
+          "default": 1,
+          "label": "Eagle Eye ring level 3",
+          "help": "1 makes the Eagle Eye ring level 3 available, 0 switches it off.",
+          "confidence": "documented"
+        }
+      },
+      "role": "settings"
+    },
+    {
+      "id": "smelterconfig",
+      "match": "SmelterConfig.json",
+      "title": "Smelter",
+      "summary": "Speed, fuel use and portability of the smelter that turns ore into ingots.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "3",
+          "label": "Config version",
+          "help": "Version number the mod writes into this file so it can upgrade older files. Leave it exactly as it is.",
+          "internal": true,
+          "level": "danger",
+          "risk": "Changing it can make the mod reset or reject the file.",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Leave it alone.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "tickLengthInSeconds": {
+          "type": "int",
+          "default": 3,
+          "label": "Tick length",
+          "help": "Length of one smelting cycle.",
+          "unit": "seconds",
+          "min": 1,
+          "confidence": "documented"
+        },
+        "takeGasPerTick": {
+          "type": "number",
+          "default": 0.5,
+          "label": "Gas per tick",
+          "help": "How much gas the smelter burns each cycle.",
+          "unit": "gas units",
+          "min": 0,
+          "confidence": "documented"
+        },
+        "tickCountToProduceCopper": {
+          "type": "int",
+          "default": 2,
+          "label": "Cycles to smelt copper",
+          "help": "Number of cycles needed to produce copper. Multiply by the tick length for the real time.",
+          "unit": "ticks",
+          "min": 1,
+          "confidence": "documented"
+        },
+        "tickCountToProduceIron": {
+          "type": "int",
+          "default": 5,
+          "label": "Cycles to smelt iron",
+          "help": "Number of cycles needed to produce iron. Multiply by the tick length for the real time.",
+          "unit": "ticks",
+          "min": 1,
+          "confidence": "documented"
+        },
+        "tickCountToProduceSilver": {
+          "type": "int",
+          "default": 10,
+          "label": "Cycles to smelt silver",
+          "help": "Number of cycles needed to produce silver. Multiply by the tick length for the real time.",
+          "unit": "ticks",
+          "min": 1,
+          "confidence": "documented"
+        },
+        "tickCountToProduceGold": {
+          "type": "int",
+          "default": 15,
+          "label": "Cycles to smelt gold",
+          "help": "Number of cycles needed to produce gold. Multiply by the tick length for the real time.",
+          "unit": "ticks",
+          "min": 1,
+          "confidence": "documented"
+        },
+        "staticSmelterNeedsGas": {
+          "type": "flag",
+          "default": 1,
+          "label": "Fixed smelter needs gas",
+          "help": "1 means the fixed smelter needs a gas canister, 0 means it burns nothing.",
+          "confidence": "documented"
+        },
+        "configMode": {
+          "type": "flag",
+          "default": 0,
+          "label": "Portable use",
+          "help": "1 allows the device to be picked up and carried in the hands and inventory; 0 keeps it as a fixed object.",
+          "confidence": "documented"
+        }
+      },
+      "role": "settings"
+    }
+  ]
+}

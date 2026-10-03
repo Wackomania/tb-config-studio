@@ -1,0 +1,1253 @@
+{
+  "schemaVersion": 1,
+  "mod": {
+    "id": "TBSecondHandMarket",
+    "folder": "TBSecondHandMarket",
+    "name": "TB Second Hand Market",
+    "summary": "A player-run market. Players place stalls, list offers and orders and trade items and vehicles with each other, with a bulletin board, global stalls and premium perks.",
+    "coverage": "in-depth",
+    "docs": "https://doc.themodbase.com/TBSecondHandMarket/Readme.html",
+    "sources": [
+      "TBSecondHandMarket/Readme",
+      "TBSecondHandMarket/Configs/BulletinBoard",
+      "TBSecondHandMarket/Configs/DealerPoints",
+      "TBSecondHandMarket/Configs/GeneralConfig",
+      "TBSecondHandMarket/Configs/GlobalStallConfig",
+      "TBSecondHandMarket/Configs/ItemBlackList",
+      "TBSecondHandMarket/Configs/ItemPriceConfig",
+      "TBSecondHandMarket/Configs/ItemsCategory",
+      "TBSecondHandMarket/Configs/ItemWhiteList",
+      "TBSecondHandMarket/Configs/Logger",
+      "TBSecondHandMarket/Configs/StallConfig"
+    ],
+    "notes": "The documentation page for the item whitelist reads like a copy of the blacklist page; its behaviour is unverified."
+  },
+  "files": [
+    {
+      "id": "bulletinboard",
+      "match": "BulletinBoard.json",
+      "title": "Bulletin board",
+      "summary": "Navigation and posting prices of the board.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Format version",
+          "help": "Version number of this file format. The mod uses it to upgrade old files. Never change it.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Never change it; resetting it can make the mod regenerate defaults.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "enableNavigation": {
+          "type": "flag",
+          "default": 1,
+          "label": "Allow navigation to stalls",
+          "help": "Lets players start navigation to a market stall from the bulletin board.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "showMapForMarketStallPositions": {
+          "type": "flag",
+          "default": 1,
+          "label": "Show stall map",
+          "help": "Shows a map of stall positions on the bulletin board.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "maxNavigationDistance": {
+          "type": "int",
+          "default": -1,
+          "label": "Max navigation distance",
+          "help": "Greatest distance a player can navigate to a stall. -1 means any distance.",
+          "confidence": "documented",
+          "unit": "metres",
+          "min": -1,
+          "special": {
+            "-1": "unlimited"
+          }
+        },
+        "priceForPublishOnBulletinBoard": {
+          "type": "int",
+          "default": 100,
+          "label": "Price to publish",
+          "help": "Cost for a normal player to post an offer on the board. -1 makes it free.",
+          "confidence": "documented",
+          "unit": "coins",
+          "min": -1,
+          "special": {
+            "-1": "free"
+          }
+        },
+        "premiumPriceForPublishOnBulletinBoard": {
+          "type": "int",
+          "default": 50,
+          "label": "Premium price to publish",
+          "help": "Cost for a premium player to post an offer. -1 makes it free.",
+          "confidence": "documented",
+          "unit": "coins",
+          "min": -1,
+          "special": {
+            "-1": "free"
+          }
+        }
+      }
+    },
+    {
+      "id": "dealerpoints",
+      "match": "DealerPoints.json",
+      "title": "Global stalls",
+      "summary": "Placement of the shared global market stalls.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "2",
+          "label": "Format version",
+          "help": "Version number of this file format. The mod uses it to upgrade old files. Never change it.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Never change it; resetting it can make the mod regenerate defaults.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "dealerPoints": {
+          "type": "list",
+          "label": "Global stalls",
+          "help": "The global market stalls placed in the world, shared by all players.",
+          "confidence": "documented"
+        },
+        "dealerPoints[].id": {
+          "type": "string",
+          "default": "g8rzznnzya",
+          "label": "Storage id",
+          "help": "Id of the stall storage. Stalls with the same id share one storage.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "dealerPoints[].position": {
+          "type": "list",
+          "label": "Position",
+          "help": "World position [X, Y, Z] of the global stall.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "dealerPoints[].position[]": {
+          "type": "number",
+          "default": 6550.74658203125,
+          "label": "Coordinate value",
+          "help": "One number of an [X, Y, Z] triple: X is east-west, Y is height, Z is north-south on the map.",
+          "unit": "metres",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "dealerPoints[].orientation": {
+          "type": "list",
+          "label": "Orientation",
+          "help": "Facing of the stall as three angles in degrees.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "dealerPoints[].orientation[]": {
+          "type": "number",
+          "default": -48.33723068237305,
+          "label": "Angle value",
+          "help": "One angle of a three-value orientation, in degrees.",
+          "unit": "degrees",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "dealerPoints[].useExactPosition": {
+          "type": "flag",
+          "default": 0,
+          "label": "Use exact position",
+          "help": "0 places the stall on the ground below; 1 uses the coordinates as given.",
+          "typical": "0 or 1",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "dealerPoints[].type": {
+          "type": "classname",
+          "default": "TBSHMGlobalStall_03",
+          "label": "Stall object",
+          "help": "Class name of the stall object.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "dealerPoints[].uniqueName": {
+          "type": "string",
+          "default": "Chernogorsk",
+          "label": "Stall name",
+          "help": "Name for this stall, used in admin tools and lists.",
+          "confidence": "documented"
+        },
+        "dealerPoints[].disableVehicleTrading": {
+          "type": "flag",
+          "default": 0,
+          "label": "Block vehicle trading",
+          "help": "1 stops normal players trading vehicles at this stall.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "dealerPoints[].premiumDisableVehicleTrading": {
+          "type": "flag",
+          "default": 0,
+          "label": "Block vehicle trading (premium)",
+          "help": "1 stops premium players trading vehicles at this stall.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "generalconfig",
+      "match": "GeneralConfig.json",
+      "title": "General settings",
+      "summary": "Premium switch, vehicle search distance and item condition limit.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "3",
+          "label": "Format version",
+          "help": "Version number of this file format. The mod uses it to upgrade old files. Never change it.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Never change it; resetting it can make the mod regenerate defaults.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "enablePremiumFeature": {
+          "type": "flag",
+          "default": 1,
+          "label": "Premium features",
+          "help": "Turns premium player features (bigger limits, lower prices) on or off.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "maxSearchDistanceToVehicle": {
+          "type": "number",
+          "default": 10,
+          "label": "Vehicle search distance",
+          "help": "How far from the stall a vehicle may be when ordering vehicle items.",
+          "confidence": "documented",
+          "unit": "metres",
+          "min": 0
+        },
+        "minOrderHealthValue": {
+          "type": "string",
+          "default": "BadlyDamaged",
+          "label": "Minimum item condition",
+          "help": "Worst condition an item can have in an order. Values run from Pristine through Worn and Damaged to BadlyDamaged and Ruined. Write them as in the existing file (the documentation spells one as \"Badly Damaged\"; the generated file uses BadlyDamaged).",
+          "confidence": "documented",
+          "typical": "Worn, Damaged, BadlyDamaged"
+        }
+      }
+    },
+    {
+      "id": "globalstallconfig",
+      "match": "GlobalStallConfig.json",
+      "title": "Global stall rules",
+      "summary": "Slots, prices, lifetimes and taxes at global stalls.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "4",
+          "label": "Format version",
+          "help": "Version number of this file format. The mod uses it to upgrade old files. Never change it.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Never change it; resetting it can make the mod regenerate defaults.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "pricePerSlot": {
+          "type": "int",
+          "default": 10,
+          "label": "Price per slot",
+          "help": "What a player pays per slot used at the global stall. See the percentage switch.",
+          "confidence": "documented",
+          "min": 0,
+          "unit": "coins or percent"
+        },
+        "pricePerSlotIsInPercentage": {
+          "type": "flag",
+          "default": 0,
+          "label": "Slot price is a percentage",
+          "help": "1 reads the slot price as a percentage instead of coins.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "pricePerSlotPremiumPlayer": {
+          "type": "int",
+          "default": 10,
+          "label": "Premium price per slot",
+          "help": "Slot price for premium players.",
+          "confidence": "documented",
+          "min": 0,
+          "unit": "coins or percent"
+        },
+        "pricePerSlotPremiumPlayerIsInPercentage": {
+          "type": "flag",
+          "default": 0,
+          "label": "Premium slot price is a percentage",
+          "help": "1 reads the premium slot price as a percentage.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "freeSlotsForPlayer": {
+          "type": "int",
+          "default": 50,
+          "label": "Free slots",
+          "help": "Slots a normal player gets without paying.",
+          "confidence": "documented",
+          "min": 0
+        },
+        "maxSlotsForPlayer": {
+          "type": "int",
+          "default": 300,
+          "label": "Max slots",
+          "help": "Most slots a normal player can have across all global stalls.",
+          "confidence": "documented",
+          "min": 0
+        },
+        "freeSlotsForPremiumPlayer": {
+          "type": "int",
+          "default": 100,
+          "label": "Free slots (premium)",
+          "help": "Slots a premium player gets without paying.",
+          "confidence": "documented",
+          "min": 0
+        },
+        "maxSlotsForPremiumPlayer": {
+          "type": "int",
+          "default": 600,
+          "label": "Max slots (premium)",
+          "help": "Most slots a premium player can have.",
+          "confidence": "documented",
+          "min": 0
+        },
+        "maxOrderLifetimeInMinutes": {
+          "type": "int",
+          "default": 10080,
+          "label": "Order lifetime",
+          "help": "How long an order stays active after creation.",
+          "confidence": "documented",
+          "unit": "minutes",
+          "min": 0,
+          "typical": "10080 (one week)"
+        },
+        "maxOrderLifetimeInMinutesPremiumPlayers": {
+          "type": "int",
+          "default": 10080,
+          "label": "Order lifetime (premium)",
+          "help": "Order lifetime for premium players.",
+          "confidence": "documented",
+          "unit": "minutes",
+          "min": 0
+        },
+        "maxOfferLifetimeInMinutes": {
+          "type": "int",
+          "default": 10080,
+          "label": "Offer lifetime",
+          "help": "How long an offer stays active after creation.",
+          "confidence": "documented",
+          "unit": "minutes",
+          "min": 0,
+          "typical": "10080 (one week)"
+        },
+        "maxOfferLifetimeInMinutesPremiumPlayers": {
+          "type": "int",
+          "default": 10080,
+          "label": "Offer lifetime (premium)",
+          "help": "Offer lifetime for premium players.",
+          "confidence": "documented",
+          "unit": "minutes",
+          "min": 0
+        },
+        "sellTaxInPercentageOrder": {
+          "type": "int",
+          "default": 0,
+          "label": "Tax on orders",
+          "help": "Percent the seller pays when filling an order at a global stall. A coin sink.",
+          "confidence": "documented",
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        },
+        "sellTaxInPercentageOffer": {
+          "type": "int",
+          "default": 0,
+          "label": "Tax on offers",
+          "help": "Percent paid when an offer is completed.",
+          "confidence": "documented",
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        },
+        "resetLifetimeOfOrderAfterUpdate": {
+          "type": "flag",
+          "default": 0,
+          "label": "Reset order lifetime on update",
+          "help": "Updating an order restarts its lifetime.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "canResetLifetimeOfOrder": {
+          "type": "flag",
+          "default": 1,
+          "label": "Players may reset order lifetime",
+          "help": "Lets players restart the order timer by hand.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "canResetLifetimeOfOffer": {
+          "type": "flag",
+          "default": 1,
+          "label": "Players may reset offer lifetime",
+          "help": "Lets players restart the offer timer by hand.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "itemblacklist",
+      "match": "ItemBlackList.json",
+      "title": "Item blacklist",
+      "summary": "Items that cannot be traded.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Format version",
+          "help": "Version number of this file format. The mod uses it to upgrade old files. Never change it.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Never change it; resetting it can make the mod regenerate defaults.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "blackListItems": {
+          "type": "list",
+          "label": "Blocked items",
+          "help": "Items that cannot be traded or ordered. Patterns work: exact name, Start*, *End and *part*.",
+          "confidence": "documented"
+        },
+        "blackListItems[]": {
+          "type": "string",
+          "default": "Survivor*",
+          "label": "Blocked item",
+          "help": "One class name or pattern, for example Zmb* for all zombies.",
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "itempriceconfig",
+      "match": "ItemPriceConfig.json",
+      "title": "Price caps",
+      "summary": "Highest price allowed for items.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Format version",
+          "help": "Version number of this file format. The mod uses it to upgrade old files. Never change it.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Never change it; resetting it can make the mod regenerate defaults.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "generalMaxPrice": {
+          "type": "int",
+          "default": -1,
+          "label": "Global price cap",
+          "help": "Highest price allowed for any item. -1 means no cap. Items in the list below use their own cap.",
+          "confidence": "documented",
+          "unit": "coins",
+          "min": -1,
+          "special": {
+            "-1": "no cap"
+          }
+        },
+        "itemMaxPrices": {
+          "type": "list",
+          "default": [],
+          "label": "Per-item price caps",
+          "help": "Price caps for single items; they override the global cap.",
+          "confidence": "documented"
+        },
+        "itemMaxPrices[].itemType": {
+          "label": "Item class",
+          "help": "Class name of the item the cap applies to.",
+          "type": "classname",
+          "confidence": "documented"
+        },
+        "itemMaxPrices[].maxPrice": {
+          "label": "Price cap",
+          "help": "Highest price allowed for this item.",
+          "type": "int",
+          "confidence": "documented",
+          "unit": "coins",
+          "min": 0
+        }
+      }
+    },
+    {
+      "id": "itemscategory",
+      "match": "ItemsCategory.json",
+      "title": "Item categories",
+      "summary": "Categories used to filter listings.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Format version",
+          "help": "Version number of this file format. The mod uses it to upgrade old files. Never change it.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Never change it; resetting it can make the mod regenerate defaults.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "categories": {
+          "type": "list",
+          "label": "Categories",
+          "help": "Item categories used to filter the board and global stall lists.",
+          "confidence": "documented"
+        },
+        "categories[].name": {
+          "type": "string",
+          "default": "Clothes",
+          "label": "Category name",
+          "help": "Name shown to players.",
+          "confidence": "documented"
+        },
+        "categories[].items": {
+          "type": "list",
+          "label": "Items in category",
+          "help": "Class names that belong to this category.",
+          "confidence": "documented"
+        },
+        "categories[].items[]": {
+          "type": "classname",
+          "default": "AirborneMask",
+          "label": "Item class",
+          "help": "One item class name.",
+          "confidence": "documented"
+        }
+      }
+    },
+    {
+      "id": "itemwhitelist",
+      "match": "ItemWhiteList.json",
+      "title": "Item whitelist",
+      "summary": "Optional list of allowed items.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Format version",
+          "help": "Version number of this file format. The mod uses it to upgrade old files. Never change it.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Never change it; resetting it can make the mod regenerate defaults.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "IsEnabled": {
+          "type": "flag",
+          "default": 0,
+          "label": "Whitelist active",
+          "help": "When 1, the whitelist is used. Judging by the file layout only listed items can then be traded; the documentation page is ambiguous (it describes the list as blocking), so test on a copy first.",
+          "typical": "0 or 1",
+          "confidence": "inferred",
+          "risk": "If it acts as an allow list, an empty or wrong list blocks all trading."
+        },
+        "whiteListItems": {
+          "type": "list",
+          "label": "Allowed items",
+          "help": "Class names or patterns (Start*, *End, *part*) of items on the whitelist.",
+          "confidence": "observed"
+        },
+        "whiteListItems[]": {
+          "type": "string",
+          "default": "FullItemName",
+          "label": "Item name",
+          "help": "One class name or pattern.",
+          "confidence": "observed"
+        }
+      }
+    },
+    {
+      "id": "logger",
+      "match": "Logger.json",
+      "title": "Logging",
+      "summary": "CSV and Discord logs for market actions.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "1",
+          "label": "Format version",
+          "help": "Version number of this file format. The mod uses it to upgrade old files. Never change it.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "logBuyStallCSV": {
+          "type": "flag",
+          "default": 0,
+          "label": "CSV log: stall purchases",
+          "help": "Writes a line to a CSV file whenever a stall is bought.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logBuyStallDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord log: stall purchases",
+          "help": "Posts a message whenever a stall is bought, to the address below.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordBuyStallWebhookURL": {
+          "type": "url",
+          "label": "Discord webhook address",
+          "help": "Web address that stall purchases are posted to when the matching Discord switch is on. Treat it like a password: anyone holding it can post to that channel. Leave empty if you do not use it.",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "A wrong or revoked address silently loses the messages."
+        },
+        "logPlaceStallCSV": {
+          "type": "flag",
+          "default": 0,
+          "label": "CSV log: stall placements",
+          "help": "Writes a line to a CSV file whenever a stall is placed.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logPlaceStallDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord log: stall placements",
+          "help": "Posts a message whenever a stall is placed, to the address below.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordPlaceStallWebhookURL": {
+          "type": "url",
+          "label": "Discord webhook address",
+          "help": "Web address that stall placements are posted to when the matching Discord switch is on. Treat it like a password: anyone holding it can post to that channel. Leave empty if you do not use it.",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "A wrong or revoked address silently loses the messages."
+        },
+        "logRemoveStallCSV": {
+          "type": "flag",
+          "default": 0,
+          "label": "CSV log: stall removals",
+          "help": "Writes a line to a CSV file whenever a stall is removed.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logRemoveStallDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord log: stall removals",
+          "help": "Posts a message whenever a stall is removed, to the address below.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordRemoveStallWebhookURL": {
+          "type": "url",
+          "label": "Discord webhook address",
+          "help": "Web address that stall removals are posted to when the matching Discord switch is on. Treat it like a password: anyone holding it can post to that channel. Leave empty if you do not use it.",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "A wrong or revoked address silently loses the messages."
+        },
+        "logAddOfferCSV": {
+          "type": "flag",
+          "default": 0,
+          "label": "CSV log: new offers",
+          "help": "Writes a line to a CSV file whenever an offer is added.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logAddOfferDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord log: new offers",
+          "help": "Posts a message whenever an offer is added, to the address below.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordAddOfferWebhookURL": {
+          "type": "url",
+          "label": "Discord webhook address",
+          "help": "Web address that new offers are posted to when the matching Discord switch is on. Treat it like a password: anyone holding it can post to that channel. Leave empty if you do not use it.",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "A wrong or revoked address silently loses the messages."
+        },
+        "logRemoveOfferCSV": {
+          "type": "flag",
+          "default": 0,
+          "label": "CSV log: offer removals",
+          "help": "Writes a line to a CSV file whenever an offer is removed.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logRemoveOfferDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord log: offer removals",
+          "help": "Posts a message whenever an offer is removed, to the address below.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordRemoveOfferWebhookURL": {
+          "type": "url",
+          "label": "Discord webhook address",
+          "help": "Web address that offer removals are posted to when the matching Discord switch is on. Treat it like a password: anyone holding it can post to that channel. Leave empty if you do not use it.",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "A wrong or revoked address silently loses the messages."
+        },
+        "logAcceptOfferCSV": {
+          "type": "flag",
+          "default": 0,
+          "label": "CSV log: accepted offers",
+          "help": "Writes a line to a CSV file whenever an offer is accepted.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logAcceptOfferDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord log: accepted offers",
+          "help": "Posts a message whenever an offer is accepted, to the address below.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordAcceptOfferWebhookURL": {
+          "type": "url",
+          "label": "Discord webhook address",
+          "help": "Web address that accepted offers are posted to when the matching Discord switch is on. Treat it like a password: anyone holding it can post to that channel. Leave empty if you do not use it.",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "A wrong or revoked address silently loses the messages."
+        },
+        "logAddOrderCSV": {
+          "type": "flag",
+          "default": 0,
+          "label": "CSV log: new orders",
+          "help": "Writes a line to a CSV file whenever an order is created.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logAddOrderDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord log: new orders",
+          "help": "Posts a message whenever an order is created, to the address below.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordAddOrderWebhookURL": {
+          "type": "url",
+          "label": "Discord webhook address",
+          "help": "Web address that new orders are posted to when the matching Discord switch is on. Treat it like a password: anyone holding it can post to that channel. Leave empty if you do not use it.",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "A wrong or revoked address silently loses the messages."
+        },
+        "logRemoveOrderCSV": {
+          "type": "flag",
+          "default": 0,
+          "label": "CSV log: order removals",
+          "help": "Writes a line to a CSV file whenever an order is removed.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logRemoveOrderDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord log: order removals",
+          "help": "Posts a message whenever an order is removed, to the address below.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordRemoveOrderWebhookURL": {
+          "type": "url",
+          "label": "Discord webhook address",
+          "help": "Web address that order removals are posted to when the matching Discord switch is on. Treat it like a password: anyone holding it can post to that channel. Leave empty if you do not use it.",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "A wrong or revoked address silently loses the messages."
+        },
+        "logAcceptOrderCSV": {
+          "type": "flag",
+          "default": 0,
+          "label": "CSV log: accepted orders",
+          "help": "Writes a line to a CSV file whenever an order is accepted.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logAcceptOrderDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord log: accepted orders",
+          "help": "Posts a message whenever an order is accepted, to the address below.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordAcceptOrderWebhookURL": {
+          "type": "url",
+          "label": "Discord webhook address",
+          "help": "Web address that accepted orders are posted to when the matching Discord switch is on. Treat it like a password: anyone holding it can post to that channel. Leave empty if you do not use it.",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "A wrong or revoked address silently loses the messages."
+        },
+        "logGetItemFromOrderCSV": {
+          "type": "flag",
+          "default": 0,
+          "label": "CSV log: items taken from orders",
+          "help": "Writes a line to a CSV file whenever an item is taken from an order.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logGetItemFromOrderDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord log: items taken from orders",
+          "help": "Posts a message whenever an item is taken from an order, to the address below.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordGetItemFromOrderWebhookURL": {
+          "type": "url",
+          "label": "Discord webhook address",
+          "help": "Web address that items taken from orders are posted to when the matching Discord switch is on. Treat it like a password: anyone holding it can post to that channel. Leave empty if you do not use it.",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "A wrong or revoked address silently loses the messages."
+        },
+        "logDeleteItemCSV": {
+          "type": "flag",
+          "default": 0,
+          "label": "CSV log: item deletions",
+          "help": "Writes a line to a CSV file whenever an item is deleted.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logDeleteItemDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord log: item deletions",
+          "help": "Posts a message whenever an item is deleted, to the address below.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordDeleteItemWebhookURL": {
+          "type": "url",
+          "label": "Discord webhook address",
+          "help": "Web address that item deletions are posted to when the matching Discord switch is on. Treat it like a password: anyone holding it can post to that channel. Leave empty if you do not use it.",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "A wrong or revoked address silently loses the messages."
+        },
+        "logAddMoneyCSV": {
+          "type": "flag",
+          "default": 0,
+          "label": "CSV log: money deposits",
+          "help": "Writes a line to a CSV file whenever money is added to a stall.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logAddMoneyDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord log: money deposits",
+          "help": "Posts a message whenever money is added to a stall, to the address below.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordAddMoneyWebhookURL": {
+          "type": "url",
+          "label": "Discord webhook address",
+          "help": "Web address that money deposits are posted to when the matching Discord switch is on. Treat it like a password: anyone holding it can post to that channel. Leave empty if you do not use it.",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "A wrong or revoked address silently loses the messages."
+        },
+        "logRemoveMoneyCSV": {
+          "type": "flag",
+          "default": 0,
+          "label": "CSV log: money withdrawals",
+          "help": "Writes a line to a CSV file whenever money is taken from a stall.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "logRemoveMoneyDiscord": {
+          "type": "flag",
+          "default": 1,
+          "label": "Discord log: money withdrawals",
+          "help": "Posts a message whenever money is taken from a stall, to the address below.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "discordRemoveMoneyWebhookURL": {
+          "type": "url",
+          "label": "Discord webhook address",
+          "help": "Web address that money withdrawals are posted to when the matching Discord switch is on. Treat it like a password: anyone holding it can post to that channel. Leave empty if you do not use it.",
+          "confidence": "documented",
+          "level": "advanced",
+          "risk": "A wrong or revoked address silently loses the messages."
+        }
+      }
+    },
+    {
+      "id": "stallconfigs",
+      "match": "StallConfigs.json",
+      "title": "Player stalls",
+      "summary": "Stall limits, placement areas and the stall types players can buy.",
+      "restart": true,
+      "fields": {
+        "version": {
+          "type": "string",
+          "default": "4",
+          "label": "Format version",
+          "help": "Version number of this file format. The mod uses it to upgrade old files. Never change it.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "isInitialized": {
+          "type": "flag",
+          "default": 1,
+          "label": "Initialised marker",
+          "help": "Set by the mod after it has written the default file. Never change it; resetting it can make the mod regenerate defaults.",
+          "internal": true,
+          "level": "danger",
+          "confidence": "documented"
+        },
+        "maxMarketStallPerUser": {
+          "type": "int",
+          "default": 2,
+          "label": "Stalls per player",
+          "help": "Most stalls one player can have. -1 means unlimited.",
+          "confidence": "documented",
+          "min": -1,
+          "special": {
+            "-1": "unlimited"
+          }
+        },
+        "maxPremiumMarketStallPerUser": {
+          "type": "int",
+          "default": 3,
+          "label": "Stalls per premium player",
+          "help": "Most stalls for a premium player. -1 means unlimited.",
+          "confidence": "documented",
+          "min": -1,
+          "special": {
+            "-1": "unlimited"
+          }
+        },
+        "maxMarketStallPerServer": {
+          "type": "int",
+          "default": -1,
+          "label": "Stalls on the server",
+          "help": "Most stalls on the whole server. -1 means unlimited.",
+          "confidence": "documented",
+          "min": -1,
+          "special": {
+            "-1": "unlimited"
+          }
+        },
+        "timeInMinutesThatOwnerHasAfterLifetimeIsExpired": {
+          "type": "int",
+          "default": 60,
+          "label": "Grace period after expiry",
+          "help": "Time the owner has to collect items once a stall expires.",
+          "confidence": "documented",
+          "unit": "minutes",
+          "min": 0
+        },
+        "playerCanOnlyPlaceMarketStallInWhitelistAreas": {
+          "type": "flag",
+          "default": 0,
+          "label": "Only place in whitelist areas",
+          "help": "1 limits stall placement to the whitelist areas. Do not switch on together with the blacklist option.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "whitelistAreas": {
+          "type": "list",
+          "label": "Whitelist areas",
+          "help": "Circular areas where stalls may be placed.",
+          "confidence": "documented"
+        },
+        "whitelistAreas[].name": {
+          "type": "string",
+          "default": "Cherno 1",
+          "label": "Area name",
+          "help": "Name of the area.",
+          "confidence": "documented"
+        },
+        "whitelistAreas[].position": {
+          "type": "list",
+          "label": "Area position",
+          "help": "Centre of the area [X, Y, Z].",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "whitelistAreas[].position[]": {
+          "type": "number",
+          "default": 6588.37744140625,
+          "label": "Coordinate value",
+          "help": "One number of an [X, Y, Z] triple: X is east-west, Y is height, Z is north-south on the map.",
+          "unit": "metres",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "whitelistAreas[].radius": {
+          "type": "int",
+          "default": 20,
+          "label": "Area radius",
+          "help": "Radius of the area.",
+          "confidence": "documented",
+          "unit": "metres",
+          "min": 0
+        },
+        "playerCanOnlyPlaceMarketStallInNonBlacklistAreas": {
+          "type": "flag",
+          "default": 0,
+          "label": "Block blacklist areas",
+          "help": "1 stops stall placement inside the blacklist areas. Do not switch on together with the whitelist option.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "blacklistAreas": {
+          "type": "list",
+          "label": "Blacklist areas",
+          "help": "Circular areas where stalls may not be placed.",
+          "confidence": "documented"
+        },
+        "blacklistAreas[].name": {
+          "type": "string",
+          "default": "Cherno Blacklist 1",
+          "label": "Area name",
+          "help": "Name of the area.",
+          "confidence": "documented"
+        },
+        "blacklistAreas[].position": {
+          "type": "list",
+          "label": "Area position",
+          "help": "Centre of the area [X, Y, Z].",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "blacklistAreas[].position[]": {
+          "type": "number",
+          "default": 6588.37744140625,
+          "label": "Coordinate value",
+          "help": "One number of an [X, Y, Z] triple: X is east-west, Y is height, Z is north-south on the map.",
+          "unit": "metres",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "blacklistAreas[].radius": {
+          "type": "int",
+          "default": 20,
+          "label": "Area radius",
+          "help": "Radius of the area.",
+          "confidence": "documented",
+          "unit": "metres",
+          "min": 0
+        },
+        "stalls": {
+          "type": "list",
+          "label": "Stall types",
+          "help": "The stall types players can buy and place, with their sizes, lifetimes and prices.",
+          "confidence": "documented"
+        },
+        "stalls[].id": {
+          "type": "string",
+          "default": "p5go6zi0ch",
+          "label": "Stall id",
+          "help": "Unique id for this stall type; any random text.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "stalls[].type": {
+          "type": "classname",
+          "default": "TBSHMStand_01_Kit",
+          "label": "Stall kit class",
+          "help": "Class name of the stall kit item.",
+          "confidence": "documented",
+          "level": "advanced"
+        },
+        "stalls[].slotCount": {
+          "type": "int",
+          "default": 100,
+          "label": "Slots",
+          "help": "Inventory slots of the stall.",
+          "confidence": "documented",
+          "min": 0
+        },
+        "stalls[].premiumExtraSlotCount": {
+          "type": "int",
+          "default": 50,
+          "label": "Extra slots (premium)",
+          "help": "Slots added for premium players.",
+          "confidence": "documented",
+          "min": 0
+        },
+        "stalls[].lifetimeInMinutes": {
+          "type": "int",
+          "default": 360,
+          "label": "Lifetime",
+          "help": "Minutes until the stall disappears.",
+          "confidence": "documented",
+          "unit": "minutes",
+          "min": 0
+        },
+        "stalls[].premiumExtraLifetimeInMinutes": {
+          "type": "int",
+          "default": 120,
+          "label": "Extra lifetime (premium)",
+          "help": "Minutes added to the lifetime for premium players.",
+          "confidence": "documented",
+          "unit": "minutes",
+          "min": 0
+        },
+        "stalls[].price": {
+          "type": "int",
+          "default": 2000,
+          "label": "Price",
+          "help": "Cost to place the stall.",
+          "confidence": "documented",
+          "unit": "coins",
+          "min": 0
+        },
+        "stalls[].premiumPriceReduce": {
+          "type": "int",
+          "default": 500,
+          "label": "Premium discount",
+          "help": "Amount taken off the price for premium players.",
+          "confidence": "documented",
+          "unit": "coins",
+          "min": 0
+        },
+        "stalls[].priceForTimeExtension": {
+          "type": "int",
+          "default": -1,
+          "label": "Extension price",
+          "help": "Cost to extend the lifetime. -1 turns extensions off.",
+          "confidence": "documented",
+          "unit": "coins",
+          "min": -1,
+          "special": {
+            "-1": "off"
+          }
+        },
+        "stalls[].durationInMinutesForTimeExtension": {
+          "type": "int",
+          "default": -1,
+          "label": "Extension length",
+          "help": "Minutes added per extension. -1 turns extensions off.",
+          "confidence": "documented",
+          "unit": "minutes",
+          "min": -1,
+          "special": {
+            "-1": "off"
+          }
+        },
+        "stalls[].disableVehicleTrading": {
+          "type": "flag",
+          "default": 0,
+          "label": "Block vehicle trading",
+          "help": "1 stops normal players trading vehicles at this stall.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        },
+        "stalls[].premiumDisableVehicleTrading": {
+          "type": "flag",
+          "default": 0,
+          "label": "Block vehicle trading (premium)",
+          "help": "1 stops premium players trading vehicles at this stall.",
+          "typical": "0 or 1",
+          "confidence": "documented"
+        }
+      }
+    }
+  ]
+}
