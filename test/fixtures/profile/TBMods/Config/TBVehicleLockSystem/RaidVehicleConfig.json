@@ -1,0 +1,25 @@
+{
+    "version": "1",
+    "vehiclesCanBeRaided": 1,
+    "needToolForRaid": 1,
+    "carRaidTimeInSeconds": 600,
+    "chanceToRaid": 20,
+    "carRaidTools": [
+        {
+            "toolType": "Screwdriver",
+            "quote": 30,
+            "damage": 100,
+            "minHealth": 1,
+            "timeInSeconds": 300,
+            "vehicleTypes": []
+        },
+        {
+            "toolType": "Lockpick",
+            "quote": 50,
+            "damage": 100,
+            "minHealth": 1,
+            "timeInSeconds": 150,
+            "vehicleTypes": []
+        }
+    ]
+}

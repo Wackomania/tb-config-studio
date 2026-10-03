@@ -1,0 +1,16 @@
+{
+    "version": "1",
+    "isInitialized": 1,
+    "vehicleSizes": {
+        "Truck_01_Covered": [
+            3.0,
+            3.5,
+            7.0
+        ],
+        "default": [
+            4.0,
+            2.0,
+            4.0
+        ]
+    }
+}

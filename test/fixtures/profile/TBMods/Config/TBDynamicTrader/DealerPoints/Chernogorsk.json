@@ -1,0 +1,124 @@
+{
+    "uniqueName": "Chernogorsk",
+    "version": "7",
+    "displayName": "Chernogorsk trader",
+    "sellTax": 0.0,
+    "acceptOnlyCash": 0,
+    "playSound": 1,
+    "gender": "m",
+    "minSoundTime": 15,
+    "maxSoundTime": 60,
+    "enabledSounds": [],
+    "positions": [
+        {
+            "position": [
+                6560.0,
+                6.0,
+                2468.0
+            ],
+            "orientation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "useExactPosition": 0,
+            "name": "Cherno docks",
+            "enableNotification": 1,
+            "showNameInNotification": 1,
+            "vehicleSpawnPosition": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "vehicleSpawnOrientation": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        },
+        {
+            "position": [
+                10300.0,
+                6.0,
+                2010.0
+            ],
+            "orientation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "useExactPosition": 0,
+            "name": "Elektro",
+            "enableNotification": 1,
+            "showNameInNotification": 1,
+            "vehicleSpawnPosition": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "vehicleSpawnOrientation": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    ],
+    "useExactPosition": 0,
+    "useUTCTime": 0,
+    "type": "TBDTTraderMachine",
+    "minMoveTimeMinutes": 5,
+    "maxMoveTimeMinutes": 10,
+    "useTraderChar": 0,
+    "traderCharType": "",
+    "traderCharAttachments": {},
+    "openTimes": [],
+    "safeZoneEnabled": 1,
+    "safeZoneRadius": 60.0,
+    "safeZoneTimeout": 10,
+    "safeZoneEnableArmband": 0,
+    "safeZoneRemoveAnimals": 1,
+    "safeZoneRemoveInfected": 1,
+    "safeZoneRemoveEAI": 1,
+    "safeZoneCleanUp": 0,
+    "currentPosition": {
+        "position": [
+            6560.0,
+            6.0,
+            2468.0
+        ],
+        "orientation": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "useExactPosition": 0,
+        "name": "Cherno docks",
+        "enableNotification": 1,
+        "showNameInNotification": 1,
+        "vehicleSpawnPosition": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "vehicleSpawnOrientation": [
+            0.0,
+            0.0,
+            0.0
+        ]
+    },
+    "nextMoveTime": {
+        "year": 2026,
+        "month": 9,
+        "day": 27,
+        "hour": 22,
+        "minute": 45,
+        "second": 47,
+        "inSeconds": 25742387
+    },
+    "uniqueFileNames": [
+        "Apple",
+        "BandageDressing",
+        "Hatchet",
+        "WaterBottle"
+    ]
+}

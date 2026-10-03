@@ -1,0 +1,9 @@
+{
+    "version": "1",
+    "logBuyCSV": 0,
+    "logBuyDiscord": 1,
+    "discordBuyWebhookURL": "",
+    "logSellCSV": 0,
+    "logSellDiscord": 1,
+    "discordSellWebhookURL": ""
+}

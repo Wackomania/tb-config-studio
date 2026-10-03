@@ -1,0 +1,19 @@
+{
+    "version": "2",
+    "canPackVehicle": 1,
+    "vehicleCargoMustBeEmpty": 1,
+    "handNeedsToBeEmpty": 1,
+    "packTimeInSeconds": 60,
+    "unpackTimeInSeconds": 60,
+    "unpackBlacklistAreas": [
+        {
+            "name": "Example Blacklist Area",
+            "position": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "radius": 10
+        }
+    ]
+}

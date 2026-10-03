@@ -1,0 +1,10 @@
+{
+    "version": "1",
+    "categorieOrder": {
+        "Chernogorsk": [
+            "Food",
+            "Medical",
+            "Tools"
+        ]
+    }
+}

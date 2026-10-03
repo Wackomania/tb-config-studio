@@ -1,0 +1,62 @@
+{
+    "alarmTimeInSeconds": 600,
+    "stopAlarmTimeInSeconds": 600,
+    "extensions": [
+        {
+            "id": "ALARM_SYSTEM",
+            "price": 5000,
+            "currencyType": "default",
+            "requiresDiscordWebhook": 0,
+            "vehicleTypPrices": [
+                {
+                    "carType": "ExampleCar",
+                    "price": 4000,
+                    "currencyType": "default"
+                }
+            ],
+            "disabledVehicleTypes": []
+        },
+        {
+            "id": "PACK_VEHICLE",
+            "price": 5000,
+            "currencyType": "default",
+            "requiresDiscordWebhook": 0,
+            "vehicleTypPrices": [
+                {
+                    "carType": "ExampleCar",
+                    "price": 4000,
+                    "currencyType": "default"
+                }
+            ],
+            "disabledVehicleTypes": []
+        },
+        {
+            "id": "DISCORD_RAID_ALERT",
+            "price": 5000,
+            "currencyType": "default",
+            "requiresDiscordWebhook": 1,
+            "vehicleTypPrices": [
+                {
+                    "carType": "ExampleCar",
+                    "price": 4000,
+                    "currencyType": "default"
+                }
+            ],
+            "disabledVehicleTypes": []
+        },
+        {
+            "id": "DISCORD_SHORT_CIRCUIT_ALERT",
+            "price": 5000,
+            "currencyType": "default",
+            "requiresDiscordWebhook": 1,
+            "vehicleTypPrices": [
+                {
+                    "carType": "ExampleCar",
+                    "price": 4000,
+                    "currencyType": "default"
+                }
+            ],
+            "disabledVehicleTypes": []
+        }
+    ]
+}

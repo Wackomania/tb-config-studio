@@ -1,0 +1,40 @@
+{
+    "version": "16",
+    "isInitialized": 1,
+    "admins": {
+        "Add here Steam Or DayZ ID": {
+            "dailyRewardAdmin": 0,
+            "realEstateAdmin": 0,
+            "carDealerAdmin": 0,
+            "basicNeedsAdmin": 0,
+            "deathInsurance": 0,
+            "secondHandMarket": 0,
+            "revivePlayer": 0,
+            "jewelsOfSurvival": 0,
+            "warParty": 0,
+            "carry": 0,
+            "dynamicDealer": 0,
+            "survivorLuck": 0,
+            "staticLightsAdmin": 0,
+            "vehicleLockSystem": 0,
+            "notes": ""
+        },
+        "7656119XXXXXXXXX1": {
+            "dailyRewardAdmin": 1,
+            "realEstateAdmin": 1,
+            "carDealerAdmin": 1,
+            "basicNeedsAdmin": 1,
+            "deathInsurance": 1,
+            "secondHandMarket": 1,
+            "revivePlayer": 1,
+            "jewelsOfSurvival": 1,
+            "warParty": 1,
+            "carry": 1,
+            "dynamicDealer": 1,
+            "survivorLuck": 1,
+            "staticLightsAdmin": 1,
+            "vehicleLockSystem": 1,
+            "notes": "owner test account (DayzHUB Console TB test)"
+        }
+    }
+}

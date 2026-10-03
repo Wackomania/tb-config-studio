@@ -1,0 +1,26 @@
+{
+    "version": "1",
+    "vehiclesCanBeShortCircuited": 1,
+    "needToolForShortCircuit": 0,
+    "shortCircuitTimeInSeconds": 300,
+    "repairShortCircuitTimeInSeconds": 30,
+    "chanceToShortCircuit": 20,
+    "shortCircuitTools": [
+        {
+            "toolType": "Screwdriver",
+            "quote": 30,
+            "damage": 100,
+            "minHealth": 1,
+            "timeInSeconds": 300,
+            "vehicleTypes": []
+        },
+        {
+            "toolType": "Lockpick",
+            "quote": 50,
+            "damage": 100,
+            "minHealth": 1,
+            "timeInSeconds": 150,
+            "vehicleTypes": []
+        }
+    ]
+}

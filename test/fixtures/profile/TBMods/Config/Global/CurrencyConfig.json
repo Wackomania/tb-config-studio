@@ -1,0 +1,17 @@
+{
+    "version": "2",
+    "isInitialized": 1,
+    "currencyValues": {},
+    "useMoneyFromLBMasterATM": 0,
+    "currencies": [
+        {
+            "uniqueName": "default",
+            "displayName": "default",
+            "currencyValues": {
+                "LB_Money_Test": 1
+            },
+            "useLBMasterATM": 0,
+            "useDCBanking": 0
+        }
+    ]
+}

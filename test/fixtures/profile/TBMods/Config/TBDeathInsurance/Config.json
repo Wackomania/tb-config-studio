@@ -1,0 +1,37 @@
+{
+    "version": "10",
+    "isInitialized": 0,
+    "maximumHeirsForOneInheritance": 2,
+    "insuranceCaseWillDeletedAfterSeconds": 86400,
+    "useLocalTime": 0,
+    "timeInSecondsWhenItemsWillBeTransferAfterDeathOfPlayer": 20,
+    "storeAllItemsInCargoOfMainItems": 0,
+    "globalInsuranceBuyCooldownInSeconds": -1,
+    "defaultInsuranceIDForNewPlayers": "",
+    "maximumFreeInsuranceCountForPlayers": -1,
+    "hideDeleteItemsButton": 0,
+    "insurances": [
+        {
+            "id": "5u6pcgxey2",
+            "price": 1000,
+            "durationInSeconds": 86400,
+            "stayActiveAfterDeath": 0,
+            "insureOnlyItemsThatAreAtTheMomentInCargoAndInventory": 0,
+            "canBuyAgainAfterSeconds": -1,
+            "isPremium": 0,
+            "isBuyable": 1,
+            "saveItemInHands": 1
+        },
+        {
+            "id": "e64zpia1yi",
+            "price": 5000,
+            "durationInSeconds": 604800,
+            "stayActiveAfterDeath": 0,
+            "insureOnlyItemsThatAreAtTheMomentInCargoAndInventory": 0,
+            "canBuyAgainAfterSeconds": -1,
+            "isPremium": 0,
+            "isBuyable": 1,
+            "saveItemInHands": 1
+        }
+    ]
+}

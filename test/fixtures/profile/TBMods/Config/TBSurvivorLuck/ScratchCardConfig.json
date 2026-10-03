@@ -1,0 +1,112 @@
+{
+    "version": "3",
+    "isInitialized": 1,
+    "WinningCombinations": [
+        {
+            "ImageSymbol": "zombie",
+            "Chance": 45,
+            "RewardVariations": [
+                {
+                    "Rewards": [],
+                    "RewardOptions": []
+                },
+                {
+                    "Rewards": [],
+                    "RewardOptions": []
+                }
+            ]
+        },
+        {
+            "ImageSymbol": "appel",
+            "Chance": 30,
+            "RewardVariations": [
+                {
+                    "Rewards": [],
+                    "RewardOptions": []
+                },
+                {
+                    "Rewards": [],
+                    "RewardOptions": []
+                }
+            ]
+        },
+        {
+            "ImageSymbol": "eat",
+            "Chance": 20,
+            "RewardVariations": [
+                {
+                    "Rewards": [],
+                    "RewardOptions": []
+                },
+                {
+                    "Rewards": [],
+                    "RewardOptions": []
+                }
+            ]
+        },
+        {
+            "ImageSymbol": "bottle",
+            "Chance": 15,
+            "RewardVariations": [
+                {
+                    "Rewards": [],
+                    "RewardOptions": []
+                }
+            ]
+        },
+        {
+            "ImageSymbol": "ducktape",
+            "Chance": 10,
+            "RewardVariations": [
+                {
+                    "Rewards": [],
+                    "RewardOptions": []
+                }
+            ]
+        },
+        {
+            "ImageSymbol": "medical",
+            "Chance": 8,
+            "RewardVariations": [
+                {
+                    "Rewards": [],
+                    "RewardOptions": []
+                },
+                {
+                    "Rewards": [],
+                    "RewardOptions": []
+                }
+            ]
+        },
+        {
+            "ImageSymbol": "plum",
+            "Chance": 4,
+            "RewardVariations": [
+                {
+                    "Rewards": [],
+                    "RewardOptions": []
+                }
+            ]
+        },
+        {
+            "ImageSymbol": "tires",
+            "Chance": 2,
+            "RewardVariations": [
+                {
+                    "Rewards": [],
+                    "RewardOptions": []
+                }
+            ]
+        },
+        {
+            "ImageSymbol": "nvg",
+            "Chance": 1,
+            "RewardVariations": [
+                {
+                    "Rewards": [],
+                    "RewardOptions": []
+                }
+            ]
+        }
+    ]
+}

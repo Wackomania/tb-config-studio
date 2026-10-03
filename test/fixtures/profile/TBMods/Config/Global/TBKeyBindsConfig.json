@@ -1,0 +1,21 @@
+{
+    "version": "1",
+    "isInitialized": 1,
+    "keyBinds": [
+        {
+            "name": "UAInputOpenTBDailyReward",
+            "defaultKey": 25,
+            "useServerKeyBind": 0
+        },
+        {
+            "name": "UAInputOpenTBJOFBook",
+            "defaultKey": 24,
+            "useServerKeyBind": 0
+        },
+        {
+            "name": "UAInputOpenTBWarParty",
+            "defaultKey": 48,
+            "useServerKeyBind": 0
+        }
+    ]
+}
