@@ -69,3 +69,7 @@ docs          user guide, schema format, security review, test report, screensho
 ```
 
 The unsigned executables may make Windows SmartScreen show a warning. Nothing in this repository is published or distributed.
+
+## Licence
+
+MIT, see [LICENSE](LICENSE). This applies to the source code of TB Config Studio. TheModBase and its mods are not covered: they belong to their author, and this project is not affiliated with them.
